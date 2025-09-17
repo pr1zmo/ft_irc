@@ -1,4 +1,6 @@
-ircserv
+/tests
+/.vscode
 *.o
 *.a
-.vscode
+ircserv
+/docs

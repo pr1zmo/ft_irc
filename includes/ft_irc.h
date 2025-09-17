@@ -20,6 +20,9 @@
 # include <iomanip>
 # include <fstream>
 # include <cerrno>
+# include <exception>
+# include "Server.hpp"
+# include "Client.hpp"
 
 # define MAX_CLIENTS 1024
 # define MAX_EVENTS 128
@@ -27,5 +30,10 @@
 # define DEFAULT_PORT 6667
 
 using namespace std;
+
+int ft_error(int err, const string &msg);
+void add_fd(int epfd, int fd, uint32_t events);
+void mod_fd(int epfd, int fd, uint32_t events);
+void del_and_close(int epfd, int fd);
 
 #endif
