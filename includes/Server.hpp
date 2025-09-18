@@ -4,6 +4,8 @@
 #include <iostream>
 #include "ft_irc.h"
 
+int ft_error(int err, const std::string &msg);
+
 class Client;
 
 class Server {
@@ -14,16 +16,14 @@ class Server {
 		int			_maxClients;
 	public:
 		Server();
-		Server(const Server& other);
-		Server& operator=(const Server& other);
+		Server(int port, int maxClients);
 		~Server();
 
 		class ServerFailedException : public std::exception {
 		public:
 			explicit ServerFailedException(const std::string& msg)
-				: message_("Server failed to start => " + msg) {}
+				: message_("Server failed to start => ") {ft_error(errno, msg);}
 
-			// must match base: throw()
 			virtual const char* what() const throw() {
 				return message_.c_str();
 			}
@@ -35,7 +35,7 @@ class Server {
 			std::string message_;
 		};
 
-		void startServer(int port);
+		void startServer(int epoll_fd, std::map<int, Client>& clients);
 		int getServerSocket() const { return _serverSocket; }
 		int getPort() const { return _port; }
 

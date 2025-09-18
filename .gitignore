@@ -4,3 +4,7 @@
 *.a
 ircserv
 /docs
+/irc_tester
+corr_irc
+/irc-tester
+meh.sh

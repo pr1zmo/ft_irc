@@ -2,36 +2,20 @@
 #include <iostream>
 
 Server::Server()
-	: _serverSocket(-1), _port(DEFAULT_PORT), _maxClients(MAX_CLIENTS), _serverAddr()
+	: _serverSocket(-1), _port(0), _maxClients(0), _serverAddr()
 {
 }
 
-Server::Server(const Server& other)
-	// : _target(other._target)
+Server::Server(int port, int maxClients)
+	: _serverSocket(-1), _port(port), _maxClients(maxClients), _serverAddr()
 {
-	*this = other;
-}
-
-Server& Server::operator=(const Server& other) {
-	// if (this != &other) {
-	// 	this->type = other.type;
-	// 	this->_target = other._target;
-	// }
-	return *this;
-}
-
-Server::~Server() {
-}
-
-void Server::startServer(int port) {
-
 	_serverAddr.sin_family = AF_INET;
 	_serverAddr.sin_addr.s_addr = INADDR_ANY;
 	_serverAddr.sin_port = htons(port);
 
 	if ((_serverSocket = socket(AF_INET, SOCK_STREAM, 0)) < 3)
 		throw ServerFailedException("socket");
-	cout << "Socket: " << _serverSocket << endl;
+	std::cout << "Socket: " << _serverSocket << std::endl;
 
 	if (fcntl(_serverSocket, F_SETFD, O_NONBLOCK) < 0){
 		throw ServerFailedException("fcntl");
@@ -43,6 +27,48 @@ void Server::startServer(int port) {
 		throw ServerFailedException("bind");
 	if (listen(_serverSocket, 3) < 0)
 		throw ServerFailedException("listen");
+}
+
+Server::~Server() {
+}
+
+void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
+	epoll_event events[MAX_EVENTS];
+
+	for (;;)
+	{
+		int ec_ = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+		if (ec_ == -1) {
+			if (errno == EINTR)
+				continue; // Interrupted by signal, retry
+			ft_error(errno, "epoll_wait");
+			break;
+		}
+
+		for (int i = 0; i < ec_; i++) {
+			int fd = events[i].data.fd;
+			int cli_fd;
+			if (fd == getServerSocket()) {
+				cli_fd = initConnection(clients);
+				if (cli_fd != -1) {
+					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET);
+				}
+			} else if (events[i].events & EPOLLIN) {
+				if (handleCmd(fd, this->_serverSocket) < 0) {
+					del_and_close(epoll_fd, fd);
+					clients.erase(clients.find(fd));
+				}
+			}
+			else if (events[i].events & EPOLLOUT) {
+				// Handle writable event if needed
+			}
+			else {
+				// error condition
+				del_and_close(epoll_fd, fd);
+				clients.erase(clients.find(fd));
+			}
+		}
+	}
 }
 
 int Server::initConnection(std::map<int, Client> &clients){

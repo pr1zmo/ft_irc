@@ -23,8 +23,9 @@
 # include <exception>
 # include "Server.hpp"
 # include "Client.hpp"
+# include "Commands.hpp"
 
-# define MAX_CLIENTS 1024
+# define MAX_CLIENTS 1022
 # define MAX_EVENTS 128
 # define BUFFER_SIZE 512
 # define DEFAULT_PORT 6667
@@ -35,5 +36,6 @@ int ft_error(int err, const string &msg);
 void add_fd(int epfd, int fd, uint32_t events);
 void mod_fd(int epfd, int fd, uint32_t events);
 void del_and_close(int epfd, int fd);
+int handleCmd(int fd, int server_fd);
 
 #endif
