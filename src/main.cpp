@@ -2,28 +2,6 @@
 
 #include "ft_irc.h"
 
-int handleCmd(int fd, int server_fd) {
-
-	char buffer[BUFFER_SIZE];
-	int bytes_read = recv(fd, buffer, sizeof(buffer), 0);
-	if (bytes_read <= 0) {
-		if (bytes_read == 0 || errno != EAGAIN) {
-			// Connection closed or error
-			cout << "Client disconnected: fd=" << fd << endl;
-			close(fd);
-			return -1;
-		}
-	} else {
-		buffer[bytes_read] = '\0'; // Null-terminate the received data
-		cout << "Received from fd=" << fd << ": " << buffer << endl;
-
-		// Echo back the received message (for testing purposes)
-		std::string response = "Echo: " + std::string(buffer);
-		// send(fd, response.c_str(), response.size(), 0);
-	}
-	return 0;
-}
-
 int ft_error(int err, const string &msg)
 {
 	cerr << "Error: " << msg << ": (" << strerror(err) << ")" << endl;
@@ -64,7 +42,7 @@ int main(int ac, char *av[]){
 	
 	try{
 		std::map<int, Client> clients;
-		Server server(std::atoi(av[1]), 10);
+		Server server(std::atoi(av[1]), 10, std::string(av[2]));
 		int ep_fd = server.setEpoll();
 		server.startServer(ep_fd, clients);
 	}

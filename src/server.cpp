@@ -2,13 +2,17 @@
 #include <iostream>
 
 Server::Server()
-	: _serverSocket(-1), _port(0), _maxClients(0), _serverAddr()
+	: _serverSocket(-1), _port(0), _maxClients(0), _serverAddr(), _password("")
 {
 }
 
-Server::Server(int port, int maxClients)
-	: _serverSocket(-1), _port(port), _maxClients(maxClients), _serverAddr()
+Server::Server(int port, int maxClients, const std::string &password)
+	: _serverSocket(-1), _port(port), _maxClients(maxClients), _serverAddr(), _password(password)
 {
+	if (!_password.empty()) {
+		_locked = true;
+	}
+
 	_serverAddr.sin_family = AF_INET;
 	_serverAddr.sin_addr.s_addr = INADDR_ANY;
 	_serverAddr.sin_port = htons(port);
@@ -54,7 +58,7 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET);
 				}
 			} else if (events[i].events & EPOLLIN) {
-				if (handleCmd(fd, this->_serverSocket) < 0) {
+				if (handleCmd(clients[fd]) < 0) {
 					del_and_close(epoll_fd, fd);
 					clients.erase(clients.find(fd));
 				}
@@ -112,4 +116,76 @@ int Server::setEpoll() {
 	add_fd(epoll_fd, _serverSocket, EPOLLIN);
 
 	return epoll_fd;
+}
+
+int checkCommand(const std::string &msg) {
+	Command command;
+	// Basic validation: command should not be empty and should end with \r\n
+
+	if (msg.empty() || msg.find("\r\n") == std::string::npos) {
+		return 0; // Invalid format
+	}
+
+	std::string firstWord = msg.substr(0, msg.find(' '));
+
+	for (size_t i = 0; i < command.validCmds.size(); ++i) {
+		if (firstWord == command.validCmds[i]) {
+			return 1; // Valid command
+		}
+	}
+	return 0;
+}
+
+int Server::handleCmd(Client &cli) {
+	int fd = cli.getFd();
+	char buffer[BUFFER_SIZE];
+	int bytes_read = recv(fd, buffer, sizeof(buffer), 0);
+	if (bytes_read <= 0) {
+		if (bytes_read == 0 || errno != EAGAIN) {
+			cout << "Client disconnected: fd=" << fd << endl;
+			close(fd);
+			return -1;
+		}
+	} else {
+		buffer[bytes_read] = '\0';
+		int tries = 0;
+		std::string msg(buffer);
+		cout << "Client: " << fd;
+
+		if (!checkCommand(msg)){
+			std::string err = "Invalid command format.\r\n";
+			send(fd, err.c_str(), err.size(), 0);
+			return 0;
+		}
+
+		while (_locked && tries < 3){
+			msg = recv(fd, buffer, sizeof(buffer), 0);
+			if (msg.empty()) {
+				cout << "Client disconnected during auth: fd=" << fd << endl;
+				close(fd);
+				return -1;
+			}
+			std::string pass = msg.substr(0, msg.find("\r\n"));
+			if (pass == _password) {
+				cli._isAuth = true;
+				std::string welcome = "Welcome to the IRC server!\r\n";
+				send(fd, welcome.c_str(), welcome.size(), 0);
+				break;
+			} else {
+				std::string deny = "Authentication failed. Try again.\r\n";
+				send(fd, deny.c_str(), deny.size(), 0);
+				tries++;
+				continue;
+			}
+		}
+		if (_locked && !cli._isAuth) {
+			std::string lock_msg = "Server is locked. Disconnecting.\r\n";
+			send(fd, lock_msg.c_str(), lock_msg.size(), 0);
+			close(fd);
+			return -1;
+		}
+		std::string response = "Echo: " + std::string(buffer);
+		send(fd, response.c_str(), response.size(), 0);
+	}
+	return 0;
 }

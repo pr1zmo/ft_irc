@@ -2,6 +2,11 @@
 
 Command::Command()
 : _size(0), _msg("") {
+	_isOp = 0;
+	std::string cmds[] = {"PASS", "NICK", "USER", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "PING", "PONG", "MODE", "TOPIC", "KICK", "LIST", "NAMES"};
+	for (size_t i = 0; i < sizeof(cmds)/sizeof(cmds[0]); ++i) {
+		validCmds.push_back(cmds[i]);
+	}
 }
 
 Command::~Command() {

@@ -36,6 +36,6 @@ int ft_error(int err, const string &msg);
 void add_fd(int epfd, int fd, uint32_t events);
 void mod_fd(int epfd, int fd, uint32_t events);
 void del_and_close(int epfd, int fd);
-int handleCmd(int fd, int server_fd);
+int handleCmd(int server_fd, Client &cli);
 
 #endif

@@ -10,13 +10,15 @@ class Client;
 
 class Server {
 	private:
-		sockaddr_in	_serverAddr;
-		int			_serverSocket;
-		int			_port;
-		int			_maxClients;
+		sockaddr_in			_serverAddr;
+		int					_serverSocket;
+		int					_port;
+		int					_maxClients;
+		const std::string _password;
+		bool 					_locked;
 	public:
 		Server();
-		Server(int port, int maxClients);
+		Server(int port, int maxClients, const std::string &password);
 		~Server();
 
 		class ServerFailedException : public std::exception {
@@ -41,6 +43,7 @@ class Server {
 
 		int initConnection(std::map<int, Client>& clients);
 		int setEpoll();
+		int handleCmd(Client &cli);
 };
 
 #endif
