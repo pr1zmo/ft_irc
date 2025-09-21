@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Commands.hpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
+/*   Updated: 2025/09/21 20:57:32 by zelbassa         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef Command_HPP
 #define Command_HPP
 
@@ -38,7 +50,7 @@ class Help {
 	public:
 		std::vector<std::string> full;
 		std::map<std::string, std::vector<std::string> > topics;
-		bool load(std::string &path);
+		bool load();
 		const std::vector<std::string>* getTopic(const std::string& key) const;
 };
 
