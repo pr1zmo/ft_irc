@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/21 20:13:33 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/22 18:15:47 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 				}
 			}
 			else if (events[i].events & EPOLLOUT) {
-				// Handle writable event if needed
+				// handle write: dummy for now
 			}
 			else {
 				// error condition
@@ -95,12 +95,12 @@ int Server::initConnection(std::map<int, Client> &clients){
 	int cli_fd = accept(_serverSocket, reinterpret_cast<struct sockaddr*>(&cli_address), &addrLen);
 	
 	if (cli_fd < 0){
-		// Don't print errors for EAGAIN - it's normal
+		// EAGAIN and EWOULDBLOCK just means we have processed all incoming connections
 		if (errno == EWOULDBLOCK || errno == EAGAIN)
 			return -1;
+		// EINTR means the call was interrupted by a signal before a valid connection arrived
 		if (errno == EINTR)
-			return -1;  // Caller should retry
-		// Print errors for real problems
+			return -1;
 		ft_error(errno, "accept");
 		return -1;
 	}
@@ -112,7 +112,6 @@ int Server::initConnection(std::map<int, Client> &clients){
 		return -1;
 	}
 
-	// Use cli_fd as key instead of cli_count
 	clients[cli_fd] = Client(cli_fd, cli_address);
 	cout << "New client connected: fd=" << cli_fd << endl;
 	return cli_fd;
@@ -135,14 +134,14 @@ int checkCommand(const std::string &msg) {
 	// Basic validation: command should not be empty and should end with \r\n
 
 	if (msg.empty() || msg.find("\r\n") == std::string::npos) {
-		return 0; // Invalid format
+		return 0;
 	}
 
 	std::string firstWord = msg.substr(0, msg.find(' '));
 
 	for (size_t i = 0; i < command.validCmds.size(); ++i) {
 		if (firstWord == command.validCmds[i]) {
-			return 1; // Valid command
+			return 1;
 		}
 	}
 	return 0;
@@ -153,6 +152,7 @@ int Server::handleCmd(Client &cli) {
 	char buffer[BUFFER_SIZE];
 	int bytes_read = recv(fd, buffer, sizeof(buffer), 0);
 	if (bytes_read <= 0) {
+		// EAGAIN means no more data to read
 		if (bytes_read == 0 || errno != EAGAIN) {
 			cout << "Client disconnected: fd=" << fd << endl;
 			close(fd);
@@ -162,7 +162,7 @@ int Server::handleCmd(Client &cli) {
 		buffer[bytes_read] = '\0';
 		int tries = 0;
 		std::string msg(buffer);
-		cout << "Client: " << fd;
+		cout << "Client " << fd << "->sent: " << msg << endl;
 
 		if (!checkCommand(msg)){
 			std::string err = "Invalid command format.\r\n";

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:27 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/21 20:14:28 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/22 15:47:52 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@
 # include <iomanip>
 # include <fstream>
 # include <cerrno>
+# include <istream>
+# include <sstream>
 # include <exception>
 # include "Server.hpp"
 # include "Client.hpp"

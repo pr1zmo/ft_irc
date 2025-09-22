@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/21 20:57:32 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/22 15:46:13 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ class Help {
 		std::vector<std::string> full;
 		std::map<std::string, std::vector<std::string> > topics;
 		bool load();
+		void printUsage() const;
 		const std::vector<std::string>* getTopic(const std::string& key) const;
 };
 
