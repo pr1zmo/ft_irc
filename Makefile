@@ -1,8 +1,8 @@
 NAME = ircserv
 CC = c++
 CFLAGS = -std=c++98 -I./includes -g3
-# CFLAGS+= -fsanitize=address
-# CFLAGS += -Wall -Wextra -Werror
+CFLAGS+= -fsanitize=address
+CFLAGS += -Wall -Wextra -Werror
 SRCS = $(wildcard src/*.cpp)
 RM = rm -f
 

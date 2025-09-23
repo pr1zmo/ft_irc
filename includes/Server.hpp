@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:23 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/21 20:14:24 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/23 11:24:24 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,13 @@ class Client;
 
 class Server {
 	private:
-		sockaddr_in			_serverAddr;
-		int					_serverSocket;
-		int					_port;
-		int					_maxClients;
-		const std::string _password;
-		bool 					_locked;
+		sockaddr_in					_serverAddr;
+		int							_serverSocket;
+		int							_port;
+		int							_maxClients;
+		const std::string 		_password;
+		bool 							_locked;
+		// std::map<int, Client>	_clients;
 	public:
 		Server();
 		Server(int port, int maxClients, const std::string &password);
@@ -56,6 +57,8 @@ class Server {
 		int initConnection(std::map<int, Client>& clients);
 		int setEpoll();
 		int handleCmd(Client &cli);
+
+		void terminate(std::map<int, Client>& clients);
 };
 
 #endif

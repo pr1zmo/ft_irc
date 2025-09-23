@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/22 18:15:47 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/23 14:02:23 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,11 @@
 #include <iostream>
 
 Server::Server()
-	: _serverSocket(-1), _port(0), _maxClients(0), _serverAddr(), _password("")
 {
 }
 
 Server::Server(int port, int maxClients, const std::string &password)
-	: _serverSocket(-1), _port(port), _maxClients(maxClients), _serverAddr(), _password(password)
+	:_port(port), _maxClients(maxClients), _password(password), _locked(false)
 {
 	if (!_password.empty()) {
 		_locked = true;
@@ -38,7 +37,12 @@ Server::Server(int port, int maxClients, const std::string &password)
 	}
 
 	int opt = 1;
-	setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEPORT, &opt, opt);
+	if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+		throw ServerFailedException("setsockopt SO_REUSEADDR");
+	}
+	if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
+		throw ServerFailedException("setsockopt SO_REUSEPORT");
+	}
 	if (bind(_serverSocket, (struct sockaddr *)&_serverAddr, sizeof(_serverAddr)) < 0)
 		throw ServerFailedException("bind");
 	if (listen(_serverSocket, 3) < 0)
@@ -48,10 +52,20 @@ Server::Server(int port, int maxClients, const std::string &password)
 Server::~Server() {
 }
 
+/*
+ * Main server loop using epoll to handle multiple clients
+ * Epoll is set to edge-triggered mode for efficiency
+ * Handles new connections and incoming data
+ * Adds file descriptors to epoll instance
+ * and then waits for events
+ * Notifies when a client sends data or disconnects or is ready to write
+ * In this case we only handle read events
+*/
+
 void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 	epoll_event events[MAX_EVENTS];
 
-	for (;;)
+	while (running)
 	{
 		int ec_ = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		if (ec_ == -1) {
@@ -85,7 +99,16 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 			}
 		}
 	}
+	close(epoll_fd);
+	terminate(clients);
 }
+
+/*
+ * Accepts a new client connection
+ * Sets the new socket to non-blocking mode
+ * Adds the new client to the clients map
+ * Returns the new client's file descriptor or -1 on error
+*/
 
 int Server::initConnection(std::map<int, Client> &clients){
 	struct sockaddr_in cli_address = {};
@@ -117,6 +140,11 @@ int Server::initConnection(std::map<int, Client> &clients){
 	return cli_fd;
 }
 
+/*
+ * Sets up the epoll instance and adds the server socket to it
+ * Returns the epoll file descriptor or -1 on error
+*/
+
 int Server::setEpoll() {
 	int epoll_fd = epoll_create1(0);
 	if (epoll_fd == -1) {
@@ -133,17 +161,25 @@ int checkCommand(const std::string &msg) {
 	Command command;
 	// Basic validation: command should not be empty and should end with \r\n
 
-	if (msg.empty() || msg.find("\r\n") == std::string::npos) {
+	if (msg.empty() || msg.find("\n") == std::string::npos) {
+		std::cerr << "message empty or no \\n" << std::endl;
 		return 0;
 	}
 
-	std::string firstWord = msg.substr(0, msg.find(' '));
+	std::string firstWord;
+
+	for (int i = 0; i < static_cast<int>(msg.size()); i++) {
+		if (msg[i] == ' ' || msg[i] == '\r' || msg[i] == '\n') {
+			break;
+		}
+		firstWord += msg[i];
+	}
 
 	for (size_t i = 0; i < command.validCmds.size(); ++i) {
-		if (firstWord == command.validCmds[i]) {
+		if (firstWord == command.validCmds[i])
 			return 1;
-		}
 	}
+	std::cerr << "Couldn't find command: " << firstWord << std::endl;
 	return 0;
 }
 
@@ -196,8 +232,17 @@ int Server::handleCmd(Client &cli) {
 			close(fd);
 			return -1;
 		}
-		std::string response = "Echo: " + std::string(buffer);
+		std::string response = "Echo: " + std::string(buffer) + "\r\n";
 		send(fd, response.c_str(), response.size(), 0);
 	}
 	return 0;
+}
+
+void Server::terminate(std::map<int, Client>& clients) {
+	std::cout << "Closing server socket: " << std::endl;
+	close(_serverSocket);
+	for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it) {
+		close(it->first);
+	}
+	running = false;
 }

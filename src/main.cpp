@@ -6,13 +6,14 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:00 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/21 20:14:01 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/23 13:38:34 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <netinet/in.h>
 
 #include "ft_irc.h"
+bool running = true;
 
 int ft_error(int err, const string &msg)
 {
@@ -21,7 +22,7 @@ int ft_error(int err, const string &msg)
 }
 
 void add_fd(int epfd, int fd, uint32_t events) {
-	struct epoll_event ev = {0};
+	struct epoll_event ev;
 	ev.events = events;
 	ev.data.fd = fd;
 	if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1) {
@@ -31,7 +32,7 @@ void add_fd(int epfd, int fd, uint32_t events) {
 }
 
 void mod_fd(int epfd, int fd, uint32_t events) {
-	struct epoll_event ev = {0};
+	struct epoll_event ev;
 	ev.events = events;
 	ev.data.fd = fd;
 	if (epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev) == -1) {
@@ -44,8 +45,26 @@ void del_and_close(int epfd, int fd) {
 	close(fd);
 }
 
+void on_signal(int sig) {
+	if (sig == SIGINT || sig == SIGTERM) {
+		running = false;
+	}
+}
+
+static void install_handlers() {
+	struct sigaction sa;
+	std::memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = &on_signal;
+	sigemptyset(&sa.sa_mask);
+
+	sigaction(SIGINT,  &sa, 0);
+	sigaction(SIGTERM, &sa, 0);
+}
+
 int main(int ac, char *av[]){
 	cout << "\n----- FT_IRC SERVER -----\n" << endl;
+
+	install_handlers();
 
 	if (ac != 3) {
 		cerr << "Usage: ./ircserv [PORT] [PASSWORD]" << endl;

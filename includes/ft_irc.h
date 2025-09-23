@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:27 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/22 15:47:52 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/23 11:13:00 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,14 @@
 # define BUFFER_SIZE 512
 # define DEFAULT_PORT 6667
 
+extern bool running;
+
 using namespace std;
 
 int ft_error(int err, const string &msg);
 void add_fd(int epfd, int fd, uint32_t events);
 void mod_fd(int epfd, int fd, uint32_t events);
 void del_and_close(int epfd, int fd);
-int handleCmd(int server_fd, Client &cli);
+// int handleCmd(int server_fd, Client &cli);
 
 #endif

@@ -6,18 +6,21 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:11 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/21 20:14:12 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/23 13:24:56 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_irc.h"
 
 Command::Command()
-: _size(0), _msg("") {
-	_isOp = 0;
-	std::string cmds[] = {"PASS", "NICK", "USER", "OPER", "QUIT", "JOIN", "PART", "PRIVMSG", "NOTICE", "PING", "PONG", "MODE", "TOPIC", "KICK", "LIST", "NAMES"};
-	for (size_t i = 0; i < sizeof(cmds)/sizeof(cmds[0]); ++i) {
-		validCmds.push_back(cmds[i]);
+: _size(0), _msg(""), _isOp(0) {
+	std::string cmds = "PASS NICK USER OPER MODE QUIT JOIN PART TOPIC NAMES LIST INVITE KICK PRIVMSG NOTICE PING PONG WHOIS WHO MODE AWAY";
+
+	for (size_t i = 0; i < cmds.size(); ) {
+		size_t j = cmds.find(' ', i);
+		if (j == std::string::npos) j = cmds.size();
+		validCmds.push_back(cmds.substr(i, j - i));
+		i = j + 1;
 	}
 }
 

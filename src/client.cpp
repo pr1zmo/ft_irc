@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/21 20:14:17 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/23 11:33:11 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Client::Client(){
 }
 
 Client::Client(int fd, struct sockaddr_in cli_addr)
-	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _isAuth(false), _cmd(NULL) {
+	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _cmd(NULL), _isAuth(false) {
 }
 
 Client::~Client() {
@@ -35,6 +35,7 @@ Client& Client::operator=(const Client &other) {
 }
 
 bool Client::authenticate(const std::string &msg) {
+	(void)msg;
 	// Simple authentication logic for demonstration
 	return true; // Always authenticate successfully for now
 }
