@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/23 14:02:23 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/25 18:16:04 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,8 @@ Server::Server()
 Server::Server(int port, int maxClients, const std::string &password)
 	:_port(port), _maxClients(maxClients), _password(password), _locked(false)
 {
-	if (!_password.empty()) {
+	if (!_password.empty())
 		_locked = true;
-	}
 
 	_serverAddr.sin_family = AF_INET;
 	_serverAddr.sin_addr.s_addr = INADDR_ANY;
@@ -32,19 +31,16 @@ Server::Server(int port, int maxClients, const std::string &password)
 		throw ServerFailedException("socket");
 	std::cout << "Socket: " << _serverSocket << std::endl;
 
-	if (fcntl(_serverSocket, F_SETFD, O_NONBLOCK) < 0){
+	if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) < 0)
 		throw ServerFailedException("fcntl");
-	}
 
 	int opt = 1;
-	if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+	if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
 		throw ServerFailedException("setsockopt SO_REUSEADDR");
-	}
-	if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
-		throw ServerFailedException("setsockopt SO_REUSEPORT");
-	}
+
 	if (bind(_serverSocket, (struct sockaddr *)&_serverAddr, sizeof(_serverAddr)) < 0)
 		throw ServerFailedException("bind");
+
 	if (listen(_serverSocket, 3) < 0)
 		throw ServerFailedException("listen");
 }
@@ -70,11 +66,11 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 		int ec_ = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		if (ec_ == -1) {
 			if (errno == EINTR)
-				continue; // Interrupted by signal, retry
+			continue; // Interrupted by signal, retry
 			ft_error(errno, "epoll_wait");
 			break;
 		}
-
+		
 		for (int i = 0; i < ec_; i++) {
 			int fd = events[i].data.fd;
 			int cli_fd;
@@ -84,18 +80,29 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET);
 				}
 			} else if (events[i].events & EPOLLIN) {
-				if (handleCmd(clients[fd]) < 0) {
-					del_and_close(epoll_fd, fd);
-					clients.erase(clients.find(fd));
-				}
+				// while(true){
+					int err = handleCmd(clients[fd]);
+					if (err == -1) {
+						del_and_close(epoll_fd, fd);
+						clients.erase(clients.find(fd));
+						break;
+					}
+					else if (err == 0) {
+						// No complete command yet, wait for more data
+						continue;
+					}
+					// break;
+				// }
 			}
 			else if (events[i].events & EPOLLOUT) {
 				// handle write: dummy for now
+				cout << "Ready to write to client: fd=" << fd << endl;
 			}
 			else {
 				// error condition
 				del_and_close(epoll_fd, fd);
 				clients.erase(clients.find(fd));
+				cout << "Epoll error on fd=" << fd << endl;
 			}
 		}
 	}
@@ -128,7 +135,7 @@ int Server::initConnection(std::map<int, Client> &clients){
 		return -1;
 	}
 
-	fcntl(cli_fd, F_SETFD, O_NONBLOCK);
+	fcntl(cli_fd, F_SETFL, O_NONBLOCK);
 	if (clients.size() >= static_cast<size_t>(_maxClients)) {
 		std::cerr << "Max clients reached. Rejecting new connection." << std::endl;
 		close(cli_fd);
@@ -161,10 +168,10 @@ int checkCommand(const std::string &msg) {
 	Command command;
 	// Basic validation: command should not be empty and should end with \r\n
 
-	if (msg.empty() || msg.find("\n") == std::string::npos) {
-		std::cerr << "message empty or no \\n" << std::endl;
-		return 0;
-	}
+	// if (msg.empty() || msg.find("\n") == std::string::npos) {
+	// 	std::cerr << "message empty or no \\n" << std::endl;
+	// 	return 0;
+	// }
 
 	std::string firstWord;
 
@@ -180,62 +187,75 @@ int checkCommand(const std::string &msg) {
 			return 1;
 	}
 	std::cerr << "Couldn't find command: " << firstWord << std::endl;
+	std::cout << "------------------------------" << std::endl;
 	return 0;
 }
+
+void static printBuffer(const std::string& label, const char* buffer, int size) {
+	std::cout << label << " (size=" << size << "): ";
+	for (int i = 0; i < size; i++) {
+		unsigned char c = static_cast<unsigned char>(buffer[i]);
+		if (c == '\r') {
+			std::cout << "\\r";
+		} else if (c == '\n') {
+			std::cout << "\\n";
+		} else if (c == '\t') {
+			std::cout << "\\t";
+		} else if (c < 32 || c > 126) {
+			// Non-printable characters as hex
+			std::cout << "\\x" << std::hex << std::setw(2) << std::setfill('0') << (int)c << std::dec;
+		} else {
+			std::cout << c;
+		}
+	}
+	std::cout << std::endl;
+}
+
+
 
 int Server::handleCmd(Client &cli) {
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
-	int bytes_read = recv(fd, buffer, sizeof(buffer), 0);
+	int bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0);
+
 	if (bytes_read <= 0) {
 		// EAGAIN means no more data to read
-		if (bytes_read == 0 || errno != EAGAIN) {
+		if (errno != EAGAIN && errno != EWOULDBLOCK) {
 			cout << "Client disconnected: fd=" << fd << endl;
 			close(fd);
 			return -1;
 		}
+		return 0;
 	} else {
 		buffer[bytes_read] = '\0';
-		int tries = 0;
-		std::string msg(buffer);
-		cout << "Client " << fd << "->sent: " << msg << endl;
 
-		if (!checkCommand(msg)){
-			std::string err = "Invalid command format.\r\n";
-			send(fd, err.c_str(), err.size(), 0);
-			return 0;
-		}
+		cli._msgBuffer += string(buffer, bytes_read);
+		cli.last_activity = time(NULL);
 
-		while (_locked && tries < 3){
-			msg = recv(fd, buffer, sizeof(buffer), 0);
-			if (msg.empty()) {
-				cout << "Client disconnected during auth: fd=" << fd << endl;
-				close(fd);
-				return -1;
-			}
-			std::string pass = msg.substr(0, msg.find("\r\n"));
-			if (pass == _password) {
-				cli._isAuth = true;
-				std::string welcome = "Welcome to the IRC server!\r\n";
-				send(fd, welcome.c_str(), welcome.size(), 0);
-				break;
-			} else {
-				std::string deny = "Authentication failed. Try again.\r\n";
-				send(fd, deny.c_str(), deny.size(), 0);
-				tries++;
-				continue;
-			}
-		}
-		if (_locked && !cli._isAuth) {
-			std::string lock_msg = "Server is locked. Disconnecting.\r\n";
-			send(fd, lock_msg.c_str(), lock_msg.size(), 0);
+		printBuffer("Raw buffer received", buffer, bytes_read);
+		printBuffer("Complete message buffer", cli._msgBuffer.c_str(), cli._msgBuffer.size());
+
+		if (cli._msgBuffer.size() > BUFFER_SIZE) {
+			cli.response("Error: Message too long.\r\n");
 			close(fd);
 			return -1;
 		}
-		std::string response = "Echo: " + std::string(buffer) + "\r\n";
-		send(fd, response.c_str(), response.size(), 0);
+
+		size_t pos;
+		while ((pos = cli._msgBuffer.find("\r\n")) != std::string::npos) {
+			std::string single_cmd = cli._msgBuffer.substr(0, pos + 2);
+			cli._msgBuffer.erase(0, pos + 2);
+			
+			printBuffer("Processing command", single_cmd.c_str(), single_cmd.size());
+			
+			if (!checkCommand(single_cmd)) {
+				cli.response("Error : Invalid command.\r\n");
+				continue; // Don't return, process other commands
+			}
+			cli.response("Command received: " + single_cmd);
+		}
 	}
-	return 0;
+	return 1;
 }
 
 void Server::terminate(std::map<int, Client>& clients) {

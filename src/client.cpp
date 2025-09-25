@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/23 11:33:11 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/25 10:22:16 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,4 +38,9 @@ bool Client::authenticate(const std::string &msg) {
 	(void)msg;
 	// Simple authentication logic for demonstration
 	return true; // Always authenticate successfully for now
+}
+
+void Client::response(const std::string &msg) {
+	send(_fd, msg.c_str(), msg.size(), 0);
+	this->_msgBuffer.clear();
 }

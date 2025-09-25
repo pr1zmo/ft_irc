@@ -1,18 +1,27 @@
 NAME = ircserv
 CC = c++
 CFLAGS = -std=c++98 -I./includes -g3
-CFLAGS+= -fsanitize=address
+# CFLAGS+= -fsanitize=address
 CFLAGS += -Wall -Wextra -Werror
-SRCS = $(wildcard src/*.cpp)
+SRCDIR = src
+OBJDIR = obj
+SRCS = $(wildcard $(SRCDIR)/*.cpp)
+OBJS = $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+
 RM = rm -f
+MKDIR = mkdir -p
 
 all: $(NAME)
 
-$(NAME): $(SRCS)
-	$(CC) $(CFLAGS) $(SRCS) -o $(NAME)
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	@$(MKDIR) $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	@echo "Nothing to clean (no .o files used)"
+	$(RM) -r $(OBJDIR)
 
 fclean: clean
 	$(RM) $(NAME)
