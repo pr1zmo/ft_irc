@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/25 18:16:04 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/26 14:29:19 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,6 @@ int Server::initConnection(std::map<int, Client> &clients){
 	}
 
 	clients[cli_fd] = Client(cli_fd, cli_address);
-	cout << "New client connected: fd=" << cli_fd << endl;
 	return cli_fd;
 }
 
@@ -164,8 +163,7 @@ int Server::setEpoll() {
 	return epoll_fd;
 }
 
-int checkCommand(const std::string &msg) {
-	Command command;
+int checkCommand(const std::string &msg, std::vector<std::string> validCmds) {
 	// Basic validation: command should not be empty and should end with \r\n
 
 	// if (msg.empty() || msg.find("\n") == std::string::npos) {
@@ -182,8 +180,8 @@ int checkCommand(const std::string &msg) {
 		firstWord += msg[i];
 	}
 
-	for (size_t i = 0; i < command.validCmds.size(); ++i) {
-		if (firstWord == command.validCmds[i])
+	for (size_t i = 0; i < validCmds.size(); ++i) {
+		if (firstWord == validCmds[i])
 			return 1;
 	}
 	std::cerr << "Couldn't find command: " << firstWord << std::endl;
@@ -191,6 +189,7 @@ int checkCommand(const std::string &msg) {
 	return 0;
 }
 
+/*
 void static printBuffer(const std::string& label, const char* buffer, int size) {
 	std::cout << label << " (size=" << size << "): ";
 	for (int i = 0; i < size; i++) {
@@ -210,10 +209,10 @@ void static printBuffer(const std::string& label, const char* buffer, int size) 
 	}
 	std::cout << std::endl;
 }
-
-
+*/
 
 int Server::handleCmd(Client &cli) {
+	Command command;
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
 	int bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0);
@@ -232,9 +231,6 @@ int Server::handleCmd(Client &cli) {
 		cli._msgBuffer += string(buffer, bytes_read);
 		cli.last_activity = time(NULL);
 
-		printBuffer("Raw buffer received", buffer, bytes_read);
-		printBuffer("Complete message buffer", cli._msgBuffer.c_str(), cli._msgBuffer.size());
-
 		if (cli._msgBuffer.size() > BUFFER_SIZE) {
 			cli.response("Error: Message too long.\r\n");
 			close(fd);
@@ -246,15 +242,16 @@ int Server::handleCmd(Client &cli) {
 			std::string single_cmd = cli._msgBuffer.substr(0, pos + 2);
 			cli._msgBuffer.erase(0, pos + 2);
 			
-			printBuffer("Processing command", single_cmd.c_str(), single_cmd.size());
 			
-			if (!checkCommand(single_cmd)) {
+			if (!checkCommand(single_cmd, command.validCmds)) {
 				cli.response("Error : Invalid command.\r\n");
-				continue; // Don't return, process other commands
+				continue;
 			}
-			cli.response("Command received: " + single_cmd);
 		}
 	}
+
+	command.execute(cli);
+
 	return 1;
 }
 

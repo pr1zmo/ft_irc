@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:11 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/23 13:24:56 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/26 14:29:55 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,3 +36,6 @@ int Command::parseCommand(char *msg) {
 	return 0;
 }
 
+void Command::execute(Client &cli){
+	
+}

@@ -6,14 +6,13 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:23 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/25 17:09:29 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/26 10:31:54 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef Server_HPP
 #define Server_HPP
 
-#include <iostream>
 #include "ft_irc.h"
 
 int ft_error(int err, const std::string &msg);

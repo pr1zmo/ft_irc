@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/22 15:46:13 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/26 14:38:03 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,20 @@ typedef struct op_commands {
 
 
 class Command {
-	t_cli_commands _cli_cmds[10];
-	t_op_commands _op_cmds[10];
-	size_t _size;
-	std::string _msg;
-	int _isOp;
 	public:
-	std::vector <std::string> validCmds;
-	Command();
-	~Command();
+		t_cli_commands _cli_cmds[10];
+		t_op_commands _op_cmds[10];
+		size_t _size;
+		std::string _msg;
+		int _isOp;
+		public:
+		std::vector <std::string> validCmds;
+		Command();
+		~Command();
 
-	int parseCommand(char *msg);
-	void setOp(int isOp) { _isOp = isOp; }
+		int parseCommand(char *msg);
+		void setOp(int isOp) { _isOp = isOp; }
+		virtual void execute(Client &cli) = 0;
 };
 
 class Help {
@@ -116,6 +118,22 @@ class Ping : public Command {
 	public:
 		Ping(/* args */);
 		~Ping();
+};
+
+class Pong : public Command {
+	public:
+		Pong(/* args */);
+		~Pong();
+};
+
+class File : public Command {
+	int fileSize;
+	public:
+		File(/* args */);
+		~File();
+		
+		int establish_connection(socklen_t ip, int port);
+		int parseFile();
 };
 
 #endif

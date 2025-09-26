@@ -1,0 +1,49 @@
+#include "Executioner.hpp"
+#include <iostream>
+
+Executioner::Executioner()
+{
+	_commands["PASS"] = new Pass();
+	_commands["NICK"] = new Nick();
+	_commands["USER"] = new User();
+	_commands["OPER"] = new Oper();
+	_commands["QUIT"] = new Quit();
+	_commands["JOIN"] = new Join();
+	_commands["PART"] = new Part();
+	_commands["PRIVMSG"] = new Privmsg();
+	_commands["NOTICE"] = new Notice();
+	_commands["PING"] = new Ping();
+	_commands["PONG"] = new Pong();
+}
+
+Executioner::~Executioner() {
+	for (std::map<std::string, Command*>::iterator it = _commands.begin(); it != _commands.end(); ++it) {
+		delete it->second;
+	}
+
+	_commands.clear();
+}
+
+int Executioner::run(Client &cli, const std::string &msg) {
+	Command command;
+	int ret = command.parseCommand(const_cast<char*>(msg.c_str()));
+	if (ret != 0) {
+		cli.response("Error: Command too long.\r\n");
+		return ret;
+	}
+
+	size_t pos = msg.find(' ');
+	std::string cmd = (pos == std::string::npos) ? msg : msg.substr(0, pos);
+	
+	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
+	if (it != _commands.end()) {
+		Command* cmdInstance = it->second;
+		cmdInstance->setOp(cli.isOperator() ? 1 : 0);
+		cmdInstance->execute(cli);
+	} else {
+		cli.response("Error: Unknown command.\r\n");
+		return -1;
+	}
+
+	return 0;
+}
