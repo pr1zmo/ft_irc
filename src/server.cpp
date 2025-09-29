@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/29 15:36:15 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/29 21:13:21 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,34 +209,43 @@ int checkCommand(const std::string &msg, std::vector<std::string> validCmds) {
 
 int Server::handleCmd(Client &cli) {
 	int fd = cli.getFd();
-	char buffer[BUFFER_SIZE];
-	int bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0);
+	char buffer[BUFFER_SIZE + 1];
 
-	if (bytes_read <= 0) {
-		// EAGAIN means no more data to read
-		if (errno != EAGAIN && errno != EWOULDBLOCK) {
-			cout << "Client disconnected: fd=" << fd << endl;
-			close(fd);
+	memset(buffer, 0, sizeof(buffer));
+	for (;;) {
+		ssize_t bytesRead = recv(fd, buffer, BUFFER_SIZE, 0);
+		if (bytesRead < 0) {
+			if (errno == EAGAIN || errno == EWOULDBLOCK) {
+				// No more data to read
+				break;
+			}
+			if (errno == EINTR) {
+				// Interrupted by signal, retry
+				continue;
+			}
+			ft_error(errno, "recv");
 			return -1;
 		}
-		return 0;
-	} else {
-		buffer[bytes_read] = '\0';
-
-		cli._msgBuffer += string(buffer, bytes_read);
-		cli.last_activity = time(NULL);
-
-		if (cli._msgBuffer.size() > BUFFER_SIZE) {
-			cli.response("Error: Message too long.\r\n");
-			close(fd);
-			return -1;
+		else if (bytesRead == 0) {
+			continue ;
 		}
-
-		size_t pos;
-		while ((pos = cli._msgBuffer.find("\r\n")) != std::string::npos) {
-			std::string single_cmd = cli._msgBuffer.substr(0, pos + 2);
-			cli._msgBuffer.erase(0, pos + 2);
+		
+		// Append received data to client's message buffer
+		cli._msgBuffer.append(buffer, bytesRead);
+		
+		// If less than BUFFER_SIZE was read, we have read all available data
+		if (bytesRead < BUFFER_SIZE) {
+			break;
 		}
+	}
+
+	size_t pos;
+	while ((pos = cli._msgBuffer.find("\r\n")) != std::string::npos) {
+		std::string msg = cli._msgBuffer.substr(0, pos + 2); // Include \r\n
+		cli._msgBuffer.erase(0, pos + 2); // Remove processed message from buffer
+
+		std::cout << "Received from fd=" << fd << ": " << msg;
+		// Process the complete command
 	}
 
 	Executioner executioner;
