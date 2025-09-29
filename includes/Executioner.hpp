@@ -2,7 +2,6 @@
 #define Executioner_HPP
 
 #include "ft_irc.h"
-#include "Commands.hpp"
 
 class Client;
 class Command;

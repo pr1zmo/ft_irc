@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/26 14:29:19 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/29 15:36:15 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,48 +61,46 @@ Server::~Server() {
 void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 	epoll_event events[MAX_EVENTS];
 
-	while (running)
-	{
+	while (running) {
 		int ec_ = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		if (ec_ == -1) {
 			if (errno == EINTR)
-			continue; // Interrupted by signal, retry
+				continue; // Interrupted by signal, retry
 			ft_error(errno, "epoll_wait");
 			break;
 		}
 		
 		for (int i = 0; i < ec_; i++) {
 			int fd = events[i].data.fd;
-			int cli_fd;
+			
 			if (fd == getServerSocket()) {
-				cli_fd = initConnection(clients);
+				int cli_fd = initConnection(clients);
 				if (cli_fd != -1) {
 					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET);
 				}
-			} else if (events[i].events & EPOLLIN) {
-				// while(true){
-					int err = handleCmd(clients[fd]);
-					if (err == -1) {
-						del_and_close(epoll_fd, fd);
-						clients.erase(clients.find(fd));
-						break;
-					}
-					else if (err == 0) {
-						// No complete command yet, wait for more data
-						continue;
-					}
-					// break;
-				// }
+			}
+			else if (events[i].events & EPOLLIN) {
+				std::map<int, Client>::iterator it = clients.find(fd);
+				if (it == clients.end()) {
+					std::cerr << "Client fd=" << fd << " not found" << std::endl;
+					del_and_close(epoll_fd, fd);
+					continue;
+				}
+				
+				int err = handleCmd(it->second);
+				if (err == -1) {
+					// del_and_close(epoll_fd, fd);
+					// clients.erase(it);
+					continue; // Changed from break - keep processing other events
+				}
 			}
 			else if (events[i].events & EPOLLOUT) {
-				// handle write: dummy for now
 				cout << "Ready to write to client: fd=" << fd << endl;
 			}
-			else {
-				// error condition
+			else if (events[i].events & (EPOLLHUP | EPOLLERR)) {
+				cout << "Client disconnected (HUP/ERR): fd=" << fd << endl;
 				del_and_close(epoll_fd, fd);
 				clients.erase(clients.find(fd));
-				cout << "Epoll error on fd=" << fd << endl;
 			}
 		}
 	}
@@ -189,30 +187,27 @@ int checkCommand(const std::string &msg, std::vector<std::string> validCmds) {
 	return 0;
 }
 
-/*
-void static printBuffer(const std::string& label, const char* buffer, int size) {
-	std::cout << label << " (size=" << size << "): ";
-	for (int i = 0; i < size; i++) {
-		unsigned char c = static_cast<unsigned char>(buffer[i]);
-		if (c == '\r') {
-			std::cout << "\\r";
-		} else if (c == '\n') {
-			std::cout << "\\n";
-		} else if (c == '\t') {
-			std::cout << "\\t";
-		} else if (c < 32 || c > 126) {
-			// Non-printable characters as hex
-			std::cout << "\\x" << std::hex << std::setw(2) << std::setfill('0') << (int)c << std::dec;
-		} else {
-			std::cout << c;
-		}
-	}
-	std::cout << std::endl;
-}
-*/
+// void static printBuffer(const std::string& label, const char* buffer, int size) {
+// 	std::cout << label << " (size=" << size << "): ";
+// 	for (int i = 0; i < size; i++) {
+// 		unsigned char c = static_cast<unsigned char>(buffer[i]);
+// 		if (c == '\r') {
+// 			std::cout << "\\r";
+// 		} else if (c == '\n') {
+// 			std::cout << "\\n";
+// 		} else if (c == '\t') {
+// 			std::cout << "\\t";
+// 		} else if (c < 32 || c > 126) {
+// 			// Non-printable characters as hex
+// 			std::cout << "\\x" << std::hex << std::setw(2) << std::setfill('0') << (int)c << std::dec;
+// 		} else {
+// 			std::cout << c;
+// 		}
+// 	}
+// 	std::cout << std::endl;
+// }
 
 int Server::handleCmd(Client &cli) {
-	Command command;
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
 	int bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0);
@@ -241,18 +236,12 @@ int Server::handleCmd(Client &cli) {
 		while ((pos = cli._msgBuffer.find("\r\n")) != std::string::npos) {
 			std::string single_cmd = cli._msgBuffer.substr(0, pos + 2);
 			cli._msgBuffer.erase(0, pos + 2);
-			
-			
-			if (!checkCommand(single_cmd, command.validCmds)) {
-				cli.response("Error : Invalid command.\r\n");
-				continue;
-			}
 		}
 	}
 
-	command.execute(cli);
+	Executioner executioner;
 
-	return 1;
+	return (executioner.run(cli, cli._msgBuffer));
 }
 
 void Server::terminate(std::map<int, Client>& clients) {

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/26 14:38:03 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/29 09:40:25 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,20 +41,24 @@ class Command {
 		public:
 		std::vector <std::string> validCmds;
 		Command();
-		~Command();
+		virtual ~Command();
 
 		int parseCommand(char *msg);
 		void setOp(int isOp) { _isOp = isOp; }
-		virtual void execute(Client &cli) = 0;
+		virtual void execute(Client &cli, const std::string& param);
 };
 
-class Help {
+class Help : public Command {
 	public:
-		std::vector<std::string> full;
+		Help();
+		~Help();
+std::vector<std::string> full;
+		std::string const helpContent;
 		std::map<std::string, std::vector<std::string> > topics;
 		bool load();
 		void printUsage() const;
 		const std::vector<std::string>* getTopic(const std::string& key) const;
+		void execute(Client &cli, const std::string& param);
 };
 
 // PASS command class
@@ -62,78 +66,91 @@ class Help {
 class Pass : public Command {
 	std::string _pass;
 	public:
-		Pass(const std::string &pass) : _pass(pass) {};
+		Pass() {};
 		~Pass() {};
+
+		void execute(Client &cli, const std::string& param);
 };
 
 class Nick : public Command {
 	public:
 		Nick(/* args */);
 		~Nick();
+		// void execute(Client &cli);
 };
 
 class User : public Command {
 	public:
 		User(/* args */);
 		~User();
+		// void execute(Client &cli);
 };
 
 class Oper : public Command {
 	public:
 		Oper(/* args */);
 		~Oper();
+		// void execute(Client &cli);
 };
 
 class Quit : public Command {
 	public:
 		Quit(/* args */);
 		~Quit();
+		// void execute(Client &cli);
 };
 
 class Join : public Command {
 	public:
 		Join(/* args */);
 		~Join();
+		// void execute(Client &cli);
 };
 
 class Part : public Command {
 	public:
 		Part(/* args */);
 		~Part();
+		// void execute(Client &cli);
 };
 
 class Privmsg : public Command {
 	public:
 		Privmsg(/* args */);
 		~Privmsg();
+		// void execute(Client &cli);
 };
 
 class Notice : public Command {
 	public:
 		Notice(/* args */);
 		~Notice();
+		// void execute(Client &cli);
 };
 
 class Ping : public Command {
 	public:
 		Ping(/* args */);
 		~Ping();
+		// void execute(Client &cli);
 };
 
 class Pong : public Command {
 	public:
 		Pong(/* args */);
 		~Pong();
+		// void execute(Client &cli);
 };
 
 class File : public Command {
-	int fileSize;
+	// int fileSize;
 	public:
 		File(/* args */);
 		~File();
 		
 		int establish_connection(socklen_t ip, int port);
 		int parseFile();
+		// void execute(Client &cli);
 };
 
 #endif

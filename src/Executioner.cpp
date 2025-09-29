@@ -1,5 +1,4 @@
 #include "Executioner.hpp"
-#include <iostream>
 
 Executioner::Executioner()
 {
@@ -14,6 +13,7 @@ Executioner::Executioner()
 	_commands["NOTICE"] = new Notice();
 	_commands["PING"] = new Ping();
 	_commands["PONG"] = new Pong();
+	_commands["HELP"] = new Help();
 }
 
 Executioner::~Executioner() {
@@ -26,6 +26,7 @@ Executioner::~Executioner() {
 
 int Executioner::run(Client &cli, const std::string &msg) {
 	Command command;
+	cout << "Received command: " << msg << endl;
 	int ret = command.parseCommand(const_cast<char*>(msg.c_str()));
 	if (ret != 0) {
 		cli.response("Error: Command too long.\r\n");
@@ -38,12 +39,11 @@ int Executioner::run(Client &cli, const std::string &msg) {
 	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
 	if (it != _commands.end()) {
 		Command* cmdInstance = it->second;
-		cmdInstance->setOp(cli.isOperator() ? 1 : 0);
-		cmdInstance->execute(cli);
+		// cmdInstance->setOp(cli.isOperator() ? 1 : 0);
+		cmdInstance->execute(cli, (pos == std::string::npos) ? "" : msg.substr(pos + 1));
 	} else {
 		cli.response("Error: Unknown command.\r\n");
 		return -1;
 	}
-
 	return 0;
 }

@@ -26,6 +26,11 @@ clean:
 fclean: clean
 	$(RM) $(NAME)
 
+run: fclean
+	$(MAKE) -j20 re
+	@clear
+	./$(NAME) 6667 a
+
 re: fclean all
 
 .PHONY: all clean fclean re
