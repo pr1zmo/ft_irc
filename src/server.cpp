@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/29 21:13:21 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/30 11:49:07 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,50 +207,119 @@ int checkCommand(const std::string &msg, std::vector<std::string> validCmds) {
 // 	std::cout << std::endl;
 // }
 
+// int Server::handleCmd(Client &cli) {
+// 	int fd = cli.getFd();
+// 	char buffer[BUFFER_SIZE + 1];
+
+// 	memset(buffer, 0, sizeof(buffer));
+// 	while (true) {
+// 		ssize_t bytesRead = recv(fd, buffer, BUFFER_SIZE, 0);
+// 		if (bytesRead < 0) {
+// 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
+// 				// No more data to read
+// 				break;
+// 			}
+// 			if (errno == EINTR) {
+// 				// Interrupted by signal, retry
+// 				continue;
+// 			}
+// 			ft_error(errno, "recv");
+// 			return -1;
+// 		}
+// 		else if (bytesRead == 0) {
+// 			continue ;
+// 		}
+		
+// 		// Append received data to client's message buffer
+// 		cli._msgBuffer.append(buffer, bytesRead);
+		
+// 		// If less than BUFFER_SIZE was read, we have read all available data
+// 		if (bytesRead < BUFFER_SIZE) {
+// 			break;
+// 		}
+// 	}
+
+// 	Executioner executioner;
+
+// 	return (executioner.run(cli, cli._msgBuffer));
+// }
+
 int Server::handleCmd(Client &cli) {
 	int fd = cli.getFd();
-	char buffer[BUFFER_SIZE + 1];
+	char buffer[BUFFER_SIZE];
 
-	memset(buffer, 0, sizeof(buffer));
+	// For draining the socket from all available data, read until EAGAIN/EWOULDBLOCK
 	for (;;) {
-		ssize_t bytesRead = recv(fd, buffer, BUFFER_SIZE, 0);
-		if (bytesRead < 0) {
+		ssize_t bytesRead = recv(fd, buffer, sizeof(buffer), 0);
+		
+		if (bytesRead > 0) {
+			// When new data is read, append it to the client's message buffer
+			cli._msgBuffer.append(buffer, bytesRead);
+			
+			// always check for buffer overflow
+			if (cli._msgBuffer.size() > 4096) {
+				std::string err = "ERROR :Input buffer overflow\r\n";
+				send(fd, err.c_str(), err.size(), 0);
+				return -1; // Disconnect client
+			}
+			continue; // Need to drain the socket completely
+		}
+		else if (bytesRead == 0) {
+			// CTRL-D sends EOF signal -> Not necessarily a disconnection in non-blocking mode
+			std::cout << "EOF received from fd=" << fd << " (client sent ^D)" << std::endl;
+			break;
+		}
+		else {
 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-				// No more data to read
 				break;
 			}
 			if (errno == EINTR) {
 				// Interrupted by signal, retry
 				continue;
 			}
+			// Real error
 			ft_error(errno, "recv");
 			return -1;
 		}
-		else if (bytesRead == 0) {
-			continue ;
-		}
-		
-		// Append received data to client's message buffer
-		cli._msgBuffer.append(buffer, bytesRead);
-		
-		// If less than BUFFER_SIZE was read, we have read all available data
-		if (bytesRead < BUFFER_SIZE) {
-			break;
-		}
 	}
 
-	size_t pos;
-	while ((pos = cli._msgBuffer.find("\r\n")) != std::string::npos) {
-		std::string msg = cli._msgBuffer.substr(0, pos + 2); // Include \r\n
-		cli._msgBuffer.erase(0, pos + 2); // Remove processed message from buffer
-
-		std::cout << "Received from fd=" << fd << ": " << msg;
-		// Process the complete command
-	}
-
+	// 2. Process complete commands (ending with \r\n)
 	Executioner executioner;
+	size_t pos;
+	
+	while ((pos = cli._msgBuffer.find("\r\n")) != std::string::npos) {
+		// Extract complete command (without \r\n)
+		std::string complete_cmd = cli._msgBuffer.substr(0, pos);
+		// Remove processed command from buffer (including \r\n)
+		cli._msgBuffer.erase(0, pos + 2);
+		
+		// Check command length (IRC RFC limit: 512 bytes including \r\n)
+		if (complete_cmd.size() > 510) {
+			std::string err = "ERROR :Command too long\r\n";
+			send(fd, err.c_str(), err.size(), 0);
+			continue;
+		}
+		
+		// Skip empty commands
+		if (complete_cmd.empty()) {
+			continue;
+		}
 
-	return (executioner.run(cli, cli._msgBuffer));
+		std::cout << "Processing complete command from fd=" << fd << ": " << complete_cmd << std::endl;
+
+		// Process the command
+		int result = executioner.run(cli, complete_cmd);
+		if (result == -1) {
+			return -1;
+		}
+	}
+
+	// 3. If there's leftover data (incomplete command), keep it for next time
+	if (!cli._msgBuffer.empty()) {
+		std::cout << "Incomplete command in buffer for fd=" << fd << ": " << cli._msgBuffer << std::endl;
+	}
+	
+	return 0; // Success, client stays connected
 }
 
 void Server::terminate(std::map<int, Client>& clients) {

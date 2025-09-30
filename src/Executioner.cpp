@@ -24,18 +24,40 @@ Executioner::~Executioner() {
 	_commands.clear();
 }
 
+// void static printBuffer(const std::string& label, const char* buffer, int size) {
+// 	std::cout << label << " (size=" << size << "): ";
+// 	for (int i = 0; i < size; i++) {
+// 		unsigned char c = static_cast<unsigned char>(buffer[i]);
+// 		if (c == '\r') {
+// 			std::cout << "\\r";
+// 		} else if (c == '\n') {
+// 			std::cout << "\\n";
+// 		} else if (c == '\t') {
+// 			std::cout << "\\t";
+// 		} else if (c < 32 || c > 126) {
+// 			// Non-printable characters as hex
+// 			std::cout << "\\x" << std::hex << std::setw(2) << std::setfill('0') << (int)c << std::dec;
+// 		} else {
+// 			std::cout << c;
+// 		}
+// 	}
+// 	std::cout << std::endl;
+// }
+
 int Executioner::run(Client &cli, const std::string &msg) {
 	Command command;
-	cout << "Received command: " << msg << endl;
+
 	int ret = command.parseCommand(const_cast<char*>(msg.c_str()));
 	if (ret != 0) {
 		cli.response("Error: Command too long.\r\n");
 		return ret;
 	}
 
+	// size_t pos = msg.find(' ');
 	size_t pos = msg.find(' ');
-	std::string cmd = (pos == std::string::npos) ? msg : msg.substr(0, pos);
 	
+	std::string cmd = (pos == std::string::npos) ? msg : msg.substr(0, pos);
+
 	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
 	if (it != _commands.end()) {
 		Command* cmdInstance = it->second;
