@@ -4,6 +4,7 @@
 *.a
 ircserv
 /docs
+/docs/*
 /irc_tester
 corr_irc
 /irc-tester

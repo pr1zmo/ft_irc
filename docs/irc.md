@@ -1,5 +1,3 @@
-Nice — if your server is already **listening on 6667**, the next steps are:
-
 ### 1) Switch to a single non-blocking event loop
 
 * Set all fds non-blocking.
