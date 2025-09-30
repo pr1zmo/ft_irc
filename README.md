@@ -6,7 +6,7 @@ It allows multiple clients to connect using a real IRC client, authenticate, joi
 
 This project was part of the 42 curriculum and is designed to deepen understanding of:
 - **Network programming** (sockets, TCP/IP)
-- **Non-blocking I/O and multiplexing** (`poll`, `select`, `epoll`, or `kqueue`)
+- **Non-blocking I/O and multiplexing** (`epoll`)
 - **Standard internet protocols**
 - **Robust server design and error handling**
 
@@ -41,7 +41,7 @@ IRC is one of the earliest real-time text-based communication protocols, and bui
 ## 🛠️ Technologies Used & Learned
 - **C++98**: low-level programming with strict compliance to the standard.
 - **Socket programming**: managing connections over TCP/IP (IPv4 & IPv6).
-- **Multiplexing**: efficient client handling using `poll()` (with alternatives supported).
+- **Multiplexing**: efficient client handling using `epoll()` (with alternatives supported).
 - **Non-blocking I/O**: ensuring the server never hangs on client operations.
 - **System calls**: `socket`, `bind`, `listen`, `accept`, `recv`, `send`, `fcntl`, etc.
 - **Makefile**: for project compilation and management.
@@ -79,7 +79,7 @@ irssi -c localhost -p 6667 -w <password>
 ## 🧪 Testing
 You can also test basic functionality using `nc`:
 ```bash
-nc -C 127.0.0.1 6667
+nc 127.0.0.1 6667
 ```
 
 ---
@@ -94,4 +94,6 @@ Through this project, I gained experience in:
 ---
 
 ## 👥 Authors
-- [Your Name](https://github.com/yourusername)
+- [zelbassa](https://github.com/pr1zmo)
+- [mbouras](https://github.com/medibrs)
+- [adouiyeh](https://github.com/adouiyeh)
