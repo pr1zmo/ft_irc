@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/29 09:40:25 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/09/30 14:27:42 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ class Privmsg : public Command {
 	public:
 		Privmsg(/* args */);
 		~Privmsg();
-		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param);
 };
 
 class Notice : public Command {
@@ -144,12 +144,15 @@ class Pong : public Command {
 
 class File : public Command {
 	// int fileSize;
+	Client *sender;
+	Client *receiver;
 	public:
 		File(/* args */);
 		~File();
 		
 		int establish_connection(socklen_t ip, int port);
 		int parseFile();
+		int parseCommand(string &msg);
 		// void execute(Client &cli);
 };
 
