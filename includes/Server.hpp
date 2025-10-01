@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:23 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/26 10:31:54 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/01 16:53:16 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,9 @@ class Server {
 		int handleCmd(Client &cli);
 
 		void terminate(std::map<int, Client>& clients);
+
+		void enableWrite(int epoll_fd, int client_fd);
+		void disableWrite(int epoll_fd, int client_fd);
 };
 
 #endif

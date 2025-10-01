@@ -14,7 +14,7 @@ Executioner::Executioner()
 	_commands["PING"] = new Ping();
 	_commands["PONG"] = new Pong();
 	_commands["HELP"] = new Help();
-	_commands["FILE"] = new File();
+	_commands["DCC"] = new File();
 }
 
 Executioner::~Executioner() {

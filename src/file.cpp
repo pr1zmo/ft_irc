@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 13:56:42 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/01 10:03:01 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/01 16:37:02 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@
 */
 
 File::File()
-: Command()
+: Command() , _fileStream(), _recipient_ip(0), _recipient_port(0), sender(NULL)
 {
 	cout << this->_msg << 'n';
 }
@@ -41,10 +41,10 @@ File::~File() {
 }
 
 int File::establish_connection(socklen_t ip, int port){
-	socklen_t rec_sk;
+	socklen_t recip_fd;
 
-	rec_sk = socket(AF_INET, SOCK_STREAM, 0);
-	if (rec_sk < 0) {
+	recip_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (recip_fd < 0) {
 		perror("Socket creation failed");
 		return -1;
 	}
@@ -54,13 +54,13 @@ int File::establish_connection(socklen_t ip, int port){
 	rec_addr.sin_addr.s_addr = ip; // Sender's IP address
 	rec_addr.sin_port = htons(port); // Sender's port number
 
-	if (connect(rec_sk, (struct sockaddr*)&rec_addr, sizeof(rec_addr)) < 0) {
+	if (connect(recip_fd, (struct sockaddr*)&rec_addr, sizeof(rec_addr)) < 0) {
 		perror("Connection to sender failed");
-		close(rec_sk);
+		close(recip_fd);
 		return -1;
 	}
 	// Connection established successfully
-	close(rec_sk);
+	close(recip_fd);
 	return 1;
 }
 
@@ -69,6 +69,36 @@ int File::parseFile() {
 	return 1;
 }
 
-void File::execute(Client &cli, const string &msg){
+int File::parseCommand(const string &msg) {
+	// DCC <file to send> <ip of the recipient> <port of the recipient>
+	vector<string> parts = split(msg, ' ');
+
+	if (parts.size() < 3) {
+		sender->queueMessage("Error: DCC command requires 3 parameters.\r\n");
+		return 0;
+	}
 	
+	_fileStream.open(parts[0].c_str(), ios::in | ios::binary);
+	if (!_fileStream.is_open()) {
+		sender->queueMessage("Error: Could not open file " + parts[0] + "\r\n");
+		return 0;
+	}
+
+	string temp;
+	while (std::getline(_fileStream, temp)){
+		cout << temp << endl;
+	}
+
+	_recipient_ip = static_cast<socklen_t>(std::strtoul(parts[1].c_str(), NULL, 10));
+	_recipient_port = std::atoi(parts[2].c_str());
+	cout << msg << endl;
+	_fileStream.close();
+	return 1;
+}
+
+void File::execute(Client &cli, const string &msg){
+	sender = &cli;
+	if (!parseCommand(msg))
+		return ;
+	cout << "Executing FILE command with msg: " << msg << endl;
 }

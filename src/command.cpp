@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:11 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/29 09:41:52 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/01 14:48:30 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 Command::Command()
 : _size(0), _msg(""), _isOp(0) {
-	std::string cmds = "PASS NICK USER OPER MODE QUIT JOIN PART TOPIC NAMES LIST INVITE KICK PRIVMSG NOTICE PING PONG WHOIS WHO MODE AWAY";
+	std::string cmds = "PASS NICK USER OPER MODE QUIT JOIN PART TOPIC NAMES LIST INVITE KICK PRIVMSG NOTICE PING PONG WHOIS WHO MODE AWAY DCC";
 
 	for (size_t i = 0; i < cmds.size(); ) {
 		size_t j = cmds.find(' ', i);

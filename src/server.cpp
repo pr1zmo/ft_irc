@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/30 11:49:07 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/01 17:14:52 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ Server::Server(int port, int maxClients, const std::string &password)
 
 	if ((_serverSocket = socket(AF_INET, SOCK_STREAM, 0)) < 3)
 		throw ServerFailedException("socket");
-	std::cout << "Socket: " << _serverSocket << std::endl;
 
 	if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) < 0)
 		throw ServerFailedException("fcntl");
@@ -76,9 +75,10 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 			if (fd == getServerSocket()) {
 				int cli_fd = initConnection(clients);
 				if (cli_fd != -1) {
-					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET);
+					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET | EPOLLOUT);
 				}
 			}
+
 			else if (events[i].events & EPOLLIN) {
 				std::map<int, Client>::iterator it = clients.find(fd);
 				if (it == clients.end()) {
@@ -86,7 +86,6 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 					del_and_close(epoll_fd, fd);
 					continue;
 				}
-				
 				int err = handleCmd(it->second);
 				if (err == -1) {
 					// del_and_close(epoll_fd, fd);
@@ -95,12 +94,21 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 				}
 			}
 			else if (events[i].events & EPOLLOUT) {
-				cout << "Ready to write to client: fd=" << fd << endl;
+				std::map<int, Client>::iterator it = clients.find(fd);
+				if (it == clients.end()) {
+					std::cerr << "Client fd=" << fd << " not found for EPOLLOUT" << std::endl;
+					del_and_close(epoll_fd, fd);
+					continue;
+				}
+				it->second.sendPendingMessages();
 			}
 			else if (events[i].events & (EPOLLHUP | EPOLLERR)) {
 				cout << "Client disconnected (HUP/ERR): fd=" << fd << endl;
 				del_and_close(epoll_fd, fd);
 				clients.erase(clients.find(fd));
+			}
+			else {
+				std::cerr << "Unknown event for fd=" << fd << std::endl;
 			}
 		}
 	}
@@ -141,6 +149,13 @@ int Server::initConnection(std::map<int, Client> &clients){
 	}
 
 	clients[cli_fd] = Client(cli_fd, cli_address);
+
+	std::string client_info = "Your connection info:\r\n";
+	client_info += "\tIP: " + std::string(inet_ntoa(cli_address.sin_addr)) + "\r\n";
+	client_info += "\tPort: " + to_string98(ntohs(cli_address.sin_port)) + "\r\n";
+	client_info += "\tFile Descriptor: " + to_string98(cli_fd) + "\r\n";
+	clients[cli_fd].response(client_info);
+	
 	return cli_fd;
 }
 
@@ -156,7 +171,7 @@ int Server::setEpoll() {
 		return -1;
 	}
 
-	add_fd(epoll_fd, _serverSocket, EPOLLIN);
+	add_fd(epoll_fd, _serverSocket, EPOLLIN | EPOLLET | EPOLLOUT);
 
 	return epoll_fd;
 }
@@ -207,43 +222,6 @@ int checkCommand(const std::string &msg, std::vector<std::string> validCmds) {
 // 	std::cout << std::endl;
 // }
 
-// int Server::handleCmd(Client &cli) {
-// 	int fd = cli.getFd();
-// 	char buffer[BUFFER_SIZE + 1];
-
-// 	memset(buffer, 0, sizeof(buffer));
-// 	while (true) {
-// 		ssize_t bytesRead = recv(fd, buffer, BUFFER_SIZE, 0);
-// 		if (bytesRead < 0) {
-// 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-// 				// No more data to read
-// 				break;
-// 			}
-// 			if (errno == EINTR) {
-// 				// Interrupted by signal, retry
-// 				continue;
-// 			}
-// 			ft_error(errno, "recv");
-// 			return -1;
-// 		}
-// 		else if (bytesRead == 0) {
-// 			continue ;
-// 		}
-		
-// 		// Append received data to client's message buffer
-// 		cli._msgBuffer.append(buffer, bytesRead);
-		
-// 		// If less than BUFFER_SIZE was read, we have read all available data
-// 		if (bytesRead < BUFFER_SIZE) {
-// 			break;
-// 		}
-// 	}
-
-// 	Executioner executioner;
-
-// 	return (executioner.run(cli, cli._msgBuffer));
-// }
-
 int Server::handleCmd(Client &cli) {
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
@@ -259,7 +237,7 @@ int Server::handleCmd(Client &cli) {
 			// always check for buffer overflow
 			if (cli._msgBuffer.size() > 4096) {
 				std::string err = "ERROR :Input buffer overflow\r\n";
-				send(fd, err.c_str(), err.size(), 0);
+				// send(fd, err.c_str(), err.size(), 0);
 				return -1; // Disconnect client
 			}
 			continue; // Need to drain the socket completely
@@ -296,6 +274,8 @@ int Server::handleCmd(Client &cli) {
 		// Check command length (IRC RFC limit: 512 bytes including \r\n)
 		if (complete_cmd.size() > 510) {
 			std::string err = "ERROR :Command too long\r\n";
+			// if (cli._has_msg)
+			// 	cli.queueMessage(err);
 			send(fd, err.c_str(), err.size(), 0);
 			continue;
 		}
@@ -304,7 +284,7 @@ int Server::handleCmd(Client &cli) {
 		if (complete_cmd.empty()) {
 			continue;
 		}
-
+		
 		std::cout << "Processing complete command from fd=" << fd << ": " << complete_cmd << std::endl;
 
 		// Process the command
@@ -329,4 +309,22 @@ void Server::terminate(std::map<int, Client>& clients) {
 		close(it->first);
 	}
 	running = false;
+}
+
+void Server::enableWrite(int epoll_fd, int client_fd){
+	epoll_event ev;
+	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
+	ev.data.fd = client_fd;
+	if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, client_fd, &ev) == -1) {
+		ft_error(errno, "epoll_ctl(MOD) enableWrite");
+	}
+}
+
+void Server::disableWrite(int epoll_fd, int client_fd){
+	epoll_event ev;
+	ev.events = EPOLLIN | EPOLLET;
+	ev.data.fd = client_fd;
+	if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, client_fd, &ev) == -1) {
+		ft_error(errno, "epoll_ctl(MOD) disableWrite");
+	}
 }

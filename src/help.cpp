@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:09 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/29 09:44:41 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/01 16:24:23 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ Help::Help() : helpContent(
 			"\n"
 			"Messaging:\n"
 			"  PRIVMSG <nick>|<#channel> :<text>   — send a private or channel message\n"
+			"File transfer:\n"
+			"  DCC <filename> <ip> <port> — send a file to a user\n"
 			"\n"
 			"Channels:\n"
 			"  JOIN <#chan>[,<#chan>...] [<key>[,<key>...]]   — join/create channels\n"

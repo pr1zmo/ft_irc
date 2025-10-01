@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/25 10:22:16 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/01 17:15:39 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Client::Client(){
 }
 
 Client::Client(int fd, struct sockaddr_in cli_addr)
-	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _cmd(NULL), _isAuth(false) {
+	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _pending_msg(""), _has_msg(false), last_activity(time(NULL)), _isAuth(false){
 }
 
 Client::~Client() {
@@ -41,6 +41,18 @@ bool Client::authenticate(const std::string &msg) {
 }
 
 void Client::response(const std::string &msg) {
-	send(_fd, msg.c_str(), msg.size(), 0);
-	this->_msgBuffer.clear();
+	queueMessage(msg);
+}
+
+void Client::sendPendingMessages() {
+	if (_has_msg && !_pending_msg.empty()) {
+		send(_fd, "Queued Message:\r\n", 17, 0); // Debug line
+		send(_fd, _pending_msg.c_str(), _pending_msg.size(), 0);
+		_pending_msg.clear();
+	}
+}
+
+void Client::queueMessage(const std::string &msg) {
+	_pending_msg += msg;
+	_has_msg = true;
 }
