@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 13:56:42 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/30 15:19:42 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/01 10:03:01 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,34 @@ File::~File() {
 }
 
 int File::establish_connection(socklen_t ip, int port){
-	socklen_t 
+	socklen_t rec_sk;
+
+	rec_sk = socket(AF_INET, SOCK_STREAM, 0);
+	if (rec_sk < 0) {
+		perror("Socket creation failed");
+		return -1;
+	}
+	struct sockaddr_in rec_addr;
+	memset(&rec_addr, 0, sizeof(rec_addr));
+	rec_addr.sin_family = AF_INET;
+	rec_addr.sin_addr.s_addr = ip; // Sender's IP address
+	rec_addr.sin_port = htons(port); // Sender's port number
+
+	if (connect(rec_sk, (struct sockaddr*)&rec_addr, sizeof(rec_addr)) < 0) {
+		perror("Connection to sender failed");
+		close(rec_sk);
+		return -1;
+	}
+	// Connection established successfully
+	close(rec_sk);
 	return 1;
 }
 
 int File::parseFile() {
 	//
 	return 1;
+}
+
+void File::execute(Client &cli, const string &msg){
+	
 }
