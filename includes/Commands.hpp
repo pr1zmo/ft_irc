@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/01 22:16:56 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/02 18:49:42 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ class File : public Command {
 	// int fileSize;
 	
 	Client *sender;
-	// Client *receiver;
+	Client *receiver;
 	public:
 		File(/* args */);
 		~File();

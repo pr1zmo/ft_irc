@@ -1,6 +1,6 @@
 NAME = ircserv
 CC = c++
-CFLAGS = -std=c++98 -I./includes -g3
+CFLAGS = -I./includes -g3 -std=c++98
 # CFLAGS+= -fsanitize=address
 # CFLAGS += -Wall -Wextra -Werror
 SRCDIR = src
@@ -29,7 +29,7 @@ fclean: clean
 run: fclean
 	$(MAKE) -j20 re
 	@clear
-	./$(NAME) 6667 a
+	valgrind ./$(NAME) 6667 a
 
 re: fclean all
 

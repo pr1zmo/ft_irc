@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 13:56:42 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/02 17:37:13 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/02 18:50:55 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ int File::establish_connection(socklen_t ip, int port){
 		return -1;
 	}
 	// Connection established successfully
+	
+	cout << "The two clients ["<< sender->getFd() << " <=> "<< receiver->getFd() << "] are now connected for file transfer. fds: " << endl;
 	close(recip_fd);
 	return 1;
 }
@@ -70,33 +72,30 @@ int File::parseFile() {
 }
 
 int File::parseCommand(const string &msg) {
-	// DCC <file to send> <ip of the recipient> <port of the recipient>
+	// msg format: DCC <file to send> <ip of the recipient> <port of the recipient>
 	vector<string> parts = split(msg, ' ');
 
 	if (parts.size() < 3) {
-		sender->queueMessage("Error: DCC command requires 3 parameters.\r\n");
-		return 0;
-	}
-	
-	_fileStream.open(parts[0].c_str(), ios::in | ios::binary);
-	if (!_fileStream.is_open()) {
-		sender->queueMessage("Error: Could not open file " + parts[0] + "\r\n");
+		sender->response("Error: DCC command requires 3 parameters.\r\n");
 		return 0;
 	}
 
-	string temp;
-	while (std::getline(_fileStream, temp)){
-		cout << temp << endl;
-	}
 
 	_recipient_ip = static_cast<socklen_t>(std::strtoul(parts[1].c_str(), NULL, 10));
 	_recipient_port = std::atoi(parts[2].c_str());
-	cout << msg << endl;
-	_fileStream.close();
+	if (_recipient_port <= 0 || _recipient_port > 65535) {
+		sender->response("Error: Invalid port number.\r\n");
+		return 0;
+	}
+	if (establish_connection(_recipient_ip, _recipient_port) < 0) {
+		sender->response("Error: Failed to connect to recipient.\r\n");
+		return 0;
+	}
 	return 1;
 }
 
 void File::execute(Client &cli, const string &msg){
+	// msg format: DCC <file to send> <ip of the recipient> <port of the recipient>
 	sender = &cli;
 	if (!parseCommand(msg))
 		return ;
