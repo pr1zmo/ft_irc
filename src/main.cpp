@@ -6,11 +6,12 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:00 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/23 13:38:34 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/02 16:36:52 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <netinet/in.h>
+#include <sys/ioctl.h>
 
 #include "ft_irc.h"
 bool running = true;

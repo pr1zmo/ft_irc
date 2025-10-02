@@ -6,12 +6,13 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/01 17:15:39 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/02 17:34:57 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 #include <iostream>
+#include <sys/ioctl.h>
 
 Client::Client(){
 }
@@ -46,8 +47,13 @@ void Client::response(const std::string &msg) {
 
 void Client::sendPendingMessages() {
 	if (_has_msg && !_pending_msg.empty()) {
-		send(_fd, "Queued Message:\r\n", 17, 0); // Debug line
 		send(_fd, _pending_msg.c_str(), _pending_msg.size(), 0);
+		// struct winsize w;
+		// ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+		
+		// string row(w.ws_col, '-');
+		// send(_fd, (row + "\r\n").c_str(), row.size() + 2, 0); // Debug line
+		_has_msg = false;
 		_pending_msg.clear();
 	}
 }
@@ -55,4 +61,8 @@ void Client::sendPendingMessages() {
 void Client::queueMessage(const std::string &msg) {
 	_pending_msg += msg;
 	_has_msg = true;
+}
+
+string Client::get_pending_msg() {
+	return this->_pending_msg;
 }

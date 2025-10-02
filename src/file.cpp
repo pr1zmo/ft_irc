@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 13:56:42 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/01 16:37:02 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/02 17:37:13 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 File::File()
 : Command() , _fileStream(), _recipient_ip(0), _recipient_port(0), sender(NULL)
 {
-	cout << this->_msg << 'n';
+	// cout << this->_msg << 'n';
 }
 
 File::~File() {

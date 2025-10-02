@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:23 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/01 16:53:16 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/02 16:31:21 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ class Server {
 
 		int initConnection(std::map<int, Client>& clients);
 		int setEpoll();
-		int handleCmd(Client &cli);
+		int handleCmd(Client &cli, int epoll_fd);
 
 		void terminate(std::map<int, Client>& clients);
 

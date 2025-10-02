@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/01 17:14:52 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/02 17:39:00 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Server::Server()
 {
 }
 
-Server::Server(int port, int maxClients, const std::string &password)
+Server::Server(int port, int maxClients, const string &password)
 	:_port(port), _maxClients(maxClients), _password(password), _locked(false)
 {
 	if (!_password.empty())
@@ -57,7 +57,7 @@ Server::~Server() {
  * In this case we only handle read events
 */
 
-void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
+void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 	epoll_event events[MAX_EVENTS];
 
 	while (running) {
@@ -80,13 +80,13 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 			}
 
 			else if (events[i].events & EPOLLIN) {
-				std::map<int, Client>::iterator it = clients.find(fd);
+				map<int, Client>::iterator it = clients.find(fd);
 				if (it == clients.end()) {
-					std::cerr << "Client fd=" << fd << " not found" << std::endl;
+					cerr << "Client fd=" << fd << " not found" << endl;
 					del_and_close(epoll_fd, fd);
 					continue;
 				}
-				int err = handleCmd(it->second);
+				int err = handleCmd(it->second, epoll_fd);
 				if (err == -1) {
 					// del_and_close(epoll_fd, fd);
 					// clients.erase(it);
@@ -94,9 +94,9 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 				}
 			}
 			else if (events[i].events & EPOLLOUT) {
-				std::map<int, Client>::iterator it = clients.find(fd);
+				map<int, Client>::iterator it = clients.find(fd);
 				if (it == clients.end()) {
-					std::cerr << "Client fd=" << fd << " not found for EPOLLOUT" << std::endl;
+					cerr << "Client fd=" << fd << " not found for EPOLLOUT" << endl;
 					del_and_close(epoll_fd, fd);
 					continue;
 				}
@@ -108,7 +108,7 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
 				clients.erase(clients.find(fd));
 			}
 			else {
-				std::cerr << "Unknown event for fd=" << fd << std::endl;
+				cerr << "Unknown event for fd=" << fd << endl;
 			}
 		}
 	}
@@ -123,7 +123,7 @@ void Server::startServer(int epoll_fd, std::map<int, Client>& clients) {
  * Returns the new client's file descriptor or -1 on error
 */
 
-int Server::initConnection(std::map<int, Client> &clients){
+int Server::initConnection(map<int, Client> &clients){
 	struct sockaddr_in cli_address = {};
 	socklen_t addrLen = sizeof(cli_address);
 	memset(&cli_address, 0, sizeof(cli_address));
@@ -143,15 +143,15 @@ int Server::initConnection(std::map<int, Client> &clients){
 
 	fcntl(cli_fd, F_SETFL, O_NONBLOCK);
 	if (clients.size() >= static_cast<size_t>(_maxClients)) {
-		std::cerr << "Max clients reached. Rejecting new connection." << std::endl;
+		cerr << "Max clients reached. Rejecting new connection." << endl;
 		close(cli_fd);
 		return -1;
 	}
 
 	clients[cli_fd] = Client(cli_fd, cli_address);
 
-	std::string client_info = "Your connection info:\r\n";
-	client_info += "\tIP: " + std::string(inet_ntoa(cli_address.sin_addr)) + "\r\n";
+	string client_info = "Your connection info:\r\n";
+	client_info += "\tIP: " + string(inet_ntoa(cli_address.sin_addr)) + "\r\n";
 	client_info += "\tPort: " + to_string98(ntohs(cli_address.sin_port)) + "\r\n";
 	client_info += "\tFile Descriptor: " + to_string98(cli_fd) + "\r\n";
 	clients[cli_fd].response(client_info);
@@ -176,15 +176,10 @@ int Server::setEpoll() {
 	return epoll_fd;
 }
 
-int checkCommand(const std::string &msg, std::vector<std::string> validCmds) {
+int checkCommand(const string &msg, vector<string> validCmds) {
 	// Basic validation: command should not be empty and should end with \r\n
 
-	// if (msg.empty() || msg.find("\n") == std::string::npos) {
-	// 	std::cerr << "message empty or no \\n" << std::endl;
-	// 	return 0;
-	// }
-
-	std::string firstWord;
+	string firstWord;
 
 	for (int i = 0; i < static_cast<int>(msg.size()); i++) {
 		if (msg[i] == ' ' || msg[i] == '\r' || msg[i] == '\n') {
@@ -197,32 +192,32 @@ int checkCommand(const std::string &msg, std::vector<std::string> validCmds) {
 		if (firstWord == validCmds[i])
 			return 1;
 	}
-	std::cerr << "Couldn't find command: " << firstWord << std::endl;
-	std::cout << "------------------------------" << std::endl;
+	cerr << "Couldn't find command: " << firstWord << endl;
+	cout << "------------------------------" << endl;
 	return 0;
 }
 
-// void static printBuffer(const std::string& label, const char* buffer, int size) {
-// 	std::cout << label << " (size=" << size << "): ";
+// void static printBuffer(const string& label, const char* buffer, int size) {
+// 	cout << label << " (size=" << size << "): ";
 // 	for (int i = 0; i < size; i++) {
 // 		unsigned char c = static_cast<unsigned char>(buffer[i]);
 // 		if (c == '\r') {
-// 			std::cout << "\\r";
+// 			cout << "\\r";
 // 		} else if (c == '\n') {
-// 			std::cout << "\\n";
+// 			cout << "\\n";
 // 		} else if (c == '\t') {
-// 			std::cout << "\\t";
+// 			cout << "\\t";
 // 		} else if (c < 32 || c > 126) {
 // 			// Non-printable characters as hex
-// 			std::cout << "\\x" << std::hex << std::setw(2) << std::setfill('0') << (int)c << std::dec;
+// 			cout << "\\x" << hex << setw(2) << setfill('0') << (int)c << dec;
 // 		} else {
-// 			std::cout << c;
+// 			cout << c;
 // 		}
 // 	}
-// 	std::cout << std::endl;
+// 	cout << endl;
 // }
 
-int Server::handleCmd(Client &cli) {
+int Server::handleCmd(Client &cli, int epoll_fd) {
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
 
@@ -236,7 +231,7 @@ int Server::handleCmd(Client &cli) {
 			
 			// always check for buffer overflow
 			if (cli._msgBuffer.size() > 4096) {
-				std::string err = "ERROR :Input buffer overflow\r\n";
+				string err = "ERROR :Input buffer overflow\r\n";
 				// send(fd, err.c_str(), err.size(), 0);
 				return -1; // Disconnect client
 			}
@@ -244,7 +239,7 @@ int Server::handleCmd(Client &cli) {
 		}
 		else if (bytesRead == 0) {
 			// CTRL-D sends EOF signal -> Not necessarily a disconnection in non-blocking mode
-			std::cout << "EOF received from fd=" << fd << " (client sent ^D)" << std::endl;
+			cout << "EOF received from fd=" << fd << " (client sent ^D)" << endl;
 			break;
 		}
 		else {
@@ -265,18 +260,15 @@ int Server::handleCmd(Client &cli) {
 	Executioner executioner;
 	size_t pos;
 	
-	while ((pos = cli._msgBuffer.find("\r\n")) != std::string::npos) {
+	while ((pos = cli._msgBuffer.find("\r\n")) != string::npos) {
 		// Extract complete command (without \r\n)
-		std::string complete_cmd = cli._msgBuffer.substr(0, pos);
+		string complete_cmd = cli._msgBuffer.substr(0, pos);
 		// Remove processed command from buffer (including \r\n)
 		cli._msgBuffer.erase(0, pos + 2);
 		
 		// Check command length (IRC RFC limit: 512 bytes including \r\n)
 		if (complete_cmd.size() > 510) {
-			std::string err = "ERROR :Command too long\r\n";
-			// if (cli._has_msg)
-			// 	cli.queueMessage(err);
-			send(fd, err.c_str(), err.size(), 0);
+			cli.response("ERROR :Line too long\r\n");
 			continue;
 		}
 		
@@ -285,10 +277,15 @@ int Server::handleCmd(Client &cli) {
 			continue;
 		}
 		
-		std::cout << "Processing complete command from fd=" << fd << ": " << complete_cmd << std::endl;
+		// cout << "Processing complete command from fd=" << fd << ": " << complete_cmd << endl;
 
 		// Process the command
 		int result = executioner.run(cli, complete_cmd);
+		
+		if (cli._has_msg){
+			enableWrite( epoll_fd, fd);
+		}
+		
 		if (result == -1) {
 			return -1;
 		}
@@ -296,21 +293,26 @@ int Server::handleCmd(Client &cli) {
 
 	// 3. If there's leftover data (incomplete command), keep it for next time
 	if (!cli._msgBuffer.empty()) {
-		std::cout << "Incomplete command in buffer for fd=" << fd << ": " << cli._msgBuffer << std::endl;
+		// cout << "Leftover incomplete command in buffer for fd=" << fd << ": " << cli._msgBuffer << endl;
 	}
 	
 	return 0; // Success, client stays connected
 }
 
-void Server::terminate(std::map<int, Client>& clients) {
-	std::cout << "Closing server socket: " << std::endl;
+void Server::terminate(map<int, Client>& clients) {
+	cout << "Closing server socket: " << endl;
 	close(_serverSocket);
-	for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it) {
+	for (map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it) {
 		close(it->first);
 	}
 	running = false;
 }
 
+/*
+ * This function enables write events for a client socket in the epoll instance
+ * Without it the server won't know when the socket is ready to send data
+ * This is important for non-blocking sockets to avoid EAGAIN errors
+*/
 void Server::enableWrite(int epoll_fd, int client_fd){
 	epoll_event ev;
 	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
@@ -319,6 +321,12 @@ void Server::enableWrite(int epoll_fd, int client_fd){
 		ft_error(errno, "epoll_ctl(MOD) enableWrite");
 	}
 }
+
+/*
+ * This function disables write events for a client socket in the epoll instance
+ * This is used when there are no pending messages to send
+ * Disabling write events helps reduce unnecessary wake-ups and CPU usage
+*/
 
 void Server::disableWrite(int epoll_fd, int client_fd){
 	epoll_event ev;

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:09 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/01 16:24:23 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/02 17:33:34 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,18 +76,18 @@ bool Help::load() {
 
 		if (!line.empty() && line[line.length() - 1] == ':' && 
 				!line.empty() && std::isupper(line[0])) {
+			if (!currentSection.empty()) {
+				topics[currentSection] = currentContent;
+			}
 
-				if (!currentSection.empty()) {
-					topics[currentSection] = currentContent;
-				}
+			currentSection = line.substr(0, line.length() - 1);
+			std::transform(currentSection.begin(), currentSection.end(), 
+				currentSection.begin(), ::toupper);
+			currentContent.clear();
+			currentContent.push_back(line);
 
-				currentSection = line.substr(0, line.length() - 1);
-				std::transform(currentSection.begin(), currentSection.end(), 
-								currentSection.begin(), ::toupper);
-				currentContent.clear();
-				currentContent.push_back(line);
 		} else if (!currentSection.empty()) {
-				currentContent.push_back(line);
+			currentContent.push_back(line);
 		}
 	}
 
@@ -109,34 +109,19 @@ const std::vector<std::string>* Help::getTopic(const std::string& key) const
 	return NULL;
 }
 
-void Help::printUsage() const {
-	std::cout << "Usage: ./help [topic]\n";
-	std::cout << "Available topics: ";
-	for (std::map<std::string, std::vector<std::string> >::const_iterator it = topics.begin(); 
-			it != topics.end(); ++it) {
-		if (it != topics.begin()) std::cout << ", ";
-		std::cout << it->first;
-	}
-	std::cout << std::endl;
-}
-
 void Help::execute(Client &cli, const std::string& param) {
-	(void)cli;
-	cout << "Running Help command" << endl;
-	
 	if (param.empty()) {
-		// std::cout << helpContent;
-		send(cli.getFd(), helpContent.c_str(), helpContent.size(), 0);
+		cli.response(helpContent + "\r\n");
 		return;
 	}
 	
 	const std::vector<std::string>* topicContent = getTopic(param);
 	if (topicContent) {
 		for (size_t i = 0; i < topicContent->size(); ++i) {
-			std::cout << (*topicContent)[i] << std::endl;
+			cli.response((*topicContent)[i] + "\r\n");			
 		}
 	} else {
-		std::cout << "No help available for topic: " << param << std::endl;
-		printUsage();
+		cli.response("No help available for that topic.\n");
+		cli.response("Usage: HELP [<command>]\r\n");
 	}
 }

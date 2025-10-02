@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:20 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/01 17:15:18 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/02 16:22:21 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ class Client {
 		void response(const std::string &msg);
 		void sendPendingMessages();
 		void queueMessage(const std::string &msg);
+
+		std::string get_pending_msg();
 };
 
 #endif
