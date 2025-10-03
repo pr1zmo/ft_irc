@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 13:56:42 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/02 18:50:55 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/03 17:16:57 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,11 +72,11 @@ int File::parseFile() {
 }
 
 int File::parseCommand(const string &msg) {
-	// msg format: DCC <file to send> <ip of the recipient> <port of the recipient>
+	// msg format: DCC <file to send> <ip of the recipient> <port of the recipient> <filesize>
 	vector<string> parts = split(msg, ' ');
 
-	if (parts.size() < 3) {
-		sender->response("Error: DCC command requires 3 parameters.\r\n");
+	if (parts.size() < 4) {
+		sender->response("Usage: DCC <file> <ip> <port> <filesize>\r\n");
 		return 0;
 	}
 
@@ -95,7 +95,7 @@ int File::parseCommand(const string &msg) {
 }
 
 void File::execute(Client &cli, const string &msg){
-	// msg format: DCC <file to send> <ip of the recipient> <port of the recipient>
+	// msg format: DCC <file to send> <ip of the recipient> <port of the recipient> <filesize>
 	sender = &cli;
 	if (!parseCommand(msg))
 		return ;

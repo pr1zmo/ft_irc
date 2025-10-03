@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/02 18:49:42 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/03 18:19:07 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,6 +157,8 @@ class File : public Command {
 		int establish_connection(socklen_t ip, int port);
 		int parseFile();
 		int parseCommand(const std::string &msg);
+		int sendFile();
+		int receiveFile();
 		void execute(Client &cli, const std::string &msg);
 };
 
