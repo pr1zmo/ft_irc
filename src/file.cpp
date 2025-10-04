@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 13:56:42 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/03 17:16:57 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/03 19:41:15 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,4 +100,14 @@ void File::execute(Client &cli, const string &msg){
 	if (!parseCommand(msg))
 		return ;
 	cout << "Executing FILE command with msg: " << msg << endl;
+}
+
+int File::sendFile() {
+	// Implement file sending logic here
+	return 1;
+}
+
+int File::receiveFile() {
+	// Implement file receiving logic here
+	return 1;
 }

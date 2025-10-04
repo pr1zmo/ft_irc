@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/03 18:19:07 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/04 22:42:19 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,8 @@ class Privmsg : public Command {
 	public:
 		Privmsg(/* args */);
 		~Privmsg();
+
+		int userExists(std::string uname);
 		void execute(Client &cli, const std::string& param);
 };
 
