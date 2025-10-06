@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:27 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/01 15:51:02 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/06 13:47:12 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@
 # define DEFAULT_PORT 6667
 
 extern bool running;
-
 using namespace std;
 
 int ft_error(int err, const string &msg);

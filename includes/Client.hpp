@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:20 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/02 16:22:21 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/06 15:12:22 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ class Client {
 		bool						_has_msg;
 		std::string	_msgBuffer;
 		size_t		last_activity;
+		bool should_quit;
 		bool _isAuth; // Example member to track authentication status
 		Client();
 		Client(int fd, struct sockaddr_in cli_addr);
@@ -44,6 +45,7 @@ class Client {
 		void response(const std::string &msg);
 		void sendPendingMessages();
 		void queueMessage(const std::string &msg);
+		void markDisconnected();
 
 		std::string get_pending_msg();
 };

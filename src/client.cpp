@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/02 17:34:57 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/06 15:36:54 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 #include <iostream>
 #include <sys/ioctl.h>
 
-Client::Client(){
+Client::Client(): should_quit(false){
 }
 
 Client::Client(int fd, struct sockaddr_in cli_addr)
-	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _pending_msg(""), _has_msg(false), last_activity(time(NULL)), _isAuth(false){
+	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _pending_msg(""), _has_msg(false), last_activity(time(NULL)), should_quit(false), _isAuth(false){
 }
 
 Client::~Client() {
@@ -65,4 +65,8 @@ void Client::queueMessage(const std::string &msg) {
 
 string Client::get_pending_msg() {
 	return this->_pending_msg;
+}
+
+void Client::markDisconnected() {
+	should_quit = true;
 }

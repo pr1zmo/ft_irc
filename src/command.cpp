@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:11 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/01 14:48:30 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/06 14:49:24 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,12 @@ Command::~Command() {
 
 int Command::parseCommand(char *msg) {
 	_size = strlen(msg);
+	cout << "The size: " << _size << '\n';
 	if (_size > BUFFER_SIZE) {
-		return ERR_INPUTTOOLONG;
+		return 0;
 	}
 	_msg = std::string(msg);
-	return 0;
+	return 1;
 }
 
 void Command::execute(Client &cli, const std::string& param) {

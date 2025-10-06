@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/02 17:39:00 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/06 15:06:28 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,64 +57,7 @@ Server::~Server() {
  * In this case we only handle read events
 */
 
-void Server::startServer(int epoll_fd, map<int, Client>& clients) {
-	epoll_event events[MAX_EVENTS];
 
-	while (running) {
-		int ec_ = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-		if (ec_ == -1) {
-			if (errno == EINTR)
-				continue; // Interrupted by signal, retry
-			ft_error(errno, "epoll_wait");
-			break;
-		}
-		
-		for (int i = 0; i < ec_; i++) {
-			int fd = events[i].data.fd;
-			
-			if (fd == getServerSocket()) {
-				int cli_fd = initConnection(clients);
-				if (cli_fd != -1) {
-					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET | EPOLLOUT);
-				}
-			}
-
-			else if (events[i].events & EPOLLIN) {
-				map<int, Client>::iterator it = clients.find(fd);
-				if (it == clients.end()) {
-					cerr << "Client fd=" << fd << " not found" << endl;
-					del_and_close(epoll_fd, fd);
-					continue;
-				}
-				int err = handleCmd(it->second, epoll_fd);
-				if (err == -1) {
-					// del_and_close(epoll_fd, fd);
-					// clients.erase(it);
-					continue; // Changed from break - keep processing other events
-				}
-			}
-			else if (events[i].events & EPOLLOUT) {
-				map<int, Client>::iterator it = clients.find(fd);
-				if (it == clients.end()) {
-					cerr << "Client fd=" << fd << " not found for EPOLLOUT" << endl;
-					del_and_close(epoll_fd, fd);
-					continue;
-				}
-				it->second.sendPendingMessages();
-			}
-			else if (events[i].events & (EPOLLHUP | EPOLLERR)) {
-				cout << "Client disconnected (HUP/ERR): fd=" << fd << endl;
-				del_and_close(epoll_fd, fd);
-				clients.erase(clients.find(fd));
-			}
-			else {
-				cerr << "Unknown event for fd=" << fd << endl;
-			}
-		}
-	}
-	close(epoll_fd);
-	terminate(clients);
-}
 
 /*
  * Accepts a new client connection
@@ -142,11 +85,11 @@ int Server::initConnection(map<int, Client> &clients){
 	}
 
 	fcntl(cli_fd, F_SETFL, O_NONBLOCK);
-	if (clients.size() >= static_cast<size_t>(_maxClients)) {
-		cerr << "Max clients reached. Rejecting new connection." << endl;
-		close(cli_fd);
-		return -1;
-	}
+	// if (clients.size() >= static_cast<size_t>(_maxClients)) {
+	// 	cerr << "Max clients reached. Rejecting new connection." << endl;
+	// 	close(cli_fd);
+	// 	return -1;
+	// }
 
 	clients[cli_fd] = Client(cli_fd, cli_address);
 
@@ -197,99 +140,88 @@ int checkCommand(const string &msg, vector<string> validCmds) {
 	return 0;
 }
 
-// void static printBuffer(const string& label, const char* buffer, int size) {
-// 	cout << label << " (size=" << size << "): ";
-// 	for (int i = 0; i < size; i++) {
-// 		unsigned char c = static_cast<unsigned char>(buffer[i]);
-// 		if (c == '\r') {
-// 			cout << "\\r";
-// 		} else if (c == '\n') {
-// 			cout << "\\n";
-// 		} else if (c == '\t') {
-// 			cout << "\\t";
-// 		} else if (c < 32 || c > 126) {
-// 			// Non-printable characters as hex
-// 			cout << "\\x" << hex << setw(2) << setfill('0') << (int)c << dec;
-// 		} else {
-// 			cout << c;
-// 		}
-// 	}
-// 	cout << endl;
-// }
-
 int Server::handleCmd(Client &cli, int epoll_fd) {
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
+
+	// cout << "[DEBUG] handleCmd: Starting for fd=" << fd << endl;
 
 	// For draining the socket from all available data, read until EAGAIN/EWOULDBLOCK
 	for (;;) {
 		ssize_t bytesRead = recv(fd, buffer, sizeof(buffer), 0);
 		
 		if (bytesRead > 0) {
+			// cout << "[DEBUG] handleCmd: Read " << bytesRead << " bytes from fd=" << fd << endl;
 			// When new data is read, append it to the client's message buffer
 			cli._msgBuffer.append(buffer, bytesRead);
 			
-			// always check for buffer overflow
+			// Buffer overflow
 			if (cli._msgBuffer.size() > 4096) {
+				// cout << "[DEBUG] handleCmd: Buffer overflow for fd=" << fd << ", size=" << cli._msgBuffer.size() << endl;
 				string err = "ERROR :Input buffer overflow\r\n";
-				// send(fd, err.c_str(), err.size(), 0);
-				return -1; // Disconnect client
+				cli.response(err);
+				return -2;
 			}
-			continue; // Need to drain the socket completely
+			continue;
 		}
 		else if (bytesRead == 0) {
-			// CTRL-D sends EOF signal -> Not necessarily a disconnection in non-blocking mode
-			cout << "EOF received from fd=" << fd << " (client sent ^D)" << endl;
-			break;
+			// cout << "[DEBUG] handleCmd: EOF received from fd=" << fd << " (client sent ^D)" << endl;
+			return -2;
 		}
 		else {
 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
+				// cout << "[DEBUG] handleCmd: EAGAIN/EWOULDBLOCK for fd=" << fd << ", breaking recv loop" << endl;
 				break;
 			}
 			if (errno == EINTR) {
+				// cout << "[DEBUG] handleCmd: EINTR for fd=" << fd << ", retrying" << endl;
 				// Interrupted by signal, retry
 				continue;
 			}
 			// Real error
+			// cout << "[DEBUG] handleCmd: recv error for fd=" << fd << ", errno=" << errno << endl;
 			ft_error(errno, "recv");
 			return -1;
 		}
 	}
 
+	// cout << "[DEBUG] handleCmd: Finished recv loop for fd=" << fd << ", buffer size=" << cli._msgBuffer.size() << endl;
+
 	// 2. Process complete commands (ending with \r\n)
 	Executioner executioner;
+	string complete_cmd;
 	size_t pos;
-	
+
 	while ((pos = cli._msgBuffer.find("\r\n")) != string::npos) {
 		// Extract complete command (without \r\n)
-		string complete_cmd = cli._msgBuffer.substr(0, pos);
+		complete_cmd = cli._msgBuffer.substr(0, pos);
 		// Remove processed command from buffer (including \r\n)
 		cli._msgBuffer.erase(0, pos + 2);
-		
+
 		// Check command length (IRC RFC limit: 512 bytes including \r\n)
 		if (complete_cmd.size() > 510) {
 			cli.response("ERROR :Line too long\r\n");
-			continue;
+			return -2;
 		}
-		
+
 		// Skip empty commands
 		if (complete_cmd.empty()) {
 			continue;
 		}
-		
-		// cout << "Processing complete command from fd=" << fd << ": " << complete_cmd << endl;
+		cout << "Processing complete command from fd=" << fd << ": " << complete_cmd << endl;
 
 		// Process the command
 		int result = executioner.run(cli, complete_cmd);
-		
+
 		if (cli._has_msg){
 			enableWrite( epoll_fd, fd);
 		}
-		
+
 		if (result == -1) {
 			return -1;
 		}
 	}
+	
 
 	// 3. If there's leftover data (incomplete command), keep it for next time
 	if (!cli._msgBuffer.empty()) {

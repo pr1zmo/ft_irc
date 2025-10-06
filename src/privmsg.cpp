@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:38 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/04 22:41:36 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/05 21:31:35 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,23 @@ Privmsg::~Privmsg()
 {
 }
 
+void Privmsg::handleFileTransfer(Client &cli, const std::string& param){
+	(void)cli;
+	(void)param;
+	cout << "Handling file transfer with param: " << param << endl;
+}
+
 void Privmsg::execute(Client &cli, const std::string& param){
 	if (param.empty()) {
 		cli.response("ERROR :No recipient given\r\n");
-		help.execute(cli, "PRIVMSG");
 		return;
 	}
+
+	if (param.find("\\x01DCC SEND") != std::string::npos) {
+		handleFileTransfer(cli, param);
+		return;
+	}
+
 	cout << "PRIVMSG command executed with param: " << param << endl;
 }
 

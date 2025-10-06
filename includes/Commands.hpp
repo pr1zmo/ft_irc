@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/04 22:42:19 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/06 14:49:22 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,6 @@
 #define Command_HPP
 
 #include "ft_irc.h"
-
-enum{
-	ERR_INPUTTOOLONG,
-	ERR_NOSUCHSERVER,
-};
 
 typedef struct cli_commands {
 	std::string cmd;
@@ -120,6 +115,7 @@ class Privmsg : public Command {
 		~Privmsg();
 
 		int userExists(std::string uname);
+		void handleFileTransfer(Client &cli, const std::string& param);
 		void execute(Client &cli, const std::string& param);
 };
 
