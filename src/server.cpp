@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/07 14:05:44 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/07 14:12:59 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,87 +144,71 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
 
-	// 1. Drain the socket
+	// cout << "[DEBUG] handleCmd: Starting for fd=" << fd << endl;
+
+	// For draining the socket from all available data, read until EAGAIN/EWOULDBLOCK
 	for (;;) {
 		ssize_t bytesRead = recv(fd, buffer, sizeof(buffer), 0);
 		
 		if (bytesRead > 0) {
-			cli._msgBuffer.append(buffer, bytesRead);
-			
-			if (cli._msgBuffer.size() > 512) {
-					cli.queueMessage("ERROR :Line too long without CRLF\r\n");
-					cli._msgBuffer.clear();
-					enableWrite(epoll_fd, fd);
-					return -2;
+			if (cli._msgBuffer.size() + strlen(buffer) > 512) {
+				string err = "ERROR :Input buffer overflow\r\n";
+				cli.response(err);
+				cli._msgBuffer.clear();
+				return 0;
 			}
+			else
+				cli._msgBuffer.append(buffer, bytesRead);
 			continue;
 		}
 		else if (bytesRead == 0) {
-			cout << "Client disconnected: fd=" << fd << endl;
 			return -2;
 		}
 		else {
 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-					break;
+				break;
 			}
 			if (errno == EINTR) {
-					continue;
+				continue;
 			}
 			ft_error(errno, "recv");
-			return -2;
+				return -1;
 		}
 	}
 
 	Executioner executioner;
+	string complete_cmd;
 	size_t pos;
-	int commandCount = 0;
 
 	while ((pos = cli._msgBuffer.find("\r\n")) != string::npos) {
-		string complete_cmd = cli._msgBuffer.substr(0, pos);
+		complete_cmd = cli._msgBuffer.substr(0, pos);
 		cli._msgBuffer.erase(0, pos + 2);
-		
-		commandCount++;
-		
-		if (commandCount > 50) {
-			cli.queueMessage("ERROR :Command flood\r\n");
-			cli._msgBuffer.clear();
-			enableWrite(epoll_fd, fd);
-			return -2;
-		}
 
 		if (complete_cmd.size() > 510) {
-			cli.queueMessage("ERROR :Command too long\r\n");
-			enableWrite(epoll_fd, fd);
-			continue;
-		}
-
-		if (complete_cmd.empty()) {
-			continue;
-		}
-
-		cout << "Processing command: " << complete_cmd << endl;
-		
-		int result = executioner.run(cli, complete_cmd);
-		
-		if (cli._has_msg) {
-			enableWrite(epoll_fd, fd);
-		}
-		
-		if (result == -1) {
+			cli.response("ERROR :Line too long\r\n");
 			return -2;
+		}
+		if (complete_cmd.empty())
+			continue;
+
+		cout << "The current command to run: " << complete_cmd << "\n";
+		int result = executioner.run(cli, complete_cmd);
+		if (cli._has_msg){
+			enableWrite( epoll_fd, fd);
+		}
+		if (result == -1) {
+			return -1;
 		}
 	}
 
 	if (!cli._msgBuffer.empty()) {
 		if (cli._msgBuffer.size() > 510) {
-			cli.queueMessage("ERROR :Incomplete line too long\r\n");
+			cli.queueMessage("ERROR :Line too long without CRLF\r\n");
 			cli._msgBuffer.clear();
-			enableWrite(epoll_fd, fd);
-			return -2;
 		}
 	}
 
-	return 0; // Success
+	return 0; // Success, client stays connected
 }
 
 void Server::terminate(map<int, Client>& clients) {
