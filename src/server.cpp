@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 15:06:28 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/07 14:05:44 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,91 +144,87 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
 
-	// cout << "[DEBUG] handleCmd: Starting for fd=" << fd << endl;
-
-	// For draining the socket from all available data, read until EAGAIN/EWOULDBLOCK
+	// 1. Drain the socket
 	for (;;) {
 		ssize_t bytesRead = recv(fd, buffer, sizeof(buffer), 0);
 		
 		if (bytesRead > 0) {
-			// cout << "[DEBUG] handleCmd: Read " << bytesRead << " bytes from fd=" << fd << endl;
-			// When new data is read, append it to the client's message buffer
 			cli._msgBuffer.append(buffer, bytesRead);
 			
-			// Buffer overflow
-			if (cli._msgBuffer.size() > 4096) {
-				// cout << "[DEBUG] handleCmd: Buffer overflow for fd=" << fd << ", size=" << cli._msgBuffer.size() << endl;
-				string err = "ERROR :Input buffer overflow\r\n";
-				cli.response(err);
-				return -2;
+			if (cli._msgBuffer.size() > 512) {
+					cli.queueMessage("ERROR :Line too long without CRLF\r\n");
+					cli._msgBuffer.clear();
+					enableWrite(epoll_fd, fd);
+					return -2;
 			}
 			continue;
 		}
 		else if (bytesRead == 0) {
-			// cout << "[DEBUG] handleCmd: EOF received from fd=" << fd << " (client sent ^D)" << endl;
+			cout << "Client disconnected: fd=" << fd << endl;
 			return -2;
 		}
 		else {
 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-				// cout << "[DEBUG] handleCmd: EAGAIN/EWOULDBLOCK for fd=" << fd << ", breaking recv loop" << endl;
-				break;
+					break;
 			}
 			if (errno == EINTR) {
-				// cout << "[DEBUG] handleCmd: EINTR for fd=" << fd << ", retrying" << endl;
-				// Interrupted by signal, retry
-				continue;
+					continue;
 			}
-			// Real error
-			// cout << "[DEBUG] handleCmd: recv error for fd=" << fd << ", errno=" << errno << endl;
 			ft_error(errno, "recv");
-			return -1;
+			return -2;
 		}
 	}
 
-	// cout << "[DEBUG] handleCmd: Finished recv loop for fd=" << fd << ", buffer size=" << cli._msgBuffer.size() << endl;
-
-	// 2. Process complete commands (ending with \r\n)
 	Executioner executioner;
-	string complete_cmd;
 	size_t pos;
+	int commandCount = 0;
 
 	while ((pos = cli._msgBuffer.find("\r\n")) != string::npos) {
-		// Extract complete command (without \r\n)
-		complete_cmd = cli._msgBuffer.substr(0, pos);
-		// Remove processed command from buffer (including \r\n)
+		string complete_cmd = cli._msgBuffer.substr(0, pos);
 		cli._msgBuffer.erase(0, pos + 2);
-
-		// Check command length (IRC RFC limit: 512 bytes including \r\n)
-		if (complete_cmd.size() > 510) {
-			cli.response("ERROR :Line too long\r\n");
+		
+		commandCount++;
+		
+		if (commandCount > 50) {
+			cli.queueMessage("ERROR :Command flood\r\n");
+			cli._msgBuffer.clear();
+			enableWrite(epoll_fd, fd);
 			return -2;
 		}
 
-		// Skip empty commands
+		if (complete_cmd.size() > 510) {
+			cli.queueMessage("ERROR :Command too long\r\n");
+			enableWrite(epoll_fd, fd);
+			continue;
+		}
+
 		if (complete_cmd.empty()) {
 			continue;
 		}
-		cout << "Processing complete command from fd=" << fd << ": " << complete_cmd << endl;
 
-		// Process the command
+		cout << "Processing command: " << complete_cmd << endl;
+		
 		int result = executioner.run(cli, complete_cmd);
-
-		if (cli._has_msg){
-			enableWrite( epoll_fd, fd);
+		
+		if (cli._has_msg) {
+			enableWrite(epoll_fd, fd);
 		}
-
+		
 		if (result == -1) {
-			return -1;
+			return -2;
 		}
 	}
-	
 
-	// 3. If there's leftover data (incomplete command), keep it for next time
 	if (!cli._msgBuffer.empty()) {
-		// cout << "Leftover incomplete command in buffer for fd=" << fd << ": " << cli._msgBuffer << endl;
+		if (cli._msgBuffer.size() > 510) {
+			cli.queueMessage("ERROR :Incomplete line too long\r\n");
+			cli._msgBuffer.clear();
+			enableWrite(epoll_fd, fd);
+			return -2;
+		}
 	}
-	
-	return 0; // Success, client stays connected
+
+	return 0; // Success
 }
 
 void Server::terminate(map<int, Client>& clients) {

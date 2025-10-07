@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 15:41:58 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/07 14:06:10 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 				}
 				continue;
 			}
-			cout << "Checking events for fd=" << fd << endl;
 			if (events[i].events & EPOLLIN) {
 				map<int, Client>::iterator it = clients.find(fd);
 				if (it == clients.end()) {
@@ -49,12 +48,17 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 					continue;
 				}
 				int err = handleCmd(it->second, epoll_fd);
+				// if (err == 0){
+				// 	continue;
+				// }
 				if (err == -1) {
 					continue; // Changed from break - keep processing other events
 				}
 				if (err == -2)
 				{
-					clients[fd].markDisconnected();
+					// clients[fd].markDisconnected();
+					del_and_close(epoll_fd, fd);
+					clients.erase(it);
 				}
 			}
 			if (events[i].events & EPOLLOUT) {
