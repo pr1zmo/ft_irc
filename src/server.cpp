@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/07 14:18:03 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/10 16:25:35 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 	// For draining the socket from all available data, read until EAGAIN/EWOULDBLOCK
 	for (;;) {
 		ssize_t bytesRead = recv(fd, buffer, sizeof(buffer), 0);
-		
+
 		if (bytesRead > 0) {
 			if (cli._msgBuffer.size() + strlen(buffer) > 512) {
 				string err = "ERROR :Input buffer overflow\r\n";

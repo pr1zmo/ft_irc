@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 09:43:28 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 14:26:47 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/13 15:48:03 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,10 @@ class Bot {
 		size_t serv_fd;
 		int getSockfd() { return _sockfd; };
 		bool connectToServer();
-		void run();
 		vector<string> bot_params;
 		int parseParams(char *msg, std::vector<std::string>& params);
+
+		void run();
 };
 
 #endif

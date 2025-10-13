@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/07 14:06:10 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/07 14:19:31 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,8 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 					continue;
 				}
 				int err = handleCmd(it->second, epoll_fd);
-				// if (err == 0){
-				// 	continue;
-				// }
 				if (err == -1) {
-					continue; // Changed from break - keep processing other events
+					continue;
 				}
 				if (err == -2)
 				{

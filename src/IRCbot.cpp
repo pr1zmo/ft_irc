@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 21:50:52 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 14:26:50 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/10 16:58:47 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,21 @@ bool Bot::connectToServer(){
 	return true;
 }
 
+void Bot::run() {
+	char buffer[1024] = {0};
+	int valread = recv(_sockfd, buffer, sizeof(buffer) - 1, 0);
+	if (valread > 0) {
+		buffer[valread] = '\0';
+		std::cout << "Message from server: " << buffer << std::endl;
+	} else if (valread == 0) {
+		std::cout << "Server closed the connection." << std::endl;
+		close(_sockfd);
+		exit(0);
+	} else {
+		perror("recv");
+	}
+}
+
 int main(int ac, char **av) {
 	if (ac < 4) {
 		std::cerr << "Usage: " << av[0] << " <server_ip> <server_port> <bot_nick>" << std::endl;
@@ -60,10 +75,8 @@ int main(int ac, char **av) {
 	try{
 		Bot bot(av[1], atoi(av[2]), av[3]);
 		if (bot.connectToServer()){
-			send(bot.getSockfd(), "HELLO\r\n", 6, 0);
-			cout << "Sent hello to server\n";
-		} else {
-			cout << "Could not connect\n";
+			while (true)
+				bot.run();
 		}
 	} catch (std::exception &e){
 		cout << e.what() << endl;
