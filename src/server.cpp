@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 15:06:28 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/14 11:12:19 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,21 +75,18 @@ int Server::initConnection(map<int, Client> &clients){
 	
 	if (cli_fd < 0){
 		// EAGAIN and EWOULDBLOCK just means we have processed all incoming connections
-		if (errno == EWOULDBLOCK || errno == EAGAIN)
+		if (errno == EWOULDBLOCK || errno == EAGAIN){
 			return -1;
+		}
 		// EINTR means the call was interrupted by a signal before a valid connection arrived
-		if (errno == EINTR)
+		if (errno == EINTR){
 			return -1;
+		}
 		ft_error(errno, "accept");
 		return -1;
 	}
 
 	fcntl(cli_fd, F_SETFL, O_NONBLOCK);
-	// if (clients.size() >= static_cast<size_t>(_maxClients)) {
-	// 	cerr << "Max clients reached. Rejecting new connection." << endl;
-	// 	close(cli_fd);
-	// 	return -1;
-	// }
 
 	clients[cli_fd] = Client(cli_fd, cli_address);
 

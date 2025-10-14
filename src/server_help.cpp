@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 15:41:58 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/14 11:24:46 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 			break;
 		}
 		
-		for (int i = 0; i < ec_; i++) {
+		for (size_t i = 0; i < ec_; i++) {
 			int fd = events[i].data.fd;
 			if (fd == getServerSocket()) {
 				int cli_fd = initConnection(clients);
@@ -41,7 +41,8 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 				}
 				continue;
 			}
-			cout << "Checking events for fd=" << fd << endl;
+			cout << "\n\033[1;32mevent type: " << events[i].events << "\033[0m\n";
+			cout << "EPOLLIN: " << EPOLLIN << "\n";
 			if (events[i].events & EPOLLIN) {
 				map<int, Client>::iterator it = clients.find(fd);
 				if (it == clients.end()) {
@@ -57,7 +58,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 					clients[fd].markDisconnected();
 				}
 			}
-			if (events[i].events & EPOLLOUT) {
+			else if (events[i].events & EPOLLOUT) {
 				map<int, Client>::iterator it = clients.find(fd);
 				if (it == clients.end()) {
 					cerr << "Client fd=" << fd << " not found for EPOLLOUT" << endl;
@@ -66,7 +67,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 				}
 				it->second.sendPendingMessages();
 			}
-			if ((events[i].events & (EPOLLHUP | EPOLLERR)) || clients[fd].should_quit) {
+			else if ((events[i].events & (EPOLLHUP | EPOLLERR)) || clients[fd].should_quit) {
 				cout << "Client disconnected (HUP/ERR): fd=" << fd << endl;
 				del_and_close(epoll_fd, fd);
 				clients.erase(clients.find(fd));
