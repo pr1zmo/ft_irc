@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/14 11:24:46 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/15 15:55:18 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,15 +50,12 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 					continue;
 				}
 				int err = handleCmd(it->second, epoll_fd);
-				if (err == -1) {
-					continue; // Changed from break - keep processing other events
-				}
+				if (err == -1)
+					continue;
 				if (err == -2)
-				{
 					clients[fd].markDisconnected();
-				}
 			}
-			else if (events[i].events & EPOLLOUT) {
+			if (events[i].events & EPOLLOUT) {
 				map<int, Client>::iterator it = clients.find(fd);
 				if (it == clients.end()) {
 					cerr << "Client fd=" << fd << " not found for EPOLLOUT" << endl;
@@ -67,7 +64,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 				}
 				it->second.sendPendingMessages();
 			}
-			else if ((events[i].events & (EPOLLHUP | EPOLLERR)) || clients[fd].should_quit) {
+			if ((events[i].events & (EPOLLHUP | EPOLLERR)) || clients[fd].should_quit) {
 				cout << "Client disconnected (HUP/ERR): fd=" << fd << endl;
 				del_and_close(epoll_fd, fd);
 				clients.erase(clients.find(fd));

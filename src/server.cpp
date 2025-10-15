@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/14 11:12:19 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/15 16:19:54 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,23 +138,25 @@ int checkCommand(const string &msg, vector<string> validCmds) {
 }
 
 int Server::handleCmd(Client &cli, int epoll_fd) {
+	Executioner executioner;
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
+	size_t _btsRd = 0;
 
-	// cout << "[DEBUG] handleCmd: Starting for fd=" << fd << endl;
-
-	// For draining the socket from all available data, read until EAGAIN/EWOULDBLOCK
 	for (;;) {
 		ssize_t bytesRead = recv(fd, buffer, sizeof(buffer), 0);
+		_btsRd += bytesRead;
 		
 		if (bytesRead > 0) {
-			// cout << "[DEBUG] handleCmd: Read " << bytesRead << " bytes from fd=" << fd << endl;
-			// When new data is read, append it to the client's message buffer
 			cli._msgBuffer.append(buffer, bytesRead);
-			
-			// Buffer overflow
+
+			// for (int i = 0; i < strlen(buffer); i++){
+			// 	if (buffer[i] == '\n')
+			// 		// cout << "\033[32mFOUND NEW LINE\033[0m\n";
+			// 		executioner.run(cli, string(buffer, i + 1));
+			// }
+
 			if (cli._msgBuffer.size() > 4096) {
-				// cout << "[DEBUG] handleCmd: Buffer overflow for fd=" << fd << ", size=" << cli._msgBuffer.size() << endl;
 				string err = "ERROR :Input buffer overflow\r\n";
 				cli.response(err);
 				return -2;
@@ -162,30 +164,24 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 			continue;
 		}
 		else if (bytesRead == 0) {
-			// cout << "[DEBUG] handleCmd: EOF received from fd=" << fd << " (client sent ^D)" << endl;
 			return -2;
 		}
 		else {
 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-				// cout << "[DEBUG] handleCmd: EAGAIN/EWOULDBLOCK for fd=" << fd << ", breaking recv loop" << endl;
 				break;
 			}
 			if (errno == EINTR) {
-				// cout << "[DEBUG] handleCmd: EINTR for fd=" << fd << ", retrying" << endl;
-				// Interrupted by signal, retry
 				continue;
 			}
-			// Real error
-			// cout << "[DEBUG] handleCmd: recv error for fd=" << fd << ", errno=" << errno << endl;
 			ft_error(errno, "recv");
 			return -1;
 		}
 	}
-
-	// cout << "[DEBUG] handleCmd: Finished recv loop for fd=" << fd << ", buffer size=" << cli._msgBuffer.size() << endl;
-
-	// 2. Process complete commands (ending with \r\n)
-	Executioner executioner;
+	/*
+	* I need to make sure that the given buffer is the same size as the complete command before executing it... I should * not execute something before checking it's size...
+	* Just a simple logic bug in your code no biggie, just don't forget what you are doing...
+	* Complete command needs to be the same size as the total bytes read...
+	*/
 	string complete_cmd;
 	size_t pos;
 
@@ -208,14 +204,15 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 		cout << "Processing complete command from fd=" << fd << ": " << complete_cmd << endl;
 
 		// Process the command
-		int result = executioner.run(cli, complete_cmd);
+		if (complete_cmd.size() == _btsRd){
+			int result = executioner.run(cli, complete_cmd);
+			if (result == -1) {
+				return -1;
+			}
+		}
 
 		if (cli._has_msg){
 			enableWrite( epoll_fd, fd);
-		}
-
-		if (result == -1) {
-			return -1;
 		}
 	}
 	
