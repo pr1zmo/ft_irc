@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/15 16:19:54 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/17 13:57:37 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,16 +145,12 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 
 	for (;;) {
 		ssize_t bytesRead = recv(fd, buffer, sizeof(buffer), 0);
-		_btsRd += bytesRead;
+		// cout << "[DEBUG] Buffer content this cycle: " << string(buffer, bytesRead) << endl;
 		
 		if (bytesRead > 0) {
+			_btsRd += bytesRead;
+			// cout << "[DEBUG] Bytes read this cycle: " << bytesRead << ", Total bytes read: " << _btsRd << endl;
 			cli._msgBuffer.append(buffer, bytesRead);
-
-			// for (int i = 0; i < strlen(buffer); i++){
-			// 	if (buffer[i] == '\n')
-			// 		// cout << "\033[32mFOUND NEW LINE\033[0m\n";
-			// 		executioner.run(cli, string(buffer, i + 1));
-			// }
 
 			if (cli._msgBuffer.size() > 4096) {
 				string err = "ERROR :Input buffer overflow\r\n";
@@ -186,43 +182,33 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 	size_t pos;
 
 	while ((pos = cli._msgBuffer.find("\r\n")) != string::npos) {
-		// Extract complete command (without \r\n)
 		complete_cmd = cli._msgBuffer.substr(0, pos);
-		// Remove processed command from buffer (including \r\n)
+
 		cli._msgBuffer.erase(0, pos + 2);
 
-		// Check command length (IRC RFC limit: 512 bytes including \r\n)
 		if (complete_cmd.size() > 510) {
 			cli.response("ERROR :Line too long\r\n");
 			return -2;
 		}
 
-		// Skip empty commands
-		if (complete_cmd.empty()) {
+		if (complete_cmd.empty())
 			continue;
-		}
-		cout << "Processing complete command from fd=" << fd << ": " << complete_cmd << endl;
 
-		// Process the command
-		if (complete_cmd.size() == _btsRd){
-			int result = executioner.run(cli, complete_cmd);
-			if (result == -1) {
-				return -1;
-			}
+		int result = executioner.run(cli, complete_cmd);
+		if (result == -1){
+			
+			return -1;
 		}
 
-		if (cli._has_msg){
-			enableWrite( epoll_fd, fd);
-		}
+		if (cli._has_msg)
+			enableWrite(epoll_fd, fd);
 	}
-	
-
-	// 3. If there's leftover data (incomplete command), keep it for next time
+	// leftover data
 	if (!cli._msgBuffer.empty()) {
-		// cout << "Leftover incomplete command in buffer for fd=" << fd << ": " << cli._msgBuffer << endl;
+		cout << "Incomplete command in buffer (waiting for \\r\\n): " 
+			<< cli._msgBuffer << endl;
 	}
-	
-	return 0; // Success, client stays connected
+	return 0;
 }
 
 void Server::terminate(map<int, Client>& clients) {

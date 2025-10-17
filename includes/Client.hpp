@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:20 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 15:12:22 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/17 13:04:00 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class Client {
 		void markDisconnected();
 
 		std::string get_pending_msg();
+		std::string getNickname() const { return _nick; }
 };
 
 #endif
