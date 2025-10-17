@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/17 13:57:37 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/17 14:05:07 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,11 +99,6 @@ int Server::initConnection(map<int, Client> &clients){
 	return cli_fd;
 }
 
-/*
- * Sets up the epoll instance and adds the server socket to it
- * Returns the epoll file descriptor or -1 on error
-*/
-
 int Server::setEpoll() {
 	int epoll_fd = epoll_create1(0);
 	if (epoll_fd == -1) {
@@ -145,11 +140,9 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 
 	for (;;) {
 		ssize_t bytesRead = recv(fd, buffer, sizeof(buffer), 0);
-		// cout << "[DEBUG] Buffer content this cycle: " << string(buffer, bytesRead) << endl;
 		
 		if (bytesRead > 0) {
 			_btsRd += bytesRead;
-			// cout << "[DEBUG] Bytes read this cycle: " << bytesRead << ", Total bytes read: " << _btsRd << endl;
 			cli._msgBuffer.append(buffer, bytesRead);
 
 			if (cli._msgBuffer.size() > 4096) {
@@ -173,11 +166,7 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 			return -1;
 		}
 	}
-	/*
-	* I need to make sure that the given buffer is the same size as the complete command before executing it... I should * not execute something before checking it's size...
-	* Just a simple logic bug in your code no biggie, just don't forget what you are doing...
-	* Complete command needs to be the same size as the total bytes read...
-	*/
+
 	string complete_cmd;
 	size_t pos;
 

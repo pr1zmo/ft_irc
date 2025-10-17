@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:20 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/17 13:04:00 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/17 14:04:33 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ class Client {
 		bool authenticate(const std::string &msg);
 		void response(const std::string &msg);
 		void sendPendingMessages();
-		void queueMessage(const std::string &msg);
 		void markDisconnected();
 
 		std::string get_pending_msg();

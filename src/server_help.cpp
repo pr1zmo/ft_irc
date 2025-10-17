@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/17 14:00:56 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/17 14:14:35 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 			if (fd == getServerSocket()) {
 				int cli_fd = initConnection(clients);
 				if (cli_fd != -1) {
-					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET);
+					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET | EPOLLOUT);
 				}
 				continue;
 			}
@@ -47,8 +47,8 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 				del_and_close(epoll_fd, fd);
 				continue;
 			}
-			cout << "\n\033[1;32mevent type: " << events[i].events << "\033[0m\n";
-			cout << "EPOLLIN: " << EPOLLIN << "\n";
+			// cout << "\n\033[1;32mevent type: " << events[i].events << "\033[0m\n";
+			// cout << "EPOLLIN: " << EPOLLIN << "\n";
 			if ((events[i].events & (EPOLLHUP | EPOLLERR)) || clients[fd].should_quit) {
 				cout << "Client disconnected (HUP/ERR): fd=" << fd << endl;
 				del_and_close(epoll_fd, fd);
@@ -72,12 +72,10 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 			}
 			if (events[i].events & EPOLLOUT) {
 				cli_it->second.sendPendingMessages();
-				
-				// If queue is empty, disable EPOLLOUT
+
 				if (!cli_it->second._has_msg) {
 					disableWrite(epoll_fd, fd);
-					
-					// If marked for disconnect and no more messages, disconnect now
+
 					if (cli_it->second.should_quit) {
 						cout << "Client quit after sending all messages: fd=" << fd << endl;
 						del_and_close(epoll_fd, fd);

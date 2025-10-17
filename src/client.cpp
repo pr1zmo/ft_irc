@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/17 13:18:46 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/17 14:04:28 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@ bool Client::authenticate(const std::string &msg) {
 }
 
 void Client::response(const std::string &msg) {
-	queueMessage(msg);
+	_pending_msg += msg;
+	_has_msg = true;
 }
 
 void Client::sendPendingMessages() {
@@ -64,11 +65,6 @@ void Client::sendPendingMessages() {
 			_pending_msg.clear();
 		}
 	}
-}
-
-void Client::queueMessage(const std::string &msg) {
-	_pending_msg += msg;
-	_has_msg = true;
 }
 
 string Client::get_pending_msg() {
