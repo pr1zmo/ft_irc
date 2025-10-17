@@ -1,5 +1,5 @@
 NAME = ircserv
-BOT_NAME = ircbot
+BOT_NAME = bot
 CC = c++
 CFLAGS = -I./includes -g3 -std=c++98
 # CFLAGS+= -fsanitize=address
@@ -29,6 +29,11 @@ bonus: $(BOT_NAME)
 
 $(BOT_NAME): $(BONUS_OBJS)
 	$(CC) $(CFLAGS) $(BONUS_OBJS) -o $(BOT_NAME)
+
+b_run: fclean
+	$(MAKE) -j20 bonus
+	@clear
+	./$(BOT_NAME) 127.0.0.1 6667 a
 
 $(BOT_OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@$(MKDIR) $(BOT_OBJDIR)

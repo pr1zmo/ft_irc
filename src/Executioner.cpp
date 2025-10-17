@@ -26,26 +26,25 @@ Executioner::~Executioner() {
 }
 
 int Executioner::run(Client &cli, const std::string &msg) {
-	Command command;
-
-	int ret = command.parseCommand(const_cast<char*>(msg.c_str()));
-	if (ret == 0) {
-		cli.response("Error: Command too long.\r\n");
-		return ret;
-	}
-
+	// Extract command name
 	size_t pos = msg.find(' ');
-	
 	std::string cmd = (pos == std::string::npos) ? msg : msg.substr(0, pos);
-
+	
+	// Find the command handler
 	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
 	if (it != _commands.end()) {
 		Command* cmdInstance = it->second;
-		// cmdInstance->setOp(cli.isOperator() ? 1 : 0);
-		cmdInstance->execute(cli, (pos == std::string::npos) ? "" : msg.substr(pos + 1));
+		
+		// Extract parameters (everything after the command name)
+		std::string params = (pos == std::string::npos) ? "" : msg.substr(pos + 1);
+		
+		// Execute the command
+		cmdInstance->execute(cli, params);
+		
+		return 0;
 	} else {
-		cli.response("Error: Unknown command.\r\n");
+		cli.response(cli.getNickname() + ": Unknown command: " + cmd + "\r\n");
+			return 0;
 		return -1;
 	}
-	return 0;
 }

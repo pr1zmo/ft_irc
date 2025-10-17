@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/07 14:19:31 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/17 15:24:30 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,51 +26,63 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 	while (running) {
 		int ec_ = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		if (ec_ == -1) {
-			if (errno == EINTR)
-				continue; // Interrupted by signal, retry
+			if (errno == EINTR) // Interrupted by signal, retry
+				continue;
 			ft_error(errno, "epoll_wait");
 			break;
 		}
 		
-		for (int i = 0; i < ec_; i++) {
+		for (size_t i = 0; i < ec_; i++) {
 			int fd = events[i].data.fd;
 			if (fd == getServerSocket()) {
 				int cli_fd = initConnection(clients);
 				if (cli_fd != -1) {
-					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET | EPOLLOUT | EPOLLHUP);
+					add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET | EPOLLOUT);
 				}
 				continue;
 			}
-			if (events[i].events & EPOLLIN) {
-				map<int, Client>::iterator it = clients.find(fd);
-				if (it == clients.end()) {
-					del_and_close(epoll_fd, fd);
-					continue;
-				}
-				int err = handleCmd(it->second, epoll_fd);
-				if (err == -1) {
-					continue;
-				}
-				if (err == -2)
-				{
-					// clients[fd].markDisconnected();
-					del_and_close(epoll_fd, fd);
-					clients.erase(it);
-				}
+			map<int, Client>::iterator cli_it = clients.find(fd);
+			if (cli_it == clients.end()) {
+				cerr << "Client fd=" << fd << " not found in clients map." << endl;
+				del_and_close(epoll_fd, fd);
+				continue;
 			}
-			if (events[i].events & EPOLLOUT) {
-				map<int, Client>::iterator it = clients.find(fd);
-				if (it == clients.end()) {
-					cerr << "Client fd=" << fd << " not found for EPOLLOUT" << endl;
-					del_and_close(epoll_fd, fd);
-					continue;
-				}
-				it->second.sendPendingMessages();
-			}
+			// cout << "\n\033[1;32mevent type: " << events[i].events << "\033[0m\n";
+			// cout << "EPOLLIN: " << EPOLLIN << "\n";
 			if ((events[i].events & (EPOLLHUP | EPOLLERR)) || clients[fd].should_quit) {
 				cout << "Client disconnected (HUP/ERR): fd=" << fd << endl;
 				del_and_close(epoll_fd, fd);
 				clients.erase(clients.find(fd));
+				continue;
+			}
+			if (events[i].events & EPOLLIN) {
+				if (cli_it == clients.end()) {
+					del_and_close(epoll_fd, fd);
+					continue;
+				}
+				int err = handleCmd(cli_it->second, epoll_fd);
+				if (err == -1)
+					continue;
+				if (err == -2)
+					clients[fd].markDisconnected();
+			}
+			cli_it = clients.find(fd);
+			if (cli_it == clients.end()) {
+				continue;
+			}
+			if (events[i].events & EPOLLOUT) {
+				cli_it->second.sendPendingMessages();
+
+				if (!cli_it->second._has_msg) {
+					disableWrite(epoll_fd, fd);
+
+					if (cli_it->second.should_quit) {
+						cout << "Client quit after sending all messages: fd=" << fd << endl;
+						del_and_close(epoll_fd, fd);
+						clients.erase(cli_it);
+						continue;
+					}
+				}
 			}
 		}
 	}

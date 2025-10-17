@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/10 16:25:35 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/17 15:24:38 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,21 +75,18 @@ int Server::initConnection(map<int, Client> &clients){
 	
 	if (cli_fd < 0){
 		// EAGAIN and EWOULDBLOCK just means we have processed all incoming connections
-		if (errno == EWOULDBLOCK || errno == EAGAIN)
+		if (errno == EWOULDBLOCK || errno == EAGAIN){
 			return -1;
+		}
 		// EINTR means the call was interrupted by a signal before a valid connection arrived
-		if (errno == EINTR)
+		if (errno == EINTR){
 			return -1;
+		}
 		ft_error(errno, "accept");
 		return -1;
 	}
 
 	fcntl(cli_fd, F_SETFL, O_NONBLOCK);
-	// if (clients.size() >= static_cast<size_t>(_maxClients)) {
-	// 	cerr << "Max clients reached. Rejecting new connection." << endl;
-	// 	close(cli_fd);
-	// 	return -1;
-	// }
 
 	clients[cli_fd] = Client(cli_fd, cli_address);
 
@@ -101,11 +98,6 @@ int Server::initConnection(map<int, Client> &clients){
 	
 	return cli_fd;
 }
-
-/*
- * Sets up the epoll instance and adds the server socket to it
- * Returns the epoll file descriptor or -1 on error
-*/
 
 int Server::setEpoll() {
 	int epoll_fd = epoll_create1(0);
@@ -141,17 +133,19 @@ int checkCommand(const string &msg, vector<string> validCmds) {
 }
 
 int Server::handleCmd(Client &cli, int epoll_fd) {
+	Executioner executioner;
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
+	size_t _btsRd = 0;
 
-	// cout << "[DEBUG] handleCmd: Starting for fd=" << fd << endl;
-
-	// For draining the socket from all available data, read until EAGAIN/EWOULDBLOCK
 	for (;;) {
 		ssize_t bytesRead = recv(fd, buffer, sizeof(buffer), 0);
 
 		if (bytesRead > 0) {
-			if (cli._msgBuffer.size() + strlen(buffer) > 512) {
+			_btsRd += bytesRead;
+			cli._msgBuffer.append(buffer, bytesRead);
+
+			if (cli._msgBuffer.size() > 4096) {
 				string err = "ERROR :Input buffer overflow\r\n";
 				cli.response(err);
 				cli._msgBuffer.clear();
@@ -177,39 +171,37 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 		}
 	}
 
-	Executioner executioner;
 	string complete_cmd;
 	size_t pos;
 
 	while ((pos = cli._msgBuffer.find("\r\n")) != string::npos) {
 		complete_cmd = cli._msgBuffer.substr(0, pos);
+
 		cli._msgBuffer.erase(0, pos + 2);
 
 		if (complete_cmd.size() > 510) {
 			cli.response("ERROR :Line too long\r\n");
 			return -2;
 		}
+
 		if (complete_cmd.empty())
 			continue;
 
-		cout << "The current command to run: " << complete_cmd << "\n";
 		int result = executioner.run(cli, complete_cmd);
-		if (cli._has_msg){
-			enableWrite( epoll_fd, fd);
-		}
-		if (result == -1) {
+		if (result == -1){
+			
 			return -1;
 		}
-	}
 
+		if (cli._has_msg)
+			enableWrite(epoll_fd, fd);
+	}
+	// leftover data
 	if (!cli._msgBuffer.empty()) {
-		if (cli._msgBuffer.size() > 510) {
-			cli.queueMessage("ERROR :Line too long without CRLF\r\n");
-			cli._msgBuffer.clear();
-		}
+		cout << "Incomplete command in buffer (waiting for \\r\\n): " 
+			<< cli._msgBuffer << endl;
 	}
-
-	return 0; // Success, client stays connected
+	return 0;
 }
 
 void Server::terminate(map<int, Client>& clients) {

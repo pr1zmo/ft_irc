@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 21:50:52 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/10 16:58:47 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/17 15:24:12 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,18 +52,38 @@ bool Bot::connectToServer(){
 	return true;
 }
 
-void Bot::run() {
-	char buffer[1024] = {0};
-	int valread = recv(_sockfd, buffer, sizeof(buffer) - 1, 0);
-	if (valread > 0) {
-		buffer[valread] = '\0';
-		std::cout << "Message from server: " << buffer << std::endl;
-	} else if (valread == 0) {
-		std::cout << "Server closed the connection." << std::endl;
-		close(_sockfd);
-		exit(0);
-	} else {
-		perror("recv");
+int Bot::parseParams(char *msg, std::vector<std::string>& params){
+	char *token = strtok(msg, " \r\n");
+	while (token != NULL) {
+		params.push_back(std::string(token));
+		token = strtok(NULL, " \r\n");
+	}
+	return params.size();
+}
+
+void Bot::run(){
+	char buffer[512];
+	memset(buffer, 0, sizeof(buffer));
+	int bytes_received = recv(_sockfd, buffer, sizeof(buffer) - 1, 0);
+	if (bytes_received < 0) {
+		ft_error(errno, "recv failed");
+		return;
+	} else if (bytes_received == 0) {
+		cout << "Connection closed by server." << endl;
+		return;
+	}
+	buffer[bytes_received] = '\0';
+	cout << "Received: " << buffer;
+
+	std::vector<std::string> params;
+	if (parseParams(buffer, params) < 1)
+		return;
+
+	// Simple bot logic: respond to PING with PONG
+	if (params.size() > 0 && params[0] == "PING") {
+		std::string pong_response = "PONG :" + params[1] + "\r\n";
+		send(_sockfd, pong_response.c_str(), pong_response.length(), 0);
+		cout << "Sent: " << pong_response;
 	}
 }
 
@@ -75,9 +95,12 @@ int main(int ac, char **av) {
 	try{
 		Bot bot(av[1], atoi(av[2]), av[3]);
 		if (bot.connectToServer()){
-			while (true)
+			while (true){
 				bot.run();
+			}
 		}
+		else 
+			cout << "Could not connect\n";
 	} catch (std::exception &e){
 		cout << e.what() << endl;
 	}
