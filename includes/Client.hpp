@@ -22,6 +22,11 @@ class Client {
 	struct sockaddr_in	_address;
 	socklen_t 				_addrLen;
 	Command* 				_cmd;
+	// User information
+	std::string				_username;
+	std::string				_realname;
+	std::string				_hostname;
+	std::string				_servername;
 	const std::string		_name;
 	const std::string		_pass;
 	const std::string		_nick;
@@ -39,6 +44,7 @@ class Client {
 		~Client();
 
 		int getFd() const { return _fd; }
+		Command* getCmd() const { return _cmd; }
 		struct sockaddr_in getAddress() const { return _address; }
 		socklen_t getAddrLen() const { return _addrLen; }
 		bool authenticate(const std::string &msg);
@@ -48,6 +54,16 @@ class Client {
 		void markDisconnected();
 
 		std::string get_pending_msg();
+		void setNickname(const std::string &nick);
+		std::string getNickname() const;
+		void setUsername(const std::string &username) { *(const_cast<std::string*>(&_username)) = username; }
+		void setRealname(const std::string &realname) { *(const_cast<std::string*>(&_realname)) = realname; }
+		void setHostname(const std::string &hostname) { *(const_cast<std::string*>(&_hostname)) = hostname; }
+		void setServername(const std::string &servername) { *(const_cast<std::string*>(&_servername)) = servername; }
+		std::string getUsername() const { return _username; }
+		std::string getRealname() const { return _realname; }
+		std::string getHostname() const { return _hostname; }
+		std::string getServername() const { return _servername; }
 };
 
 #endif

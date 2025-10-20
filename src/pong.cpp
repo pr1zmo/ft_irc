@@ -19,3 +19,11 @@ Pong::Pong() {
 Pong::~Pong() {
 	
 }
+
+void Pong::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients) {
+    (void)cli;
+    (void)param;
+    (void)cmd;
+    (void)clients;
+    // Implementation of PONG command execution
+}

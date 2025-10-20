@@ -40,7 +40,7 @@ void Privmsg::handleFileTransfer(Client &cli, const std::string& param){
 	cout << "Handling file transfer with param: " << param << endl;
 }
 
-void Privmsg::execute(Client &cli, const std::string& param){
+void Privmsg::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients) {
 	if (param.empty()) {
 		cli.response("ERROR :No recipient given\r\n");
 		return;

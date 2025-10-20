@@ -40,7 +40,7 @@ class Command {
 
 		int parseCommand(char *msg);
 		void setOp(int isOp) { _isOp = isOp; }
-		virtual void execute(Client &cli, const std::string& param);
+		virtual void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class Help : public Command {
@@ -53,7 +53,7 @@ std::vector<std::string> full;
 		bool load();
 		std::string printUsage() const;
 		const std::vector<std::string>* getTopic(const std::string& key) const;
-		void execute(Client &cli, const std::string& param);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 // PASS command class
@@ -64,14 +64,14 @@ class Pass : public Command {
 		Pass() {};
 		~Pass() {};
 
-		void execute(Client &cli, const std::string& param);
+		void execute(Client &cli, const std::string& param,	 const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class Nick : public Command {
 	public:
 		Nick(/* args */);
 		~Nick();
-		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class User : public Command {
@@ -79,6 +79,7 @@ class User : public Command {
 		User(/* args */);
 		~User();
 		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class Oper : public Command {
@@ -86,6 +87,7 @@ class Oper : public Command {
 		Oper(/* args */);
 		~Oper();
 		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class Quit : public Command {
@@ -93,6 +95,7 @@ class Quit : public Command {
 		Quit(/* args */);
 		~Quit();
 		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class Join : public Command {
@@ -100,6 +103,7 @@ class Join : public Command {
 		Join(/* args */);
 		~Join();
 		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class Part : public Command {
@@ -107,6 +111,7 @@ class Part : public Command {
 		Part(/* args */);
 		~Part();
 		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class Privmsg : public Command {
@@ -116,7 +121,7 @@ class Privmsg : public Command {
 
 		int userExists(std::string uname);
 		void handleFileTransfer(Client &cli, const std::string& param);
-		void execute(Client &cli, const std::string& param);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class Notice : public Command {
@@ -124,6 +129,7 @@ class Notice : public Command {
 		Notice(/* args */);
 		~Notice();
 		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class Ping : public Command {
@@ -131,6 +137,7 @@ class Ping : public Command {
 		Ping(/* args */);
 		~Ping();
 		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class Pong : public Command {
@@ -138,6 +145,7 @@ class Pong : public Command {
 		Pong(/* args */);
 		~Pong();
 		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 class File : public Command {
@@ -157,7 +165,7 @@ class File : public Command {
 		int parseCommand(const std::string &msg);
 		int sendFile();
 		int receiveFile();
-		void execute(Client &cli, const std::string &msg);
+		void execute(Client &cli, const std::string &msg, const std::string& cmd, std::map<int, Client>& clients);
 };
 
 #endif

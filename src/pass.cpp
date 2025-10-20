@@ -12,8 +12,10 @@
 
 #include "ft_irc.h"
 
-void Pass::execute(Client &cli, const std::string& param) {
+void Pass::execute(Client &cli, const std::string& param,	 const std::string& cmd, std::map<int, Client>& clients) {
 	(void)cli;
 	(void)param;
+	(void)cmd;
+	(void)clients;
 	//
 }

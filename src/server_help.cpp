@@ -47,7 +47,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 					del_and_close(epoll_fd, fd);
 					continue;
 				}
-				int err = handleCmd(it->second, epoll_fd);
+				int err = handleCmd(it->second, epoll_fd, clients);
 				// if (err == 0){
 				// 	continue;
 				// }
