@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:27 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 13:47:12 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/20 13:28:13 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@
 # include "Executioner.hpp"
 
 # define MAX_CLIENTS 1022
-# define MAX_EVENTS 128
+# define MAX_EVENTS 1024
 # define BUFFER_SIZE 512
 # define DEFAULT_PORT 6667
 

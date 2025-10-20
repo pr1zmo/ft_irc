@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/17 15:24:38 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/20 16:29:15 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ Server::Server(int port, int maxClients, const string &password)
 	if (bind(_serverSocket, (struct sockaddr *)&_serverAddr, sizeof(_serverAddr)) < 0)
 		throw ServerFailedException("bind");
 
-	if (listen(_serverSocket, 3) < 0)
+	if (listen(_serverSocket, SOMAXCONN) < 0)
 		throw ServerFailedException("listen");
 }
 
@@ -53,7 +53,7 @@ Server::~Server() {
  * Handles new connections and incoming data
  * Adds file descriptors to epoll instance
  * and then waits for events
- * Notifies when a client sends data or disconnects or is ready to write
+ * Notifies when a client sends data or disconnects or is ready to writeMA
  * In this case we only handle read events
 */
 
@@ -66,33 +66,34 @@ Server::~Server() {
  * Returns the new client's file descriptor or -1 on error
 */
 
-int Server::initConnection(map<int, Client> &clients){
-	struct sockaddr_in cli_address = {};
-	socklen_t addrLen = sizeof(cli_address);
-	memset(&cli_address, 0, sizeof(cli_address));
+int Server::initConnection(map<int, Client>& clients) {
+	struct sockaddr_in cli_addr;
+	socklen_t cli_addr_len = sizeof(cli_addr);
 	
-	int cli_fd = accept(_serverSocket, reinterpret_cast<struct sockaddr*>(&cli_address), &addrLen);
-	
-	if (cli_fd < 0){
-		// EAGAIN and EWOULDBLOCK just means we have processed all incoming connections
-		if (errno == EWOULDBLOCK || errno == EAGAIN){
-			return -1;
-		}
-		// EINTR means the call was interrupted by a signal before a valid connection arrived
-		if (errno == EINTR){
-			return -1;
-		}
+	int cli_fd = accept(_serverSocket, (struct sockaddr *)&cli_addr, &cli_addr_len);
+	if (cli_fd == -1) {
 		ft_error(errno, "accept");
 		return -1;
 	}
-
-	fcntl(cli_fd, F_SETFL, O_NONBLOCK);
-
-	clients[cli_fd] = Client(cli_fd, cli_address);
+	
+	// Make socket non-blocking
+	int flags = fcntl(cli_fd, F_GETFL, 0);
+	if (flags == -1) {
+		close(cli_fd);
+		return -1;
+	}
+	
+	if (fcntl(cli_fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+		close(cli_fd);
+		return -1;
+	}
+	// if (errno == EAGAIN || errno == EWOULDBLOCK) cout << "WTFFFFFFFFFFFFFFFF THIS WOULD BLOCKKK???\n";
+	
+	clients[cli_fd] = Client(cli_fd, cli_addr);
 
 	string client_info = "Your connection info:\r\n";
-	client_info += "\tIP: " + string(inet_ntoa(cli_address.sin_addr)) + "\r\n";
-	client_info += "\tPort: " + to_string98(ntohs(cli_address.sin_port)) + "\r\n";
+	client_info += "\tIP: " + string(inet_ntoa(cli_addr.sin_addr)) + "\r\n";
+	client_info += "\tPort: " + to_string98(ntohs(cli_addr.sin_port)) + "\r\n";
 	client_info += "\tFile Descriptor: " + to_string98(cli_fd) + "\r\n";
 	clients[cli_fd].response(client_info);
 	
@@ -157,7 +158,8 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 			continue;
 		}
 		else if (bytesRead == 0) {
-			return -2;
+			close(cli.getFd());
+			break;
 		}
 		else {
 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -199,7 +201,7 @@ int Server::handleCmd(Client &cli, int epoll_fd) {
 	// leftover data
 	if (!cli._msgBuffer.empty()) {
 		cout << "Incomplete command in buffer (waiting for \\r\\n): " 
-			<< cli._msgBuffer << endl;
+		<< cli._msgBuffer << endl;
 	}
 	return 0;
 }

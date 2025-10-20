@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:23 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/02 16:31:21 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/20 16:22:00 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ class Server {
 
 		void enableWrite(int epoll_fd, int client_fd);
 		void disableWrite(int epoll_fd, int client_fd);
+
+		friend class EventHandler;
 };
 
 #endif

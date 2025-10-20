@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:00 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/14 10:47:21 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/20 16:26:46 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,13 @@ int ft_error(int err, const string &msg)
 	return err;
 }
 
-void add_fd(int epfd, int fd, uint32_t events) {
-	struct epoll_event ev;
+void add_fd(int epoll_fd, int fd, uint32_t events) {
+	epoll_event ev;
 	ev.events = events;
 	ev.data.fd = fd;
-	if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1) {
-		ft_error(errno, "epoll_ctl(ADD)");
-		close(fd);
+	
+	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1) {
+		ft_error(errno, "epoll_ctl ADD");
 	}
 }
 
