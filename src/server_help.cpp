@@ -20,7 +20,7 @@ void static listClients(map<int, Client>& clients) {
 	}
 }
 
-void Server::startServer(int epoll_fd, map<int, Client>& clients) {
+void Server::startServer(int epoll_fd, map<int, Client>& clients, Server& server) {
 	epoll_event events[MAX_EVENTS];
 
 	while (running) {
@@ -47,7 +47,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 					del_and_close(epoll_fd, fd);
 					continue;
 				}
-				int err = handleCmd(it->second, epoll_fd, clients);
+				int err = handleCmd(it->second, epoll_fd, clients, server);
 				// if (err == 0){
 				// 	continue;
 				// }

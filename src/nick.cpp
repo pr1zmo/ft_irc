@@ -43,12 +43,18 @@ static inline std::string toLowerAscii(const std::string &s) {
     return r;
 }
 
-void Nick::execute(Client &client, const std::string &params, const std::string &cmd, std::map<int, Client>& clients)
+void Nick::execute(Client &client, const std::string &params, const std::string &cmd, std::map<int, Client>& clients, Server& server)
 {
 
     std::string p = trim(params);
     std::istringstream iss(p);
     std::string new_nick;
+
+    if (client._isAuth == false) {
+        //error for not authenticated
+        client.response(":server 464 * :Password required\r\n");
+        return;
+    }
     if (!(iss >> new_nick)) {
         client.response(":server 431 * :No nickname given\r\n"); 
         return;
@@ -98,7 +104,6 @@ void Nick::execute(Client &client, const std::string &params, const std::string 
     } else {
         // fallback: set on given client
         client.setNickname(new_nick);
-        if (cli)
     }
 
 }

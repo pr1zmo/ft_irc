@@ -21,7 +21,7 @@ Notice::~Notice()
 {
 }
 
-void Notice::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients) {
+void Notice::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
     (void)cli;
     (void)param;
     (void)cmd;

@@ -140,7 +140,7 @@ int checkCommand(const string &msg, vector<string> validCmds) {
 	return 0;
 }
 
-int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients) {
+int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Server& server) {
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
 
@@ -193,7 +193,7 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients) {
 			continue;
 
 		cout << "The current command to run: " << complete_cmd << "\n";
-		int result = executioner.run(cli, complete_cmd, clients);
+		int result = executioner.run(cli, complete_cmd, clients, server);
 		if (cli._has_msg){
 			enableWrite( epoll_fd, fd);
 		}

@@ -31,6 +31,7 @@ class Client {
 	const std::string		_pass;
 	const std::string		_nick;
 	std::string				_pending_msg;
+	bool						_isRegistered;
 	// const std::string _cmd;
 	public:
 		bool						_has_msg;

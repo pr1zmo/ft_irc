@@ -49,18 +49,19 @@ class Server {
 			std::string message_;
 		};
 
-		void startServer(int epoll_fd, std::map<int, Client>& clients);
+		void startServer(int epoll_fd, std::map<int, Client>& clients, Server& server);
 		int getServerSocket() const { return _serverSocket; }
 		int getPort() const { return _port; }
 
 		int initConnection(std::map<int, Client>& clients);
 		int setEpoll();
-		int handleCmd(Client &cli, int epoll_fd, std::map<int, Client>& clients);
+		int handleCmd(Client &cli, int epoll_fd, std::map<int, Client>& clients, Server& server);
 
 		void terminate(std::map<int, Client>& clients);
 
 		void enableWrite(int epoll_fd, int client_fd);
 		void disableWrite(int epoll_fd, int client_fd);
+		std::string getPassword() const { return _password; }
 };
 
 #endif
