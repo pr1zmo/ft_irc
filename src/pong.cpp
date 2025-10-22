@@ -26,4 +26,5 @@ void Pong::execute(Client &cli, const std::string& param, const std::string& cmd
     (void)cmd;
     (void)clients;
     // Implementation of PONG command execution
+    cli.response("PONG :server\r\n");
 }
