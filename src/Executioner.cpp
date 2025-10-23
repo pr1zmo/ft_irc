@@ -47,6 +47,7 @@ int Executioner::run(Client &cli, const std::string &msg, std::map<int, Client>&
 		if (cli._isAuth && ( cmd == "NICK" || cmd == "USER")) {
 			if (!cli.getNickname().empty() && !cli.getUsername().empty()) {
 				cli.response(":server 001 " + cli.getNickname() + " :Welcome to the IRC server! Registered successfully\r\n");
+				cli.registerClient();
 			}
 
 		}

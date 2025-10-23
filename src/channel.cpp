@@ -94,6 +94,12 @@ const Message& Channel::getMessage(size_t idx) const {
 size_t Channel::messageCount() const {
     return messages.size();
 }
+void Channel::broadcast(const std::string& msg) const {
+    for (size_t i = 0; i < users.size(); ++i) {
+        //send the message to each user
+        std::cout << "To " << users[i] << ": " << msg << std::endl;
+    }
+}
 
 void Channel::debugPrint() const {
     std::cout << "Channel #" << name << " users(" << users.size() << "):";

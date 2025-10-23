@@ -14,6 +14,8 @@
 #define Server_HPP
 
 #include "ft_irc.h"
+#include "Channel.hpp"
+
 
 int ft_error(int err, const std::string &msg);
 
@@ -27,11 +29,17 @@ class Server {
 		int							_maxClients;
 		const std::string 		_password;
 		bool 							_locked;
+
+		std::map<std::string, Channel*> _channels;
 	//	std::map<int, Client>	_clients;
 	public:
 		Server();
 		Server(int port, int maxClients, const std::string &password);
 		~Server();
+		Channel* getChannel(const std::string& name);
+		std::string getPassword() const { return _password; }
+		//add channel to server
+		void addChannel(const std::string& name, Channel* channel);
 
 		class ServerFailedException : public std::exception {
 		public:
@@ -48,7 +56,7 @@ class Server {
 		private:
 			std::string message_;
 		};
-
+		public:
 		void startServer(int epoll_fd, std::map<int, Client>& clients, Server& server);
 		int getServerSocket() const { return _serverSocket; }
 		int getPort() const { return _port; }
@@ -61,7 +69,7 @@ class Server {
 
 		void enableWrite(int epoll_fd, int client_fd);
 		void disableWrite(int epoll_fd, int client_fd);
-		std::string getPassword() const { return _password; }
+
 };
 
 #endif

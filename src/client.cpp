@@ -81,3 +81,24 @@ void Client::setNickname(const std::string &nick) {
 std::string Client::getNickname() const {
 	return _nick;
 }
+void Client::registerClient() {
+	_isRegistered = true;
+}
+void Client::unregisterClient() {
+	_isRegistered = false;
+}
+Channel* Client::getChannel() const {
+	// Placeholder implementation
+	return NULL;
+}
+
+void Client::joinChannel(Channel* channel) {
+	// join the channel
+	channel->addUser(this->getNickname());
+	
+}
+void Client::leaveChannel() {	
+	// Placeholder implementation
+	Channel* channel = getChannel();
+}
+	

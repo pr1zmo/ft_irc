@@ -1,3 +1,6 @@
+#ifndef CHANNEL_HPP
+#define CHANNEL_HPP
+
 #include <string>
 #include <vector>
 #include <set>
@@ -17,34 +20,35 @@ public:
     Channel(const std::string& name);
     ~Channel();
 
-    // membership
+    
     bool addUser(const std::string& nick);           // returns true if added
     bool removeUser(const std::string& nick);        // returns true if removed
     bool contains(const std::string& nick) const;
     size_t userCount() const;
 
-    // operator (op) management
+    
     bool addOp(const std::string& nick);
     bool removeOp(const std::string& nick);
     bool isOp(const std::string& nick) const;
 
-    // invite management
+   
     bool inviteUser(const std::string& nick);
     bool uninviteUser(const std::string& nick);
     bool isInvited(const std::string& nick) const;
 
-    // ban management and kick
+    
     bool banUser(const std::string& nick);
     bool unbanUser(const std::string& nick);
     bool isBanned(const std::string& nick) const;
     bool kickUser(const std::string& nick, const std::string& reason = "");
 
-    // messages
+    
     void pushMessage(const Message& m);
     const Message& getMessage(size_t idx) const;
     size_t messageCount() const;
+    void broadcast(const std::string& msg) const;
 
-    // debug / print
+    
     void debugPrint() const;
 
 private:
@@ -56,3 +60,4 @@ private:
     std::set<std::string> invitedUsers;        // invited nicks
     std::set<std::string> ops;                 // channel operators (mode +o)
 };
+#endif

@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "Client.hpp"
+#include "Channel.hpp"
 #include <iostream>
 
 Server::Server()
@@ -248,4 +250,15 @@ void Server::disableWrite(int epoll_fd, int client_fd){
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, client_fd, &ev) == -1) {
 		ft_error(errno, "epoll_ctl(MOD) disableWrite");
 	}
+}
+Channel* Server::getChannel(const std::string& name) {
+    std::map<std::string, Channel*>::iterator it = _channels.find(name);
+    if (it == _channels.end())
+        return NULL;
+    return it->second;
+}
+
+void Server::addChannel(const std::string& name, Channel* channel) {
+    if (name.empty() || channel == NULL) return;
+    _channels[name] = channel;
 }
