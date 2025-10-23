@@ -262,3 +262,5 @@ void Server::addChannel(const std::string& name, Channel* channel) {
     if (name.empty() || channel == NULL) return;
     _channels[name] = channel;
 }
+
+// ensure this matches the declaration in Server.hpp (const)

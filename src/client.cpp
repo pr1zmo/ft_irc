@@ -94,7 +94,7 @@ Channel* Client::getChannel() const {
 
 void Client::joinChannel(Channel* channel) {
 	// join the channel
-	channel->addUser(this->getNickname());
+	channel->addUser(this->getNickname(), const_cast<Client*>(this));
 	
 }
 void Client::leaveChannel() {	

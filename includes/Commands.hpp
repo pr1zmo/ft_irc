@@ -108,6 +108,34 @@ class Join : public Command {
 		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
+class Topic : public Command {
+	public:
+		Topic(/* args */);
+		~Topic();
+		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
+};
+class Mode : public Command {
+	public:
+		Mode(/* args */);
+		~Mode();
+		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
+};
+class List : public Command {
+	public:
+		List(/* args */);
+		~List();
+		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
+};
+class Kick : public Command {
+	public:
+		Kick(/* args */);
+		~Kick();
+		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
+};
 
 class Part : public Command {
 	public:

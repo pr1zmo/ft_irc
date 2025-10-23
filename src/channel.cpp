@@ -1,13 +1,14 @@
-// ...existing code...
 #include "Channel.hpp"
+#include "Server.hpp" // needed to call findClientByNick()
+#include <iostream>
 
 Channel::Channel(const std::string& n) : name(n) {}
 Channel::~Channel() {}
 
-bool Channel::addUser(const std::string& nick) {
+bool Channel::addUser(const std::string& nick, Client* clientPtr) {
     if (isBanned(nick)) return false;
     if (users_set.insert(nick).second) {
-        users.push_back(nick);
+        users[nick] = clientPtr;
         invitedUsers.erase(nick); // clear invite on join
         return true;
     }
@@ -16,7 +17,7 @@ bool Channel::addUser(const std::string& nick) {
 
 bool Channel::removeUser(const std::string& nick) {
     if (users_set.erase(nick) > 0) {
-        users.erase(std::remove(users.begin(), users.end(), nick), users.end());
+        users.erase(nick);
         ops.erase(nick); // remove op if they leave
         return true;
     }
@@ -94,16 +95,22 @@ const Message& Channel::getMessage(size_t idx) const {
 size_t Channel::messageCount() const {
     return messages.size();
 }
-void Channel::broadcast(const std::string& msg) const {
-    for (size_t i = 0; i < users.size(); ++i) {
-        //send the message to each user
-        std::cout << "To " << users[i] << ": " << msg << std::endl;
+
+void Channel::broadcast(const std::string& nick, const std::string& msg, Server& server) const {
+    for (std::map<std::string, Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+        Client* clientPtr = it->second;
+        if (clientPtr && clientPtr->getNickname() != nick) {
+            clientPtr->response(msg + "\r\n");
+            clientPtr->sendPendingMessages();
+        }
     }
 }
 
 void Channel::debugPrint() const {
     std::cout << "Channel #" << name << " users(" << users.size() << "):";
-    for (size_t i = 0; i < users.size(); ++i) std::cout << " " << users[i];
+    for (std::map<std::string, Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+        std::cout << " " << it->first;
+    }
     std::cout << "\nops:";
     for (std::set<std::string>::const_iterator it = ops.begin(); it != ops.end(); ++it) std::cout << " " << *it;
     std::cout << std::endl;

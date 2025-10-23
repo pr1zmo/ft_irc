@@ -8,6 +8,9 @@
 #include <ctime>
 #include <algorithm>
 #include <iostream>
+#include "Client.hpp"
+
+class Client;
 
 struct Message {
     std::string sender;
@@ -20,8 +23,8 @@ public:
     Channel(const std::string& name);
     ~Channel();
 
-    
-    bool addUser(const std::string& nick);           // returns true if added
+
+    bool addUser(const std::string& nick, Client* clientPtr);           // returns true if added
     bool removeUser(const std::string& nick);        // returns true if removed
     bool contains(const std::string& nick) const;
     size_t userCount() const;
@@ -46,14 +49,15 @@ public:
     void pushMessage(const Message& m);
     const Message& getMessage(size_t idx) const;
     size_t messageCount() const;
-    void broadcast(const std::string& msg) const;
+    void broadcast(const std::string& nick, const std::string& msg, class Server& server) const;
 
     
     void debugPrint() const;
+    std::string getName() const { return name; }
 
 private:
     std::string name;
-    std::vector<std::string> users;            // ordered list (join order)
+    std::map<std::string, Client*> users;            // ordered list (join order)
     std::set<std::string> users_set;           // fast membership checks
     std::deque<Message> messages;              // ordered history
     std::set<std::string> bannedUsers;         // banned nicks

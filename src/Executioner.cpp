@@ -8,6 +8,10 @@ Executioner::Executioner()
 	_commands["OPER"] = new Oper();
 	_commands["QUIT"] = new Quit();
 	_commands["JOIN"] = new Join();
+	// _commands["TOPIC"] = new Topic();
+	// _commands["MODE"] = new Mode();
+	// _commands["LIST"] = new List();
+	_commands["KICK"] = new Kick();
 	_commands["PART"] = new Part();
 	_commands["PRIVMSG"] = new Privmsg();
 	_commands["NOTICE"] = new Notice();

@@ -38,7 +38,7 @@ void Join::execute(Client &cli, const std::string& param, const std::string& cmd
         server.addChannel(param, channel);
 
     }
-    if (!channel->addUser(cli.getNickname())) {
+    if (!channel->addUser(cli.getNickname(), &cli)) {
         cli.response("You are already in the channel");
         return;
     }
@@ -48,5 +48,5 @@ void Join::execute(Client &cli, const std::string& param, const std::string& cmd
         channel->addOp(cli.getNickname());
     }
     cli.response(":server 332 " + cli.getNickname() + " " + param + " :Welcome to " + param + "\r\n");
-    channel->broadcast(cli.getNickname() + " has joined the channel");
+    channel->broadcast(cli.getNickname(), cli.getNickname() + " has joined the channel", server);
 }
