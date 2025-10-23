@@ -54,9 +54,12 @@ public:
     
     void debugPrint() const;
     std::string getName() const { return name; }
+    std::string getTopic() const { return topic; }
+    void setTopic(const std::string& t) { topic = t; }
 
 private:
     std::string name;
+    std::string topic;
     std::map<std::string, Client*> users;            // ordered list (join order)
     std::set<std::string> users_set;           // fast membership checks
     std::deque<Message> messages;              // ordered history
