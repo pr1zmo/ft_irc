@@ -137,6 +137,7 @@ class Kick : public Command {
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
+
 class Part : public Command {
 	public:
 		Part(/* args */);

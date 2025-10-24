@@ -9,7 +9,7 @@ Executioner::Executioner()
 	_commands["QUIT"] = new Quit();
 	_commands["JOIN"] = new Join();
 	_commands["TOPIC"] = new Topic();
-	// _commands["MODE"] = new Mode();
+	_commands["MODE"] = new Mode();
 	// _commands["LIST"] = new List();
 	_commands["KICK"] = new Kick();
 	_commands["PART"] = new Part();
@@ -25,7 +25,6 @@ Executioner::~Executioner() {
 	for (std::map<std::string, Command*>::iterator it = _commands.begin(); it != _commands.end(); ++it) {
 		delete it->second;
 	}
-
 	_commands.clear();
 }
 

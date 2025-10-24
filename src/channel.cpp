@@ -115,3 +115,45 @@ void Channel::debugPrint() const {
     for (std::set<std::string>::const_iterator it = ops.begin(); it != ops.end(); ++it) std::cout << " " << *it;
     std::cout << std::endl;
 }
+
+void Channel::applyModeChanges(const std::string& modeChanges) {
+    bool adding = true;
+    for (size_t i = 0; i < modeChanges.size(); ++i) {
+        char ch = modeChanges[i];
+        if (ch == '+') {
+            adding = true;
+        } else if (ch == '-') {
+            adding = false;
+        } else {
+            switch (ch) {
+                case 'o': // operator status
+                    // This requires additional parameters in a real implementation
+                    // Here we just toggle the first user for demonstration
+                    if (!users.empty()) {
+                        std::string targetNick = users.begin()->first;
+                        if (adding) {
+                            addOp(targetNick);
+                        } else {
+                            removeOp(targetNick);
+                        }
+                    }
+                    break;
+                // Handle other modes i t k l
+                case 'i': // invite only
+                    // Implement invite-only mode logic
+                    break;
+                case 't': // topic set by ops only
+                    // Implement topic restriction logic
+                    break;
+                case 'k': // password protected
+                    // Implement password protection logic
+                    break;
+                case 'l': // user limit
+                    // Implement user limit logic
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}

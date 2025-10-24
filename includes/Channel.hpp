@@ -57,9 +57,27 @@ public:
     std::string getTopic() const { return topic; }
     void setTopic(const std::string& t) { topic = t; }
 
+    void setPassword(const std::string& p) { password = p; }
+    bool checkPassword(const std::string& p) const { return password == p; }    
+    void applyModeChanges(const std::string& modeChanges);
+    void setUserLimit(size_t limit) { userLimit = limit; }
+    size_t getUserLimit() const { return userLimit; }
+    void setInviteOnly(bool flag) { inviteOnly = flag; }
+    bool isInviteOnly() const { return inviteOnly; }
+    void setTopicRestricted(bool flag) { topicRestricted = flag; }
+    bool isTopicRestricted() const { return topicRestricted; }
+    void setPasswordProtected(bool flag) { passwordProtected = flag; }
+    bool isPasswordProtected() const { return passwordProtected; }
+
 private:
     std::string name;
     std::string topic;
+    std::string password;
+    size_t userLimit;
+    bool inviteOnly;
+    bool topicRestricted;
+    bool passwordProtected;
+
     std::map<std::string, Client*> users;            // ordered list (join order)
     std::set<std::string> users_set;           // fast membership checks
     std::deque<Message> messages;              // ordered history

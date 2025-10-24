@@ -72,7 +72,8 @@ class Client {
 		void unregisterClient();
 		Channel* getChannel() const;
 		void joinChannel(Channel* channel);
-		void leaveChannel();	
+		void leaveChannel();
+		
 };
 
 #endif
