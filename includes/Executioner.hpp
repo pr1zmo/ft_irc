@@ -14,7 +14,8 @@ class Executioner {
 		~Executioner();
 
 		std::map<std::string, Command*> _commands;
-		int run(Client &cli, const std::string &msg);
+		
+		int run(Client &cli, const std::string &msg, std::map<int, Client>& clients);
 };
 
 #endif

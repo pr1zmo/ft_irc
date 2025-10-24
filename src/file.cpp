@@ -94,7 +94,7 @@ int File::parseCommand(const string &msg) {
 	return 1;
 }
 
-void File::execute(Client &cli, const string &msg){
+void File::execute(Client &cli, const string &msg, const std::string& cmd, std::map<int, Client>& clients) {
 	// msg format: DCC <file to send> <ip of the recipient> <port of the recipient> <filesize>
 	sender = &cli;
 	if (!parseCommand(msg))

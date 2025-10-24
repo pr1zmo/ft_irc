@@ -55,7 +55,7 @@ class Server {
 
 		int initConnection(std::map<int, Client>& clients);
 		int setEpoll();
-		int handleCmd(Client &cli, int epoll_fd);
+		int handleCmd(Client &cli, int epoll_fd, std::map<int, Client>& clients);
 
 		void terminate(std::map<int, Client>& clients);
 

@@ -74,3 +74,14 @@ string Client::get_pending_msg() {
 void Client::markDisconnected() {
 	should_quit = true;
 }
+// Command* Client::getCmd() const {
+// 	return this->_cmd;
+// }
+void Client::setNickname(const std::string &nick) {
+	// Assuming _nick is not const for this operation
+	*(const_cast<std::string*>(&_nick)) = nick;
+}
+
+std::string Client::getNickname() const {
+	return _nick;
+}

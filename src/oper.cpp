@@ -20,3 +20,11 @@ Oper::Oper(/* args */)
 Oper::~Oper()
 {
 }
+
+void Oper::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients) {
+    (void)cli;
+    (void)param;
+    (void)cmd;
+    (void)clients;
+    // Implementation of OPER command execution
+}

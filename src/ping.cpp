@@ -20,3 +20,11 @@ Ping::Ping(/* args */)
 Ping::~Ping()
 {
 }
+
+void Ping::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients) {
+    (void)cli;
+    (void)param;
+    (void)cmd;
+    (void)clients;
+    // Implementation of PING command execution
+}
