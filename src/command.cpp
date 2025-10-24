@@ -37,30 +37,31 @@ int Command::parseCommand(char *msg) {
 	return 1;
 }
 
-void Command::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients) {
+void Command::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
 	(void)cli;
 	(void)param;
-	cout << "param: " << param << '\n';
-	cout << "cmd: " << cmd << '\n';
+	// cout << "param: " << param << '\n';
+	// cout << "cmd: " << cmd << '\n';
 
 
-	if (cmd == "HELP") {
-		Help helpCmd;
-		helpCmd.execute(cli, param, cmd, clients);
-	}
-	else if (cmd == "PASS") {
-		Pass passCmd;
-		passCmd.execute(cli, param, cmd, clients);
-	}
-	else if (cmd == "NICK") {
-		Nick nickCmd;
-		nickCmd.execute(cli, param, cmd, clients);
-	}
-	else if (cmd == "USER") {
-		User userCmd;
-		userCmd.execute(cli, param, cmd, clients);
-	}
-	else {
-		cout << "Command execution not implemented for: " << cmd << '\n';
-	}
+	// if (cmd == "HELP") {
+	// 	Help helpCmd;
+	// 	helpCmd.execute(cli, param, cmd, clients, server);
+	// }
+	// else if (cmd == "PASS") {
+	// 	Pass passCmd;
+	// 	std::cout << "im pass\n";
+	// 	passCmd.execute(cli, param, cmd, clients, server);
+	// }
+	// else if (cmd == "NICK") {
+	// 	Nick nickCmd;
+	// 	nickCmd.execute(cli, param, cmd, clients, server);
+	// }
+	// else if (cmd == "USER") {
+	// 	User userCmd;
+	// 	userCmd.execute(cli, param, cmd, clients, server);
+	// }
+	// else {
+	// 	cout << "Command execution not implemented for: " << cmd << '\n';
+	// }
 }

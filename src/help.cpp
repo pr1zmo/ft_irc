@@ -109,7 +109,7 @@ const std::vector<std::string>* Help::getTopic(const std::string& key) const
 	return NULL;
 }
 
-void Help::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients) {
+void Help::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
 	if (param.empty()) {
 		cli.response(helpContent + "\r\n");
 		return;

@@ -2,6 +2,7 @@
 #define Executioner_HPP
 
 #include "ft_irc.h"
+#include "Server.hpp"
 
 class Client;
 class Command;
@@ -15,7 +16,7 @@ class Executioner {
 
 		std::map<std::string, Command*> _commands;
 		
-		int run(Client &cli, const std::string &msg, std::map<int, Client>& clients);
+		int run(Client &cli, const std::string &msg, std::map<int, Client>& clients, Server& server);
 };
 
 #endif

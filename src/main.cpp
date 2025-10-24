@@ -76,7 +76,7 @@ int main(int ac, char *av[]){
 		std::map<int, Client> clients;
 		Server server(std::atoi(av[1]), 10, std::string(av[2]));
 		int ep_fd = server.setEpoll();
-		server.startServer(ep_fd, clients);
+		server.startServer(ep_fd, clients, server);
 	}
 	catch (const std::exception& e) {
 		cerr << e.what() << endl;

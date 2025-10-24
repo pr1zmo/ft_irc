@@ -20,15 +20,22 @@ User::User(/* args */)
 User::~User()
 {
 }
-void User::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients) {
+void User::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
     (void)cli;
     (void)param;
     (void)cmd;
     (void)clients;
+    (void)server;
     // Implementation of USER command execution
     std::string p = param;
     std::istringstream iss(p);
     std::string username, hostname, servername, realname;
+    
+    if (cli._isAuth == false) {
+        //error for not authenticated
+        cli.response(":server 464 * :Password required\r\n");
+        return;
+    }
     if (!(iss >> username >> hostname >> servername)) {
         cli.response(":server 461 * USER :Not enough parameters\r\n");
         return;
@@ -82,10 +89,6 @@ void User::execute(Client &cli, const std::string& param, const std::string& cmd
     cli.setHostname(hostname);
     cli.setServername(servername);
     cli.setRealname(realname);
-    if (!cli.getNickname().empty()) {
-        cli.response(":server 451 * :You have not registered\r\n");
-        return;
-    }
     
     clients[cli.getFd()] = cli;
 }

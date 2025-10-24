@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "Client.hpp"
+#include "Channel.hpp"
 #include <iostream>
 
 Server::Server()
@@ -133,7 +135,7 @@ int checkCommand(const string &msg, vector<string> validCmds) {
 	return 0;
 }
 
-int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients) {
+int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Server& server) {
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
 	size_t _btsRd = 0;
@@ -189,7 +191,7 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients) {
 			continue;
 
 		cout << "The current command to run: " << complete_cmd << "\n";
-		int result = executioner.run(cli, complete_cmd, clients);
+		int result = executioner.run(cli, complete_cmd, clients, server);
 		if (cli._has_msg){
 			enableWrite( epoll_fd, fd);
 		}
@@ -245,3 +247,16 @@ void Server::disableWrite(int epoll_fd, int client_fd){
 		ft_error(errno, "epoll_ctl(MOD) disableWrite");
 	}
 }
+Channel* Server::getChannel(const std::string& name) {
+    std::map<std::string, Channel*>::iterator it = _channels.find(name);
+    if (it == _channels.end())
+        return NULL;
+    return it->second;
+}
+
+void Server::addChannel(const std::string& name, Channel* channel) {
+    if (name.empty() || channel == NULL) return;
+    _channels[name] = channel;
+}
+
+// ensure this matches the declaration in Server.hpp (const)

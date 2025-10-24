@@ -14,6 +14,8 @@
 #define Client_HPP
 
 #include "ft_irc.h"
+#include "Channel.hpp"
+class Channel;
 
 class Command;
 
@@ -31,6 +33,7 @@ class Client {
 	const std::string		_pass;
 	const std::string		_nick;
 	std::string				_pending_msg;
+	bool						_isRegistered;
 	// const std::string _cmd;
 	public:
 		bool						_has_msg;
@@ -63,6 +66,13 @@ class Client {
 		std::string getRealname() const { return _realname; }
 		std::string getHostname() const { return _hostname; }
 		std::string getServername() const { return _servername; }
+		bool isRegistered() const { return _isRegistered; }
+		void registerClient();
+		void unregisterClient();
+		Channel* getChannel() const;
+		void joinChannel(Channel* channel);
+		void leaveChannel();
+		
 };
 
 #endif
