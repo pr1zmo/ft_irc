@@ -59,4 +59,5 @@ int Executioner::run(Client &cli, const std::string &msg, std::map<int, Client>&
 			return 0;
 		return -1;
 	}
+	return 0;
 }

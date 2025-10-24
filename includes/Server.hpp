@@ -61,7 +61,7 @@ class Server {
             std::string message_;
         };
         public:
-        void startServer(int epoll_fd, std::map<int, Client>& clients, Server& server);
+        void startServer(int epoll_fd, std::map<int, Client>& clients);
         int getServerSocket() const { return _serverSocket; }
         int getPort() const { return _port; }
 

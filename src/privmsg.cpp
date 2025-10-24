@@ -35,10 +35,10 @@ Privmsg::~Privmsg()
 }
 
 void Privmsg::handleFileTransfer(Client &cli, const std::string& param){
-	File file;
+	// File file;
 
-	cout << "Handling file transfer with param: " << param << endl;
-	file.execute(cli, param);
+	// cout << "Handling file transfer with param: " << param << endl;
+	// file.execute(cli, param);
 }
 
 void Privmsg::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {

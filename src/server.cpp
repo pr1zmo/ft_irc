@@ -174,6 +174,7 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 		}
 	}
 
+	Executioner executioner;
 	string complete_cmd;
 	size_t pos;
 
@@ -192,9 +193,6 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 
 		cout << "The current command to run: " << complete_cmd << "\n";
 		int result = executioner.run(cli, complete_cmd, clients, server);
-		if (cli._has_msg){
-			enableWrite( epoll_fd, fd);
-		}
 		if (result == -1) {
 			return -1;
 		}
@@ -202,11 +200,13 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 		if (cli._has_msg)
 			enableWrite(epoll_fd, fd);
 	}
+
 	// leftover data
 	if (!cli._msgBuffer.empty()) {
 		cout << "Incomplete command in buffer (waiting for \\r\\n): " 
 		<< cli._msgBuffer << endl;
 	}
+
 	return 0;
 }
 
