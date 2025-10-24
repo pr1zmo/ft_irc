@@ -26,7 +26,7 @@ void EventHandler::handleNewConnection() {
 	if (cli_fd != -1) {
 		add_fd(_epoll_fd, cli_fd, EPOLLIN | EPOLLET);
 		
-		// Check if client has a welcome message queued
+		// Check for queud messages first
 		std::map<int, Client>::iterator it = _clients.find(cli_fd);
 		if (it != _clients.end() && it->second._has_msg) {
 			_server.enableWrite(_epoll_fd, cli_fd);
@@ -59,14 +59,14 @@ void EventHandler::handleClientWrite(int fd) {
 
 	it->second.sendPendingMessages();
 
-	// Check if client should disconnect after sending
+	// Client will be marked to disconnect in some cases / check if client should quit
 	if (it->second.should_quit && !it->second._has_msg) {
 		std::cout << "Client quit after sending all messages: fd=" << fd << std::endl;
 		cleanupClient(fd);
 		return;
 	}
 
-	// Disable EPOLLOUT if no more messages
+	// No more message => Disable epoll
 	if (!it->second._has_msg) {
 		_server.disableWrite(_epoll_fd, fd);
 	}
@@ -95,19 +95,16 @@ void EventHandler::processEvent(const epoll_event& event) {
 	int fd = event.data.fd;
 	uint32_t events = event.events;
 
-	// Handle new connections
 	if (fd == _server.getServerSocket()) {
 		handleNewConnection();
 		return;
 	}
 
-	// Check for disconnect events first
 	if (events & (EPOLLHUP | EPOLLERR)) {
 		handleClientDisconnect(fd, events);
 		return;
 	}
 
-	// Check if client should quit before processing
 	std::map<int, Client>::iterator it = _clients.find(fd);
 	if (it != _clients.end() && it->second.should_quit && !it->second._has_msg) {
 		cleanupClient(fd);
@@ -121,11 +118,10 @@ void EventHandler::processEvent(const epoll_event& event) {
 		// Re-check if client was marked for disconnect
 		it = _clients.find(fd);
 		if (it == _clients.end()) {
-			return; // Client was removed
+			return;
 		}
 	}
 
-	// Handle outgoing data
 	if (events & EPOLLOUT) {
 		handleClientWrite(fd);
 	}

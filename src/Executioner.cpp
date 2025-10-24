@@ -26,19 +26,15 @@ Executioner::~Executioner() {
 }
 
 int Executioner::run(Client &cli, const std::string &msg) {
-	// Extract command name
 	size_t pos = msg.find(' ');
 	std::string cmd = (pos == std::string::npos) ? msg : msg.substr(0, pos);
 	
-	// Find the command handler
 	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
 	if (it != _commands.end()) {
 		Command* cmdInstance = it->second;
 		
-		// Extract parameters (everything after the command name)
 		std::string params = (pos == std::string::npos) ? "" : msg.substr(pos + 1);
 		
-		// Execute the command
 		cmdInstance->execute(cli, params);
 		
 		return 0;
