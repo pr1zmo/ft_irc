@@ -27,6 +27,7 @@ void Topic::execute(Client &cli, const std::string& param, const std::string& cm
     if (!new_topic.empty() && new_topic[0] == ' ') new_topic = new_topic.substr(1);
     if (!new_topic.empty() && new_topic[0] == ':') new_topic = new_topic.substr(1);
 
+
     Channel* channel = server.getChannel(channel_name);
     if (!channel) {
         cli.response(":server 403 " + cli.getNickname() + " " + channel_name + " :No such channel\r\n");
@@ -37,8 +38,8 @@ void Topic::execute(Client &cli, const std::string& param, const std::string& cm
         // View current topic
         cli.response(":server 332 " + cli.getNickname() + " " + channel_name + " :" + channel->getTopic() + "\r\n");
     } else {
-        // Set new topic
-        if (!channel->isOp(cli.getNickname())) {
+        // check if user is op or if topic is restricted
+        if (!channel->isOp(cli.getNickname()) && channel->isTopicRestricted()) {
             cli.response(":server 482 " + cli.getNickname() + " " + channel_name + " :You're not channel operator\r\n");
             return;
         }

@@ -38,7 +38,6 @@ void Join::execute(Client &cli, const std::string& param, const std::string& cmd
         return;
     }
 
-    // parse channel name and optional password without modifying param
     std::string channelName;
     std::string password;
     size_t pos = param.find(' ');
@@ -56,7 +55,8 @@ void Join::execute(Client &cli, const std::string& param, const std::string& cmd
         channel->setInviteOnly(false);
         channel->setTopicRestricted(false);
         channel->setPasswordProtected(false);
-        channel->setUserLimit(100);
+        channel->setUserLimit(0);
+        channel->setHasLimit(false);
         if (!password.empty()) {
             channel->setPassword(password);
             channel->setPasswordProtected(true);
@@ -64,36 +64,35 @@ void Join::execute(Client &cli, const std::string& param, const std::string& cmd
         server.addChannel(channelName, channel);
     }
 
-
     if (channel->isPasswordProtected()) {
         if (password.empty() || !channel->checkPassword(password)) {
             cli.response(":server 475 " + cli.getNickname() + " " + channelName + " :Cannot join (+k)\r\n");
             return;
         }
     }
-    // if (channel->isInviteOnly() && !channel->isInvited(cli.getNickname()) && !channel->isOp(cli.getNickname())) {
-    //     cli.response(":server 473 " + cli.getNickname() + " " + channelName + " :Cannot join (invite only)\r\n");
-    //     return;
-    // }
+    if (channel->isInviteOnly() && !channel->isInvited(cli.getNickname()) ) {
+        cli.response(":server 473 " + cli.getNickname() + " " + channelName + " :Cannot join (invite only)\r\n");
+        return;
+    }
 
-    // attempt to add user
+    if (channel->hasLimit() && channel->userCount() >= channel->getUserLimit()) {
+        cli.response(":server 471 " + cli.getNickname() + " " + channelName + " :Cannot join (channel is full)\r\n");
+        return;
+    }
+    
     if (!channel->addUser(cli.getNickname(), &cli)) {
         cli.response(":server 443 " + cli.getNickname() + " " + channelName + " :is already on channel\r\n");
         return;
     }
-
-    // mark as joined
+    
     cli.joinChannel(channel);
-
-    // first member becomes op
+ 
     if (channel->userCount() == 1) {
         channel->addOp(cli.getNickname());
     }
-
-    // send join confirmations / topic / names as appropriate
+  
     cli.response(":server 332 " + cli.getNickname() + " " + channelName + " :Welcome to " + channelName + "\r\n");
-
-    // broadcast JOIN to channel members
+ 
     channel->broadcast(cli.getNickname(), ":" + cli.getNickname() + " JOIN " + channelName + "\r\n", server);
 }
 

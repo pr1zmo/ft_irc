@@ -59,7 +59,7 @@ public:
 
     void setPassword(const std::string& p) { password = p; }
     bool checkPassword(const std::string& p) const { return password == p; }    
-    void applyModeChanges(const std::string& modeChanges);
+    void applyModeChanges(const std::string& modeChanges, const std::string& target, Client& cli, class Server& server);
     void setUserLimit(size_t limit) { userLimit = limit; }
     size_t getUserLimit() const { return userLimit; }
     void setInviteOnly(bool flag) { inviteOnly = flag; }
@@ -68,12 +68,15 @@ public:
     bool isTopicRestricted() const { return topicRestricted; }
     void setPasswordProtected(bool flag) { passwordProtected = flag; }
     bool isPasswordProtected() const { return passwordProtected; }
+    void setHasLimit(bool flag) { has_limit = flag; }
+    bool hasLimit() const { return has_limit; }
 
 private:
     std::string name;
     std::string topic;
     std::string password;
     size_t userLimit;
+    bool has_limit;
     bool inviteOnly;
     bool topicRestricted;
     bool passwordProtected;

@@ -154,8 +154,6 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 				cli.markDisconnected();
 				return 0;
 			}
-			else
-				cli._msgBuffer.append(buffer, bytesRead);
 			continue;
 		}
 		else if (bytesRead == 0) {
@@ -200,6 +198,7 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 		if (cli._has_msg)
 			enableWrite(epoll_fd, fd);
 	}
+	
 
 	// leftover data
 	if (!cli._msgBuffer.empty()) {

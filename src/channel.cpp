@@ -100,7 +100,7 @@ void Channel::broadcast(const std::string& nick, const std::string& msg, Server&
     for (std::map<std::string, Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
         Client* clientPtr = it->second;
         if (clientPtr && clientPtr->getNickname() != nick) {
-            clientPtr->response(msg + "\r\n");
+            clientPtr->response(msg);
             clientPtr->sendPendingMessages();
         }
     }
@@ -116,8 +116,12 @@ void Channel::debugPrint() const {
     std::cout << std::endl;
 }
 
-void Channel::applyModeChanges(const std::string& modeChanges) {
+void Channel::applyModeChanges(const std::string& modeChanges, const std::string& target, Client& cli, Server& server) {
     bool adding = true;
+    std::cout << "Applying mode changes: " << modeChanges << std::endl;
+    // Separate mode changes by words
+    std::istringstream iss(modeChanges);
+
     for (size_t i = 0; i < modeChanges.size(); ++i) {
         char ch = modeChanges[i];
         if (ch == '+') {
@@ -127,10 +131,14 @@ void Channel::applyModeChanges(const std::string& modeChanges) {
         } else {
             switch (ch) {
                 case 'o': // operator status
-                    // This requires additional parameters in a real implementation
-                    // Here we just toggle the first user for demonstration
+                    //check if target user is in channel
+                    if (users.find(target) == users.end()) {
+                        cli.response("Error: User " + target + " is not in channel " + name + ".\r\n");
+                        return;
+                    }
                     if (!users.empty()) {
-                        std::string targetNick = users.begin()->first;
+                        // get target nick from command parameters in real implementation
+                        std::string targetNick = target;
                         if (adding) {
                             addOp(targetNick);
                         } else {
@@ -140,16 +148,54 @@ void Channel::applyModeChanges(const std::string& modeChanges) {
                     break;
                 // Handle other modes i t k l
                 case 'i': // invite only
-                    // Implement invite-only mode logic
+                    // Implement invite-only logic
+                    if (adding) {
+                        // set invite-only flag
+                        inviteOnly = true;
+                    } else {
+                        // unset invite-only flag
+                        inviteOnly = false;
+                    }
                     break;
                 case 't': // topic set by ops only
                     // Implement topic restriction logic
+                    if (adding) {
+                        topicRestricted = true;
+                    } else {
+                        topicRestricted = false;
+                    }
                     break;
                 case 'k': // password protected
                     // Implement password protection logic
+                    if (adding) {
+                        // check for password parameter and set new password
+                        if (target.empty()) {
+                            cli.response("Error: MODE +k requires a password parameter.\r\n");
+                            return;
+                        }
+                        //set password
+                        setPassword(target);
+                        passwordProtected = true;
+                    } else {
+                        // unset password
+                        passwordProtected = false;
+                    }
                     break;
                 case 'l': // user limit
                     // Implement user limit logic
+                    if (adding) {
+                        // check for limit parameter and set new limit
+                        if (target.empty()) {
+                            cli.response("Error: MODE +l requires a limit parameter.\r\n");
+                            return;
+                        }
+                        size_t limit = std::atoi(target.c_str());
+                        setUserLimit(limit);
+                        has_limit = true;
+                    } else {
+                        // unset user limit
+                        has_limit = false;
+                    }
                     break;
                 default:
                     break;

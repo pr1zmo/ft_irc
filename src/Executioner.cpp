@@ -10,6 +10,7 @@ Executioner::Executioner()
 	_commands["JOIN"] = new Join();
 	_commands["TOPIC"] = new Topic();
 	_commands["MODE"] = new Mode();
+	_commands["INVITE"] = new Invite();
 	// _commands["LIST"] = new List();
 	_commands["KICK"] = new Kick();
 	_commands["PART"] = new Part();
