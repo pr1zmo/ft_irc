@@ -131,13 +131,11 @@ void Channel::applyModeChanges(const std::string& modeChanges, const std::string
         } else {
             switch (ch) {
                 case 'o': // operator status
-                    //check if target user is in channel
                     if (users.find(target) == users.end()) {
                         cli.response("Error: User " + target + " is not in channel " + name + ".\r\n");
                         return;
                     }
                     if (!users.empty()) {
-                        // get target nick from command parameters in real implementation
                         std::string targetNick = target;
                         if (adding) {
                             addOp(targetNick);
@@ -146,45 +144,35 @@ void Channel::applyModeChanges(const std::string& modeChanges, const std::string
                         }
                     }
                     break;
-                // Handle other modes i t k l
-                case 'i': // invite only
-                    // Implement invite-only logic
+                case 'i': 
                     if (adding) {
-                        // set invite-only flag
                         inviteOnly = true;
                     } else {
-                        // unset invite-only flag
                         inviteOnly = false;
                     }
                     break;
-                case 't': // topic set by ops only
-                    // Implement topic restriction logic
+                case 't':
                     if (adding) {
                         topicRestricted = true;
                     } else {
                         topicRestricted = false;
                     }
                     break;
-                case 'k': // password protected
-                    // Implement password protection logic
+                case 'k': 
                     if (adding) {
-                        // check for password parameter and set new password
                         if (target.empty()) {
                             cli.response("Error: MODE +k requires a password parameter.\r\n");
                             return;
                         }
-                        //set password
                         setPassword(target);
                         passwordProtected = true;
                     } else {
-                        // unset password
                         passwordProtected = false;
                     }
                     break;
-                case 'l': // user limit
-                    // Implement user limit logic
+                case 'l':
                     if (adding) {
-                        // check for limit parameter and set new limit
+
                         if (target.empty()) {
                             cli.response("Error: MODE +l requires a limit parameter.\r\n");
                             return;
@@ -193,7 +181,7 @@ void Channel::applyModeChanges(const std::string& modeChanges, const std::string
                         setUserLimit(limit);
                         has_limit = true;
                     } else {
-                        // unset user limit
+
                         has_limit = false;
                     }
                     break;
