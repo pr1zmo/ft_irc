@@ -10,8 +10,9 @@
 #include <iostream>
 #include "Client.hpp"
 
-class Client;
 
+class Client;
+class Server;
 struct Message {
     std::string sender;
     std::string text;
@@ -30,8 +31,9 @@ public:
     size_t userCount() const;
 
     
-    bool addOp(const std::string& nick);
-    bool removeOp(const std::string& nick);
+    bool addOp(const std::string& nick, Server& server);
+    // if 'server' is non-null the method will broadcast a MODE -o message to the channel
+    bool removeOp(const std::string& nick, Server* server = NULL);
     bool isOp(const std::string& nick) const;
 
    
@@ -70,6 +72,11 @@ public:
     bool isPasswordProtected() const { return passwordProtected; }
     void setHasLimit(bool flag) { has_limit = flag; }
     bool hasLimit() const { return has_limit; }
+    std::string namesList() const;
+    bool hasUser(const std::string& nick) const;
+    bool isEmpty() const {
+        return users.empty();
+    }
 
 private:
     std::string name;

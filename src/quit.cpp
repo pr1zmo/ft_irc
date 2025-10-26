@@ -22,9 +22,9 @@ Quit::~Quit()
 }
 
 void Quit::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
-    (void)cli;
-    (void)param;
     (void)cmd;
     (void)clients;
-    // Implementation of QUIT command execution
+    std::string quitMessage = param.empty() ? "Client Quit" : param;
+    cli.response("ERROR :Closing Link: " + cli.getNickname() + " (" + quitMessage + ")\r\n");
+    cli.markDisconnected();
 }

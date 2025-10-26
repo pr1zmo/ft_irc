@@ -105,4 +105,7 @@ void Client::leaveChannel() {
 	// Placeholder implementation
 	Channel* channel = getChannel();
 }
-	
+// mark the client as disconnected
+// void Client::disconnect() {
+// 	should_quit = true;
+// }

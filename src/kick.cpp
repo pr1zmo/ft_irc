@@ -19,9 +19,9 @@ Kick::~Kick()
 
 void Kick::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
     std::istringstream iss(param);
+    std::string channelName;
     std::string target_nick;
     std::string reason;
-    std::string channelName;        
 
     if (!(iss >> channelName >> target_nick)) {
         cli.response("Usage: " + cmd + " #channel <nick> [reason]\r\n");
@@ -29,49 +29,62 @@ void Kick::execute(Client &cli, const std::string& param, const std::string& cmd
     }
     std::getline(iss, reason);
     if (!reason.empty() && reason[0] == ' ') reason = reason.substr(1);
-    if (reason.empty()) {
-        reason = "No reason specified";
-    }
-    // basic validation
+    if (!reason.empty() && reason[0] == ':') reason = reason.substr(1);
+    if (reason.empty()) reason = "Kicked";
+
     if (channelName.empty() || channelName[0] != '#') {
-        cli.response(":" + cli.getNickname() + " NOTICE * :Invalid channel name\r\n");
+        cli.response(":server 403 " + cli.getNickname() + " " + channelName + " :No such channel\r\n");
         return;
     }
 
-    cout << "KICK command: target_nick=" << target_nick << ", reason=" << reason << endl;
+    Channel* channel = server.getChannel(channelName);
+    if (!channel) {
+        cli.response(":server 403 " + cli.getNickname() + " " + channelName + " :No such channel\r\n");
+        return;
+    }
+
+    if (!channel->contains(cli.getNickname())) {
+        cli.response(":server 442 " + cli.getNickname() + " " + channelName + " :You're not on that channel\r\n");
+        return;
+    }
+
+    if (!channel->isOp(cli.getNickname())) {
+        cli.response(":server 482 " + cli.getNickname() + " " + channelName + " :You're not channel operator\r\n");
+        return;
+    }
 
     std::map<int, Client>::iterator it = clients.begin();
-    bool found = false;
+    Client* target_client_ptr = NULL;
     for (; it != clients.end(); ++it) {
         if (it->second.getNickname() == target_nick) {
-            found = true;
+            target_client_ptr = &it->second;
             break;
         }
     }
 
-    if (found) {
-        Client& target_client = it->second;
-
-
-        Channel* channel = server.getChannel(channelName);
-        if (!channel) {
-            cli.response(":" + cli.getNickname() + " NOTICE * :No such channel\r\n");
-        } else {
-            if (!channel->contains(target_nick)) {
-            cli.response(":" + cli.getNickname() + " NOTICE * :User " + target_nick + " is not on channel " + channel->getName() + "\r\n");
-            } else if (!channel->isOp(cli.getNickname())) {
-            cli.response(":" + cli.getNickname() + " NOTICE * :You are not channel operator in " + channel->getName() + "\r\n");
-            } else {
-            channel->kickUser(target_nick, reason);
-            target_client.response(":" + cli.getNickname() + " KICK " + target_nick + " :" + reason + "\r\n");
-            target_client.sendPendingMessages();
-            cli.response("You kicked " + target_nick + " from " + channel->getName() + " :" + reason + "\r\n");
-            channel->broadcast(cli.getNickname(), ":" + cli.getNickname() + " KICK " + target_nick + " FROM " + channel->getName() + " :" + reason, server);
-            }
-        }
-    } else {
-        cli.response(":" + cli.getNickname() + " NOTICE * :User " + target_nick + " not found\r\n");
+    if (!channel->contains(target_nick)) {
+        cli.response(":server 441 " + cli.getNickname() + " " + target_nick + " " + channelName + " :They aren't on that channel\r\n");
+        return;
     }
+
+    channel->removeUser(target_nick);
+
+    std::string kickLine = ":" + cli.getNickname() + "!" + cli.getUsername() + "@" + cli.getHostname()
+                        + " KICK " + channelName + " " + target_nick + " :" + reason + "\r\n";
+    channel->broadcast(cli.getNickname(), kickLine, server);
+
+    cli.response(kickLine);
+    cli.sendPendingMessages();
+
+
+    if (target_client_ptr) {
+        target_client_ptr->response(kickLine);
+        target_client_ptr->sendPendingMessages();
+        target_client_ptr->response(":" + cli.getNickname() + " NOTICE " + target_nick + " :You have been kicked from " + channelName + " : " + reason + "\r\n");
+        target_client_ptr->sendPendingMessages();
+    }
+
+    cli.response("You kicked " + target_nick + " from " + channelName + " : " + reason + "\r\n");
 }
 
 

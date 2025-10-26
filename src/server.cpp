@@ -258,4 +258,12 @@ void Server::addChannel(const std::string& name, Channel* channel) {
     _channels[name] = channel;
 }
 
+void Server::removeChannel(const std::string& name) {
+	std::map<std::string, Channel*>::iterator it = _channels.find(name);
+	if (it != _channels.end()) {
+		delete it->second; 
+		_channels.erase(it);
+	}
+}
+
 // ensure this matches the declaration in Server.hpp (const)

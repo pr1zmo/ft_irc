@@ -13,6 +13,7 @@
 #include "ft_irc.h"
 #include <sstream>
 #include <vector>
+#include <cstdlib> // for strtoul
 
 static std::string trim_str(const std::string &s) {
     size_t l = s.find_first_not_of(' ');
@@ -30,14 +31,14 @@ Privmsg::~Privmsg()
 {
 }
 
-void Privmsg::handleFileTransfer(Client &cli, const std::string& param){
-    // File transfer handling placeholder
-    (void)cli;
-    (void)param;
-}
+// void Privmsg::handleFileTransfer(Client &cli, const std::string& param){
+
+// }
 
 void Privmsg::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
     (void)cmd;
+    // control-A sentinel used for DCC detection
+    std::string ctrl(1, '\001');
     
     if (param.empty()) {
         cli.response("ERROR :No recipient given\r\n");
@@ -95,6 +96,11 @@ void Privmsg::execute(Client &cli, const std::string& param, const std::string& 
             if (!userFound) {
                 cli.response(":server 401 " + cli.getNickname() + " " + target + " :No such nick/channel\r\n");
             }
+            // check for DCC in the message payload (use ctrl char)
+            // if (message.find(ctrl + "DCC SEND") != std::string::npos) {
+            //     handleFileTransfer(cli, message);
+            //     return;
+            // }
         }
     }
 

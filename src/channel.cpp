@@ -14,6 +14,9 @@ bool Channel::addUser(const std::string& nick, Client* clientPtr) {
     }
     return false;
 }
+bool Channel::hasUser(const std::string& nick) const {
+    return users_set.find(nick) != users_set.end();
+}
 
 bool Channel::removeUser(const std::string& nick) {
     if (users_set.erase(nick) > 0) {
@@ -30,14 +33,27 @@ bool Channel::contains(const std::string& nick) const {
 
 size_t Channel::userCount() const { return users.size(); }
 
-bool Channel::addOp(const std::string& nick) {
+bool Channel::addOp(const std::string& nick, Server& server) {
     if (!contains(nick)) return false;
+    //:<nick>!<user>@<host> MODE #chan +o <target>
+    this->broadcast("",
+        ":" + nick + "!" + users.at(nick)->getUsername() + "@" + users.at(nick)->getHostname() +
+        " MODE " + name + " +o " + nick + "\r\n", server);
     ops.insert(nick);
     return true;
 }
 
-bool Channel::removeOp(const std::string& nick) {
-    return ops.erase(nick) > 0;
+bool Channel::removeOp(const std::string& nick, Server* server) {
+    if (ops.find(nick) == ops.end()) return false;
+    // broadcast MODE -o <nick> if server provided
+    if (server && users.find(nick) != users.end()) {
+        Client* c = users.at(nick);
+        std::string modeMsg = ":" + nick + "!" + c->getUsername() + "@" + c->getHostname() +
+                              " MODE " + name + " -o " + nick + "\r\n";
+        this->broadcast("", modeMsg, *server);
+    }
+    ops.erase(nick);
+    return true;
 }
 
 bool Channel::isOp(const std::string& nick) const {
@@ -58,7 +74,7 @@ bool Channel::isInvited(const std::string& nick) const {
 }
 
 bool Channel::banUser(const std::string& nick) {
-    // remove from channel if present
+
     removeUser(nick);
     bannedUsers.insert(nick);
     return true;
@@ -73,11 +89,8 @@ bool Channel::isBanned(const std::string& nick) const {
 }
 
 bool Channel::kickUser(const std::string& nick, const std::string& reason) {
-    // kick only if member exists
     if (!contains(nick)) return false;
     removeUser(nick);
-    // server or command handler should send KICK reply to user and channel
-    // here we only modify channel state
     (void)reason;
     return true;
 }
@@ -105,6 +118,24 @@ void Channel::broadcast(const std::string& nick, const std::string& msg, Server&
         }
     }
 }
+//channel namelist
+
+std::string Channel::namesList() const {
+    std::string names;
+    for (std::map<std::string, Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+        const std::string& nick = it->first;
+        if (isOp(nick)) {
+            names += "@" + nick + " ";
+        } else {
+            names += nick + " ";
+        }
+    }
+    if (!names.empty() && names[names.size() - 1] == ' ') {
+        names.erase(names.size() - 1); // remove trailing space
+    }
+    return names;
+}
+
 
 void Channel::debugPrint() const {
     std::cout << "Channel #" << name << " users(" << users.size() << "):";
@@ -138,9 +169,9 @@ void Channel::applyModeChanges(const std::string& modeChanges, const std::string
                     if (!users.empty()) {
                         std::string targetNick = target;
                         if (adding) {
-                            addOp(targetNick);
+                            addOp(targetNick, server);
                         } else {
-                            removeOp(targetNick);
+                            removeOp(targetNick, &server);
                         }
                     }
                     break;

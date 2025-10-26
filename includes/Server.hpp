@@ -43,6 +43,7 @@ class Server {
         std::string getPassword() const { return _password; }
         //add channel to server
         void addChannel(const std::string& name, Channel* channel);
+        void removeChannel(const std::string& name);
 
 
         class ServerFailedException : public std::exception {

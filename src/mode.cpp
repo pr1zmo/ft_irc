@@ -32,6 +32,17 @@ void Mode::execute(Client &cli, const std::string& param, const std::string& cmd
             cli.response("Error: No such channel.\r\n");
             return;
         }
+        // issuer must be on the channel
+        if (!channel->contains(cli.getNickname())) {
+            cli.response(":server 442 " + cli.getNickname() + " " + channelName + " :You're not on that channel\r\n");
+            return;
+        }
+        // issuer must be operator
+        if (!channel->isOp(cli.getNickname())) {
+            cli.response(":server 482 " + cli.getNickname() + " " + channelName + " :You're not channel operator\r\n");
+            return;
+        }
+
         // Apply mode changes to the channel
         channel->applyModeChanges(modeChanges, target, cli, server);
     } else {
