@@ -64,7 +64,7 @@ void Kick::execute(Client &cli, const std::string& param, const std::string& cmd
             } else {
             channel->kickUser(target_nick, reason);
             target_client.response(":" + cli.getNickname() + " KICK " + target_nick + " :" + reason + "\r\n");
-            target_client.sendPendingMessages();
+            // target_client.sendPendingMessages();
             cli.response("You kicked " + target_nick + " from " + channel->getName() + " :" + reason + "\r\n");
             channel->broadcast(cli.getNickname(), ":" + cli.getNickname() + " KICK " + target_nick + " FROM " + channel->getName() + " :" + reason, server);
             }

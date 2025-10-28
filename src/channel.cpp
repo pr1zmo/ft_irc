@@ -101,7 +101,7 @@ void Channel::broadcast(const std::string& nick, const std::string& msg, Server&
         Client* clientPtr = it->second;
         if (clientPtr && clientPtr->getNickname() != nick) {
             clientPtr->response(msg + "\r\n");
-            clientPtr->sendPendingMessages();
+            // clientPtr->sendPendingMessages();
         }
     }
 }

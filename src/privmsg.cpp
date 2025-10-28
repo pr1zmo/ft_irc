@@ -68,7 +68,7 @@ void Privmsg::execute(Client &cli, const std::string& param, const std::string& 
 		if (it->second.getNickname() == target) {
 			std::cout << "Sending message to user: " << target << std::endl;
 			it->second.response(":" + cli.getNickname() + " PRIVMSG " + target + " :" + message + "\r\n");
-			it->second.sendPendingMessages();
+			// it->second.sendPendingMessages();
 			userFound = true;
 			break;
 		}

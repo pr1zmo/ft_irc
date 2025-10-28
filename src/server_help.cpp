@@ -136,7 +136,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 		
 		if (event_count == -1) {
 			if (errno == EINTR) {
-					continue;
+				continue;
 			}
 			ft_error(errno, "epoll_wait");
 			break;
