@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/20 16:29:15 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/28 20:51:51 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,6 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 				cli.markDisconnected();
 				return 0;
 			}
-
 			continue;
 		}
 		else if (bytesRead == 0) {
@@ -199,6 +198,7 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 		if (cli._has_msg)
 			enableWrite(epoll_fd, fd);
 	}
+	
 
 	// leftover data
 	if (!cli._msgBuffer.empty()) {
@@ -256,6 +256,14 @@ Channel* Server::getChannel(const std::string& name) {
 void Server::addChannel(const std::string& name, Channel* channel) {
     if (name.empty() || channel == NULL) return;
     _channels[name] = channel;
+}
+
+void Server::removeChannel(const std::string& name) {
+	std::map<std::string, Channel*>::iterator it = _channels.find(name);
+	if (it != _channels.end()) {
+		delete it->second; 
+		_channels.erase(it);
+	}
 }
 
 // ensure this matches the declaration in Server.hpp (const)

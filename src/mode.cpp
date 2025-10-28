@@ -15,23 +15,36 @@ void Mode::execute(Client &cli, const std::string& param, const std::string& cmd
 
     // Parse parameters to extract target and mode changes
     std::istringstream iss(param);
+    std::string channelName;
     std::string target;
     std::string modeChanges;
-    iss >> target >> modeChanges;
-    if (target.empty() || modeChanges.empty()) {
-        cli.response("Error: MODE command requires a target and mode changes.\r\n");
+    // last param is user or key for channel and its optional
+    iss >> channelName >> modeChanges >> target;
+    if (channelName.empty() || modeChanges.empty()) {
+        cli.response("Error: MODE command requires a channel and mode changes.\r\n");
         return;
     }
     // Determine if target is a channel or user
-    if (target[0] == '#') {
+    if (channelName[0] == '#') {
         // Handle channel mode changes
-        Channel* channel = server.getChannel(target);
+        Channel* channel = server.getChannel(channelName);
         if (!channel) {
             cli.response("Error: No such channel.\r\n");
             return;
         }
+        // issuer must be on the channel
+        if (!channel->contains(cli.getNickname())) {
+            cli.response(":server 442 " + cli.getNickname() + " " + channelName + " :You're not on that channel\r\n");
+            return;
+        }
+        // issuer must be operator
+        if (!channel->isOp(cli.getNickname())) {
+            cli.response(":server 482 " + cli.getNickname() + " " + channelName + " :You're not channel operator\r\n");
+            return;
+        }
+
         // Apply mode changes to the channel
-        channel->applyModeChanges(modeChanges);
+        channel->applyModeChanges(modeChanges, target, cli, server);
     } else {
         // Handle user mode changes
         Client* user = NULL;

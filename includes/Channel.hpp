@@ -10,8 +10,9 @@
 #include <iostream>
 #include "Client.hpp"
 
-class Client;
 
+class Client;
+class Server;
 struct Message {
     std::string sender;
     std::string text;
@@ -30,8 +31,9 @@ public:
     size_t userCount() const;
 
     
-    bool addOp(const std::string& nick);
-    bool removeOp(const std::string& nick);
+    bool addOp(const std::string& nick, Server& server);
+    // if 'server' is non-null the method will broadcast a MODE -o message to the channel
+    bool removeOp(const std::string& nick, Server* server = NULL);
     bool isOp(const std::string& nick) const;
 
    
@@ -59,7 +61,7 @@ public:
 
     void setPassword(const std::string& p) { password = p; }
     bool checkPassword(const std::string& p) const { return password == p; }    
-    void applyModeChanges(const std::string& modeChanges);
+    void applyModeChanges(const std::string& modeChanges, const std::string& target, Client& cli, class Server& server);
     void setUserLimit(size_t limit) { userLimit = limit; }
     size_t getUserLimit() const { return userLimit; }
     void setInviteOnly(bool flag) { inviteOnly = flag; }
@@ -68,12 +70,20 @@ public:
     bool isTopicRestricted() const { return topicRestricted; }
     void setPasswordProtected(bool flag) { passwordProtected = flag; }
     bool isPasswordProtected() const { return passwordProtected; }
+    void setHasLimit(bool flag) { has_limit = flag; }
+    bool hasLimit() const { return has_limit; }
+    std::string namesList() const;
+    bool hasUser(const std::string& nick) const;
+    bool isEmpty() const {
+        return users.empty();
+    }
 
 private:
     std::string name;
     std::string topic;
     std::string password;
     size_t userLimit;
+    bool has_limit;
     bool inviteOnly;
     bool topicRestricted;
     bool passwordProtected;

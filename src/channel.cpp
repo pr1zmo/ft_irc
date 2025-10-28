@@ -14,6 +14,9 @@ bool Channel::addUser(const std::string& nick, Client* clientPtr) {
     }
     return false;
 }
+bool Channel::hasUser(const std::string& nick) const {
+    return users_set.find(nick) != users_set.end();
+}
 
 bool Channel::removeUser(const std::string& nick) {
     if (users_set.erase(nick) > 0) {
@@ -30,14 +33,27 @@ bool Channel::contains(const std::string& nick) const {
 
 size_t Channel::userCount() const { return users.size(); }
 
-bool Channel::addOp(const std::string& nick) {
+bool Channel::addOp(const std::string& nick, Server& server) {
     if (!contains(nick)) return false;
+    //:<nick>!<user>@<host> MODE #chan +o <target>
+    this->broadcast("",
+        ":" + nick + "!" + users.at(nick)->getUsername() + "@" + users.at(nick)->getHostname() +
+        " MODE " + name + " +o " + nick + "\r\n", server);
     ops.insert(nick);
     return true;
 }
 
-bool Channel::removeOp(const std::string& nick) {
-    return ops.erase(nick) > 0;
+bool Channel::removeOp(const std::string& nick, Server* server) {
+    if (ops.find(nick) == ops.end()) return false;
+    // broadcast MODE -o <nick> if server provided
+    if (server && users.find(nick) != users.end()) {
+        Client* c = users.at(nick);
+        std::string modeMsg = ":" + nick + "!" + c->getUsername() + "@" + c->getHostname() +
+                              " MODE " + name + " -o " + nick + "\r\n";
+        this->broadcast("", modeMsg, *server);
+    }
+    ops.erase(nick);
+    return true;
 }
 
 bool Channel::isOp(const std::string& nick) const {
@@ -58,7 +74,7 @@ bool Channel::isInvited(const std::string& nick) const {
 }
 
 bool Channel::banUser(const std::string& nick) {
-    // remove from channel if present
+
     removeUser(nick);
     bannedUsers.insert(nick);
     return true;
@@ -73,11 +89,8 @@ bool Channel::isBanned(const std::string& nick) const {
 }
 
 bool Channel::kickUser(const std::string& nick, const std::string& reason) {
-    // kick only if member exists
     if (!contains(nick)) return false;
     removeUser(nick);
-    // server or command handler should send KICK reply to user and channel
-    // here we only modify channel state
     (void)reason;
     return true;
 }
@@ -100,11 +113,29 @@ void Channel::broadcast(const std::string& nick, const std::string& msg, Server&
     for (std::map<std::string, Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
         Client* clientPtr = it->second;
         if (clientPtr && clientPtr->getNickname() != nick) {
-            clientPtr->response(msg + "\r\n");
-            // clientPtr->sendPendingMessages();
+            clientPtr->response(msg);
+            clientPtr->sendPendingMessages();
         }
     }
 }
+//channel namelist
+
+std::string Channel::namesList() const {
+    std::string names;
+    for (std::map<std::string, Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
+        const std::string& nick = it->first;
+        if (isOp(nick)) {
+            names += "@" + nick + " ";
+        } else {
+            names += nick + " ";
+        }
+    }
+    if (!names.empty() && names[names.size() - 1] == ' ') {
+        names.erase(names.size() - 1); // remove trailing space
+    }
+    return names;
+}
+
 
 void Channel::debugPrint() const {
     std::cout << "Channel #" << name << " users(" << users.size() << "):";
@@ -116,8 +147,12 @@ void Channel::debugPrint() const {
     std::cout << std::endl;
 }
 
-void Channel::applyModeChanges(const std::string& modeChanges) {
+void Channel::applyModeChanges(const std::string& modeChanges, const std::string& target, Client& cli, Server& server) {
     bool adding = true;
+    std::cout << "Applying mode changes: " << modeChanges << std::endl;
+    // Separate mode changes by words
+    std::istringstream iss(modeChanges);
+
     for (size_t i = 0; i < modeChanges.size(); ++i) {
         char ch = modeChanges[i];
         if (ch == '+') {
@@ -127,29 +162,59 @@ void Channel::applyModeChanges(const std::string& modeChanges) {
         } else {
             switch (ch) {
                 case 'o': // operator status
-                    // This requires additional parameters in a real implementation
-                    // Here we just toggle the first user for demonstration
+                    if (users.find(target) == users.end()) {
+                        cli.response("Error: User " + target + " is not in channel " + name + ".\r\n");
+                        return;
+                    }
                     if (!users.empty()) {
-                        std::string targetNick = users.begin()->first;
+                        std::string targetNick = target;
                         if (adding) {
-                            addOp(targetNick);
+                            addOp(targetNick, server);
                         } else {
-                            removeOp(targetNick);
+                            removeOp(targetNick, &server);
                         }
                     }
                     break;
-                // Handle other modes i t k l
-                case 'i': // invite only
-                    // Implement invite-only mode logic
+                case 'i': 
+                    if (adding) {
+                        inviteOnly = true;
+                    } else {
+                        inviteOnly = false;
+                    }
                     break;
-                case 't': // topic set by ops only
-                    // Implement topic restriction logic
+                case 't':
+                    if (adding) {
+                        topicRestricted = true;
+                    } else {
+                        topicRestricted = false;
+                    }
                     break;
-                case 'k': // password protected
-                    // Implement password protection logic
+                case 'k': 
+                    if (adding) {
+                        if (target.empty()) {
+                            cli.response("Error: MODE +k requires a password parameter.\r\n");
+                            return;
+                        }
+                        setPassword(target);
+                        passwordProtected = true;
+                    } else {
+                        passwordProtected = false;
+                    }
                     break;
-                case 'l': // user limit
-                    // Implement user limit logic
+                case 'l':
+                    if (adding) {
+
+                        if (target.empty()) {
+                            cli.response("Error: MODE +l requires a limit parameter.\r\n");
+                            return;
+                        }
+                        size_t limit = std::atoi(target.c_str());
+                        setUserLimit(limit);
+                        has_limit = true;
+                    } else {
+
+                        has_limit = false;
+                    }
                     break;
                 default:
                     break;

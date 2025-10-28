@@ -108,6 +108,13 @@ class Join : public Command {
 		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
+class Invite : public Command {
+	public:
+		Invite(/* args */);
+		~Invite();
+		// void execute(Client &cli);
+		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
+};
 class Topic : public Command {
 	public:
 		Topic(/* args */);

@@ -12,7 +12,6 @@ Topic::~Topic()
 }
 
 void Topic::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
-    // Implementation of TOPIC command execution
     (void)clients;
     std::istringstream iss(param);
     std::string channel_name;
@@ -34,15 +33,28 @@ void Topic::execute(Client &cli, const std::string& param, const std::string& cm
     }
 
     if (new_topic.empty()) {
-        // View current topic
-        cli.response(":server 332 " + cli.getNickname() + " " + channel_name + " :" + channel->getTopic() + "\r\n");
-    } else {
-        // Set new topic
-        if (!channel->isOp(cli.getNickname())) {
-            cli.response(":server 482 " + cli.getNickname() + " " + channel_name + " :You're not channel operator\r\n");
-            return;
+        const std::string topic = channel->getTopic();
+        if (topic.empty()) {
+            cli.response(":server 331 " + cli.getNickname() + " " + channel_name + " :No topic is set\r\n");
+        } else {
+            cli.response(":server 332 " + cli.getNickname() + " " + channel_name + " :" + topic + "\r\n");
         }
-        channel->setTopic(new_topic);
-        channel->broadcast(cli.getNickname(), ":" + cli.getNickname() + " TOPIC " + channel_name + " :" + new_topic, server);
+        return;
     }
+
+    if (!channel->contains(cli.getNickname())) {
+        cli.response(":server 442 " + cli.getNickname() + " " + channel_name + " :You're not on that channel\r\n");
+        return;
+    }
+
+    if (channel->isTopicRestricted() && !channel->isOp(cli.getNickname())) {
+        cli.response(":server 482 " + cli.getNickname() + " " + channel_name + " :You're not channel operator\r\n");
+        return;
+    }
+
+    channel->setTopic(new_topic);
+
+    std::string topicMsg = ":" + cli.getNickname() + "!" + cli.getUsername() + "@" + cli.getHostname()
+                         + " TOPIC " + channel_name + " :" + new_topic + "\r\n";
+    channel->broadcast(cli.getNickname(), topicMsg, server);
 }
