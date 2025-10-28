@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Notice.cpp                                         :+:      :+:    :+:   */
+/*   notice.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:55 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/21 20:13:56 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/28 21:04:02 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@ Notice::~Notice()
 }
 
 void Notice::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
-    (void)cli;
-    (void)param;
-    (void)cmd;
-    (void)clients;
-    // Implementation of NOTICE command execution
+	(void)cli;
+	(void)param;
+	(void)cmd;
+	(void)clients;
+	// Implementation of NOTICE command execution
 }
