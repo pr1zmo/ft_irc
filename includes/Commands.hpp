@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 14:49:22 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/29 12:47:40 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ std::vector<std::string> full;
 		std::string const helpContent;
 		std::map<std::string, std::vector<std::string> > topics;
 		bool load();
-		std::string printUsage() const;
+		// std::string printUsage() const;
 		const std::vector<std::string>* getTopic(const std::string& key) const;
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };

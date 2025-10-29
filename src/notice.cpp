@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:55 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/28 21:04:02 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/29 12:50:12 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,5 +26,6 @@ void Notice::execute(Client &cli, const std::string& param, const std::string& c
 	(void)param;
 	(void)cmd;
 	(void)clients;
+	(void)server;
 	// Implementation of NOTICE command execution
 }

@@ -12,7 +12,7 @@ Mode::~Mode() {
 }
 
 void Mode::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
-
+	(void)cmd;
 	// Parse parameters to extract target and mode changes
 	std::istringstream iss(param);
 	std::string channelName;

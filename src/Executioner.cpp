@@ -31,7 +31,7 @@ Executioner::~Executioner() {
 
 int Executioner::run(Client &cli, const std::string &msg, std::map<int, Client>& clients, Server& server) {
 	Command command;
-	std::cout << "Executing command: " << msg << std::endl;
+	// std::cout << "Executing command: " << msg << std::endl;
 	int ret = command.parseCommand(const_cast<char*>(msg.c_str()));
 	if (ret == 0) {
 		cli.response("Error: Command too long.\r\n");

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 13:56:42 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/03 19:41:15 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/29 12:48:32 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,9 @@ int File::parseCommand(const string &msg) {
 }
 
 void File::execute(Client &cli, const string &msg, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
+	(void)cmd;
+	(void)clients;
+	(void)server;
 	// msg format: DCC <file to send> <ip of the recipient> <port of the recipient> <filesize>
 	sender = &cli;
 	if (!parseCommand(msg))

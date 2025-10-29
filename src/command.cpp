@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:11 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 14:49:24 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/29 12:49:57 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ Command::~Command() {
 
 int Command::parseCommand(char *msg) {
 	_size = strlen(msg);
-	cout << "The size: " << _size << '\n';
+	// cout << "The size: " << _size << '\n';
 	if (_size > BUFFER_SIZE) {
 		return 0;
 	}
@@ -40,6 +40,9 @@ int Command::parseCommand(char *msg) {
 void Command::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
 	(void)cli;
 	(void)param;
+	(void)cmd;
+	(void)clients;
+	(void)server;
 	// cout << "param: " << param << '\n';
 	// cout << "cmd: " << cmd << '\n';
 

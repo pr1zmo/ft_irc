@@ -3,7 +3,7 @@ BOT_NAME = bot
 CC = c++
 CFLAGS = -I./includes -g3 -std=c++98
 # CFLAGS+= -fsanitize=address
-# CFLAGS += -Wall -Wextra -Werror
+ CFLAGS += -Wall -Wextra -Werror
 SRCDIR = src
 OBJDIR = obj
 BOT_OBJDIR = obj_bot

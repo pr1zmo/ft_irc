@@ -6,20 +6,20 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/20 16:26:26 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/29 12:54:19 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "EventHandler.hpp"
 
-void static listClients(map<int, Client>& clients) {
-	cout << "Current connected clients:" << endl;
-	for (map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it) {
-		cout << " - FD: " << it->first << ", IP: " << inet_ntoa(it->second.getAddress().sin_addr)
-			<< ", Port: " << ntohs(it->second.getAddress().sin_port) << endl;
-	}
-}
+// void static listClients(map<int, Client>& clients) {
+// 	cout << "Current connected clients:" << endl;
+// 	for (map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it) {
+// 		cout << " - FD: " << it->first << ", IP: " << inet_ntoa(it->second.getAddress().sin_addr)
+// 			<< ", Port: " << ntohs(it->second.getAddress().sin_port) << endl;
+// 	}
+// }
 
 void EventHandler::handleNewConnection() {
 	int cli_fd = _server.initConnection(_clients);

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/20 14:27:50 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/29 12:53:56 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ Client::Client(): should_quit(false){
 }
 
 Client::Client(int fd, struct sockaddr_in cli_addr)
-	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _pending_msg(""), _has_msg(false), last_activity(time(NULL)), should_quit(false), _isAuth(false), _nick("Guest" + to_string98(fd)){
+	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _nick("Guest" + to_string98(fd)), _pending_msg(""), _has_msg(false), last_activity(time(NULL)), should_quit(false), _isAuth(false){
 }
 
 Client::~Client() {
@@ -103,7 +103,7 @@ void Client::joinChannel(Channel* channel) {
 }
 void Client::leaveChannel() {	
 	// Placeholder implementation
-	Channel* channel = getChannel();
+	// Channel* channel = getChannel();
 }
 // mark the client as disconnected
 // void Client::disconnect() {

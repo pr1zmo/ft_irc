@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:57 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/28 21:03:54 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/29 12:49:10 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,8 @@ static inline std::string toLowerAscii(const std::string &s) {
 
 void Nick::execute(Client &client, const std::string &params, const std::string &cmd, std::map<int, Client>& clients, Server& server)
 {
-
+	(void)server;
+	(void)cmd;
 	std::string p = trim(params);
 	std::istringstream iss(p);
 	std::string new_nick;

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/28 20:51:51 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/29 12:44:22 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,7 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 		if (complete_cmd.empty())
 			continue;
 
-		cout << "The current command to run: " << complete_cmd << "\n";
+		// cout << "The current command to run: " << complete_cmd << "\n";
 		int result = executioner.run(cli, complete_cmd, clients, server);
 		if (result == -1) {
 			return -1;
@@ -202,8 +202,8 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 
 	// leftover data
 	if (!cli._msgBuffer.empty()) {
-		cout << "Incomplete command in buffer (waiting for \\r\\n): " 
-		<< cli._msgBuffer << endl;
+		// cout << "Incomplete command in buffer (waiting for \\r\\n): " 
+		// << cli._msgBuffer << endl;
 	}
 
 	return 0;

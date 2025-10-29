@@ -110,6 +110,7 @@ size_t Channel::messageCount() const {
 }
 
 void Channel::broadcast(const std::string& nick, const std::string& msg, Server& server) const {
+	(void)server;
 	for (std::map<std::string, Client*>::const_iterator it = users.begin(); it != users.end(); ++it) {
 		Client* clientPtr = it->second;
 		if (clientPtr && clientPtr->getNickname() != nick) {

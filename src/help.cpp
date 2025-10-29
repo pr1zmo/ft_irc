@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:09 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/02 17:33:34 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/29 12:51:40 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,51 +14,68 @@
 #include "Commands.hpp"
 
 Help::Help() : helpContent( 
-			"*** ft_irc — HELP ***\n"
-			"\n"
-			"Server start (shell):\n"
-			"  ./ircserv <port> <password>\n"
-			"\n"
-			"Registration (do these first):\n"
-			"  PASS <password>                  — provide server password\n"
-			"  NICK <nickname>                  — set your nickname\n"
-			"  USER <username> 0 * :<realname>  — set username & real name\n"
-			"\n"
-			"Messaging:\n"
-			"  PRIVMSG <nick>|<#channel> :<text>   — send a private or channel message\n"
-			"File transfer:\n"
-			"  DCC <filename> <ip> <port> — send a file to a user\n"
-			"\n"
-			"Channels:\n"
-			"  JOIN <#chan>[,<#chan>...] [<key>[,<key>...]]   — join/create channels\n"
-			"\n"
-			"Channel operators:\n"
-			"  KICK <#chan> <nick> [<reason>]                 — remove a user\n"
-			"  INVITE <nick> <#chan>                          — invite a user\n"
-			"  TOPIC <#chan> [:<new-topic>]                   — set/view the topic\n"
-			"  MODE <#chan> {[+|-]i|t|k|o|l} [<args>...]      — channel modes:\n"
-			"     +i/-i         invite-only on/off\n"
-			"     +t/-t         restrict TOPIC to ops / allow all\n"
-			"     +k <key>/-k   set/remove channel key (password)\n"
-			"     +o <nick>/-o  give/take operator privilege\n"
-			"     +l <n>/-l     set/remove user limit\n"
-			"\n"
-			"Conventions:\n"
-			"  • Commands are case-insensitive and end with CRLF (\\r\\n).\n"
-			"  • Channels start with '#'. The last parameter may contain spaces and must be prefixed with ':'.\n"
-			"  • Targets accept either a nickname or a #channel, depending on the command.\n"
-			"\n"
-			"Quick start:\n"
-			"  PASS s3cr3t\n"
-			"  NICK alice\n"
-			"  USER alice 0 * :Alice Liddell\n"
-			"  JOIN #tea\n"
-			"  PRIVMSG #tea :hello world\n") {
-	
+            "*** ft_irc — HELP ***\n"
+            "\n"
+            "Server start (shell):\n"
+            "  ./ircserv <port> <password>\n"
+            "\n"
+            "Registration (do these first):\n"
+            "  PASS <password>                  — provide server password\n"
+            "  NICK <nickname>                  — set your nickname\n"
+            "  USER <username> 0 * :<realname>  — set username & real name\n"
+            "\n"
+            "Core / session:\n"
+            "  QUIT [:<message>]                — disconnect from the server\n"
+            "  PING <token>                     — ping the server\n"
+            "  PONG <token>                     — reply to a PING\n"
+            "\n"
+            "Messaging:\n"
+            "  PRIVMSG <nick>|<#channel> :<text>   — send a private or channel message\n"
+            "  NOTICE  <nick>|<#channel> :<text>   — like PRIVMSG, but recipients must not auto-reply\n"
+            "\n"
+            "Channels:\n"
+            "  JOIN <#chan>[,<#chan>...] [<key>[,<key>...]]   — join/create channels\n"
+            "  PART <#chan>[,<#chan>...] [<message>]          — leave channel(s)\n"
+            "  LIST [<#chan>[,<#chan>...]]                    — list channels (optionally filter)\n"
+            "  TOPIC <#chan> [:<new-topic>]                   — set/view the topic\n"
+            "\n"
+            "Channel operators:\n"
+            "  KICK <#chan> <nick> [<reason>]                 — remove a user\n"
+            "  INVITE <nick> <#chan>                          — invite a user\n"
+            "  MODE <#chan> {[+|-]i|t|k|o|l} [<args>...]      — channel modes:\n"
+            "     +i/-i         invite-only on/off\n"
+            "     +t/-t         restrict TOPIC to ops / allow all\n"
+            "     +k <key>/-k   set/remove channel key (password)\n"
+            "     +o <nick>/-o  give/take operator privilege\n"
+            "     +l <n>/-l     set/remove user limit\n"
+            "\n"
+            "Server operators:\n"
+            "  OPER <name> <password>                          — obtain operator privileges\n"
+            "\n"
+            "File transfer (client-to-client via CTCP DCC):\n"
+            "  Send a CTCP payload inside PRIVMSG. The server only forwards it:\n"
+            "    PRIVMSG <nick> :\\x01DCC SEND <file> <ip> <port> <size>\\x01\n"
+            "\n"
+            "Help:\n"
+            "  HELP [<command>]                                 — show general or command-specific help\n"
+            "\n"
+            "Conventions:\n"
+            "  • Commands are case-insensitive and must end with CRLF (\\r\\n).\n"
+            "  • Lines are limited to 512 bytes including CRLF (RFC).\n"
+            "  • Channels start with '#'. The last parameter may contain spaces and must be prefixed with ':'.\n"
+            "\n"
+            "Quick start:\n"
+            "  PASS s3cr3t\n"
+            "  NICK alice\n"
+            "  USER alice 0 * :Alice Liddell\n"
+            "  JOIN #tea\n"
+            "  PRIVMSG #tea :hello world\n"
+            "  LIST\n"
+            "  PART #tea :bye\n"
+            "  QUIT :goodbye\n") {
 }
 
 Help::~Help() {
-	
 }
 
 bool Help::load() {
@@ -110,6 +127,9 @@ const std::vector<std::string>* Help::getTopic(const std::string& key) const
 }
 
 void Help::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
+	(void)cmd;
+	(void)server;
+	(void)clients;
 	if (param.empty()) {
 		cli.response(helpContent + "\r\n");
 		return;
