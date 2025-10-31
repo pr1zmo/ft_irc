@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/29 12:53:56 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/31 15:50:36 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 Client::Client(): should_quit(false){
 }
 
-Client::Client(int fd, struct sockaddr_in cli_addr)
-	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _nick("Guest" + to_string98(fd)), _pending_msg(""), _has_msg(false), last_activity(time(NULL)), should_quit(false), _isAuth(false){
+Client::Client(int fd, struct sockaddr_in cli_addr, int e_fd)
+	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _nick("Guest" + to_string98(fd)), _pending_msg(""), _has_msg(false), last_activity(time(NULL)), should_quit(false), _isAuth(false), epoll_fd(e_fd){
 }
 
 Client::~Client() {
@@ -31,6 +31,7 @@ Client& Client::operator=(const Client &other) {
 		_addrLen = other._addrLen;
 		_isAuth = other._isAuth;
 		_cmd = other._cmd; // Shallow copy for now...
+		epoll_fd = other.epoll_fd;
 	}
 	return *this;
 }
@@ -44,6 +45,7 @@ bool Client::authenticate(const std::string &msg) {
 void Client::response(const std::string &msg) {
 	_pending_msg += msg;
 	_has_msg = true;
+	enableWrite(epoll_fd, _fd);
 }
 
 void Client::sendPendingMessages() {

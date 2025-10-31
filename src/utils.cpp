@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:24 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/06 13:20:46 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/31 14:06:35 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,4 +39,13 @@ vector<string> split(const string &s, char delimiter) {
 		parts.push_back(part);
 	}
 	return parts;
+}
+
+void enableWrite(int epoll_fd, int cli_fd){
+	epoll_event ev;
+	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
+	ev.data.fd = cli_fd;
+	if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, cli_fd, &ev) == -1) {
+		ft_error(errno, "epoll_ctl(MOD) enableWrite");
+	}
 }

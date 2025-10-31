@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/29 12:44:22 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/31 14:08:25 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,14 +91,17 @@ int Server::initConnection(map<int, Client>& clients) {
 	}
 	// if (errno == EAGAIN || errno == EWOULDBLOCK) cout << "WTFFFFFFFFFFFFFFFF THIS WOULD BLOCKKK???\n";
 	
-	clients[cli_fd] = Client(cli_fd, cli_addr);
+	clients[cli_fd] = Client(cli_fd, cli_addr, epoll_fd);
+
+	add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET);
 
 	string client_info = "Your connection info:\r\n";
 	client_info += "\tIP: " + string(inet_ntoa(cli_addr.sin_addr)) + "\r\n";
 	client_info += "\tPort: " + to_string98(ntohs(cli_addr.sin_port)) + "\r\n";
 	client_info += "\tFile Descriptor: " + to_string98(cli_fd) + "\r\n";
 	clients[cli_fd].response(client_info);
-	
+	enableWrite(epoll_fd, cli_fd);
+
 	return cli_fd;
 }
 
@@ -109,7 +112,7 @@ int Server::setEpoll() {
 		return -1;
 	}
 
-	add_fd(epoll_fd, _serverSocket, EPOLLIN | EPOLLET | EPOLLOUT);
+	add_fd(epoll_fd, _serverSocket, EPOLLIN | EPOLLET);
 
 	return epoll_fd;
 }
@@ -223,14 +226,14 @@ void Server::terminate(map<int, Client>& clients) {
  * Without it the server won't know when the socket is ready to send data
  * This is important for non-blocking sockets to avoid EAGAIN errors
 */
-void Server::enableWrite(int epoll_fd, int client_fd){
-	epoll_event ev;
-	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
-	ev.data.fd = client_fd;
-	if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, client_fd, &ev) == -1) {
-		ft_error(errno, "epoll_ctl(MOD) enableWrite");
-	}
-}
+// void Server::enableWrite(int epoll_fd, int client_fd){
+// 	epoll_event ev;
+// 	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
+// 	ev.data.fd = client_fd;
+// 	if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, client_fd, &ev) == -1) {
+// 		ft_error(errno, "epoll_ctl(MOD) enableWrite");
+// 	}
+// }
 
 /*
  * This function disables write events for a client socket in the epoll instance

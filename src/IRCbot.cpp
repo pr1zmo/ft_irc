@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 21:50:52 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/17 15:24:12 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/31 15:53:10 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int Bot::parseParams(char *msg, std::vector<std::string>& params){
 }
 
 void Bot::run(){
-	char buffer[512];
+	char buffer[4096];
 	memset(buffer, 0, sizeof(buffer));
 	int bytes_received = recv(_sockfd, buffer, sizeof(buffer) - 1, 0);
 	if (bytes_received < 0) {
@@ -78,7 +78,11 @@ void Bot::run(){
 	std::vector<std::string> params;
 	if (parseParams(buffer, params) < 1)
 		return;
+		
 
+	// int size = 4096;
+	// char buffer[size];
+	send(_sockfd, "HELP\r\n", 7, 0);
 	// Simple bot logic: respond to PING with PONG
 	if (params.size() > 0 && params[0] == "PING") {
 		std::string pong_response = "PONG :" + params[1] + "\r\n";

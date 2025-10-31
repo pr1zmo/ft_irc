@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 09:43:28 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/13 15:48:03 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/31 14:40:27 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ class Bot {
 		bool connectToServer();
 		vector<string> bot_params;
 		int parseParams(char *msg, std::vector<std::string>& params);
+
+		int setCredentials();
 
 		void run();
 };

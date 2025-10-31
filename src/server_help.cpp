@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/29 12:54:19 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/31 14:06:54 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,12 @@
 void EventHandler::handleNewConnection() {
 	int cli_fd = _server.initConnection(_clients);
 	if (cli_fd != -1) {
-		add_fd(_epoll_fd, cli_fd, EPOLLIN | EPOLLET);
+		// add_fd(_epoll_fd, cli_fd, EPOLLIN | EPOLLET);
 
 		// Check for queud messages first
 		std::map<int, Client>::iterator it = _clients.find(cli_fd);
 		if (it != _clients.end() && it->second._has_msg) {
-			_server.enableWrite(_epoll_fd, cli_fd);
+			enableWrite(_epoll_fd, cli_fd);
 		}
 	}
 }

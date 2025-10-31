@@ -74,14 +74,11 @@ void Kick::execute(Client &cli, const std::string& param, const std::string& cmd
 	channel->broadcast(cli.getNickname(), kickLine, server);
 
 	cli.response(kickLine);
-	cli.sendPendingMessages();
-
-
+	
+	
 	if (target_client_ptr) {
 		target_client_ptr->response(kickLine);
-		target_client_ptr->sendPendingMessages();
 		target_client_ptr->response(":" + cli.getNickname() + " NOTICE " + target_nick + " :You have been kicked from " + channelName + " : " + reason + "\r\n");
-		target_client_ptr->sendPendingMessages();
 	}
 
 	cli.response("You kicked " + target_nick + " from " + channelName + " : " + reason + "\r\n");

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:00 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/20 16:26:46 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/31 13:02:44 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,11 +75,11 @@ int main(int ac, char *av[]){
 	try{
 		std::map<int, Client> clients;
 		Server server(std::atoi(av[1]), 10, std::string(av[2]));
-		int ep_fd = server.setEpoll();
-		server.startServer(ep_fd, clients);
+		server.epoll_fd = server.setEpoll();
+		server.startServer(server.epoll_fd, clients);
 	}
 	catch (const std::exception& e) {
-		cerr << e.what() << endl;
+	cerr << e.what() << endl;
 		return 1;
 	}
 

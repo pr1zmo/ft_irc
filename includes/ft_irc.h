@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:27 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/20 13:28:13 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/31 14:05:30 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,5 +55,6 @@ void del_and_close(int epfd, int fd);
 string to_string98(int n);
 vector<string> split(const string &s, char delimiter);
 // int handleCmd(int server_fd, Client &cli);
+void enableWrite(int epoll_fd, int cli_fd);
 
 #endif

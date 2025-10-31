@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:20 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/17 14:04:33 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/10/31 14:09:15 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,13 +36,14 @@ class Client {
 	bool						_isRegistered;
 	// const std::string _cmd;
 	public:
-		bool						_has_msg;
+		bool			_has_msg;
 		std::string	_msgBuffer;
 		size_t		last_activity;
-		bool should_quit;
-		bool _isAuth; // Example member to track authentication status
+		bool			should_quit;
+		bool			_isAuth; // Example member to track authentication status
+		int			epoll_fd;
 		Client();
-		Client(int fd, struct sockaddr_in cli_addr);
+		Client(int fd, struct sockaddr_in cli_addr, int e_fd);
 		Client& operator=(const Client &other);
 		~Client();
 
