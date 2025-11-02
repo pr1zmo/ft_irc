@@ -52,9 +52,7 @@ int Executioner::run(Client &cli, const std::string &msg, std::map<int, Client>&
 				cli.response(":server 001 " + cli.getNickname() + " :Welcome to the IRC server! Registered successfully\r\n");
 				cli.registerClient();
 			}
-
 		}
-		
 	} else {
 		cli.response(cli.getNickname() + ": Unknown command: " + cmd + "\r\n");
 			return 0;

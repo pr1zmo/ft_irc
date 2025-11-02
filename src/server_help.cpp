@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/31 14:06:54 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/01 22:04:10 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,6 @@
 // 			<< ", Port: " << ntohs(it->second.getAddress().sin_port) << endl;
 // 	}
 // }
-
-void EventHandler::handleNewConnection() {
-	int cli_fd = _server.initConnection(_clients);
-	if (cli_fd != -1) {
-		// add_fd(_epoll_fd, cli_fd, EPOLLIN | EPOLLET);
-
-		// Check for queud messages first
-		std::map<int, Client>::iterator it = _clients.find(cli_fd);
-		if (it != _clients.end() && it->second._has_msg) {
-			enableWrite(_epoll_fd, cli_fd);
-		}
-	}
-}
 
 void EventHandler::handleClientRead(int fd) {
 	std::map<int, Client>::iterator it = _clients.find(fd);
@@ -96,7 +83,7 @@ void EventHandler::processEvent(const epoll_event& event) {
 	uint32_t events = event.events;
 
 	if (fd == _server.getServerSocket()) {
-		handleNewConnection();
+		_server.initConnection(_clients);
 		return;
 	}
 

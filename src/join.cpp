@@ -1,5 +1,6 @@
 #include "ft_irc.h"
 #include "Channel.hpp"
+#include <memory>
 
 Join::Join(/* args */)
 : Command()
@@ -52,6 +53,7 @@ void Join::execute(Client &cli, const std::string& rawParam, const std::string& 
 	const std::string chanKey = canonChan(channelName);
 
 	Channel* channel = server.getChannel(chanKey);
+	// channel = server.getChannel(chanKey);
 	if (!channel) {
 		channel = new Channel(channelName);       
 		channel->setInviteOnly(false);

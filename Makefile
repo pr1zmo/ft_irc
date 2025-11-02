@@ -3,7 +3,7 @@ BOT_NAME = bot
 CC = c++
 CFLAGS = -I./includes -g3 -std=c++98
 # CFLAGS+= -fsanitize=address
- CFLAGS += -Wall -Wextra -Werror
+CFLAGS += -Wall -Wextra -Werror
 SRCDIR = src
 OBJDIR = obj
 BOT_OBJDIR = obj_bot
@@ -48,7 +48,7 @@ fclean: clean
 run: fclean
 	$(MAKE) -j20 re
 	@clear
-	valgrind ./$(NAME) 6667 a
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME) 6667 a
 
 re: fclean all
 

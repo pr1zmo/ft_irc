@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/31 14:08:25 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/01 21:54:38 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@ Server::Server(int port, int maxClients, const string &password)
 }
 
 Server::~Server() {
+	for (map<string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); it++)
+		delete it->second;
 }
 
 /*
@@ -89,7 +91,6 @@ int Server::initConnection(map<int, Client>& clients) {
 		close(cli_fd);
 		return -1;
 	}
-	// if (errno == EAGAIN || errno == EWOULDBLOCK) cout << "WTFFFFFFFFFFFFFFFF THIS WOULD BLOCKKK???\n";
 	
 	clients[cli_fd] = Client(cli_fd, cli_addr, epoll_fd);
 
@@ -115,27 +116,6 @@ int Server::setEpoll() {
 	add_fd(epoll_fd, _serverSocket, EPOLLIN | EPOLLET);
 
 	return epoll_fd;
-}
-
-int checkCommand(const string &msg, vector<string> validCmds) {
-	// Basic validation: command should not be empty and should end with \r\n
-
-	string firstWord;
-
-	for (int i = 0; i < static_cast<int>(msg.size()); i++) {
-		if (msg[i] == ' ' || msg[i] == '\r' || msg[i] == '\n') {
-			break;
-		}
-		firstWord += msg[i];
-	}
-
-	for (size_t i = 0; i < validCmds.size(); ++i) {
-		if (firstWord == validCmds[i])
-			return 1;
-	}
-	cerr << "Couldn't find command: " << firstWord << endl;
-	cout << "------------------------------" << endl;
-	return 0;
 }
 
 int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Server& server) {
@@ -201,13 +181,6 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 		if (cli._has_msg)
 			enableWrite(epoll_fd, fd);
 	}
-	
-
-	// leftover data
-	if (!cli._msgBuffer.empty()) {
-		// cout << "Incomplete command in buffer (waiting for \\r\\n): " 
-		// << cli._msgBuffer << endl;
-	}
 
 	return 0;
 }
@@ -218,7 +191,6 @@ void Server::terminate(map<int, Client>& clients) {
 	for (map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it) {
 		close(it->first);
 	}
-	running = false;
 }
 
 /*

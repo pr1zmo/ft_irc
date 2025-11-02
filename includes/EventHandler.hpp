@@ -10,7 +10,6 @@ public:
 	int _epoll_fd;
 	std::map<int, Client>& _clients;
 
-	void handleNewConnection();
 	void handleClientRead(int fd);
 	void handleClientWrite(int fd);
 	void handleClientDisconnect(int fd, uint32_t events);
