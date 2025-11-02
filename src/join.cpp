@@ -58,6 +58,13 @@ void Join::execute(Client &cli, const std::string& rawParam, const std::string& 
 		channel = new Channel(channelName);       
 		channel->setInviteOnly(false);
 		channel->setTopicRestricted(false);
+		if (key.empty())
+		{
+			channel->setPasswordProtected(false);
+		} else {
+			channel->setPasswordProtected(true);
+			channel->setPassword(key);
+		}
 		channel->setUserLimit(0);
 		channel->setHasLimit(false);
 		server.addChannel(chanKey, channel);
