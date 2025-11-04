@@ -6,20 +6,12 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/01 22:04:10 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/04 12:34:51 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "EventHandler.hpp"
-
-// void static listClients(map<int, Client>& clients) {
-// 	cout << "Current connected clients:" << endl;
-// 	for (map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it) {
-// 		cout << " - FD: " << it->first << ", IP: " << inet_ntoa(it->second.getAddress().sin_addr)
-// 			<< ", Port: " << ntohs(it->second.getAddress().sin_port) << endl;
-// 	}
-// }
 
 void EventHandler::handleClientRead(int fd) {
 	std::map<int, Client>::iterator it = _clients.find(fd);
@@ -46,6 +38,9 @@ void EventHandler::handleClientWrite(int fd) {
 
 	it->second.sendPendingMessages();
 
+	if (!it->second._has_msg) {
+		_server.disableWrite(_epoll_fd, fd);
+	}
 	// Client will be marked to disconnect in some cases / check if client should quit
 	if (it->second.should_quit && !it->second._has_msg) {
 		std::cout << "Client quit after sending all messages: fd=" << fd << std::endl;
@@ -54,9 +49,6 @@ void EventHandler::handleClientWrite(int fd) {
 	}
 
 	// No more message => Disable epoll
-	if (!it->second._has_msg) {
-		_server.disableWrite(_epoll_fd, fd);
-	}
 }
 
 void EventHandler::handleClientDisconnect(int fd, uint32_t events) {
@@ -83,7 +75,10 @@ void EventHandler::processEvent(const epoll_event& event) {
 	uint32_t events = event.events;
 
 	if (fd == _server.getServerSocket()) {
-		_server.initConnection(_clients);
+		for (;;){
+			if (_server.initConnection(_clients) == -1)
+				break;
+		}
 		return;
 	}
 

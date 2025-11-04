@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:27 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/31 14:05:30 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/04 10:49:43 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@
 # include "Commands.hpp"
 # include "Executioner.hpp"
 
-# define MAX_CLIENTS 1022
+# define MAX_CLIENTS 1024
 # define MAX_EVENTS 1024
 # define BUFFER_SIZE 512
 # define DEFAULT_PORT 6667
@@ -54,7 +54,6 @@ void mod_fd(int epfd, int fd, uint32_t events);
 void del_and_close(int epfd, int fd);
 string to_string98(int n);
 vector<string> split(const string &s, char delimiter);
-// int handleCmd(int server_fd, Client &cli);
 void enableWrite(int epoll_fd, int cli_fd);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/01 21:54:38 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/04 11:14:47 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,11 @@ Server::~Server() {
 int Server::initConnection(map<int, Client>& clients) {
 	struct sockaddr_in cli_addr;
 	socklen_t cli_addr_len = sizeof(cli_addr);
-	
+
 	int cli_fd = accept(_serverSocket, (struct sockaddr *)&cli_addr, &cli_addr_len);
 	if (cli_fd == -1) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			return -1;
 		ft_error(errno, "accept");
 		return -1;
 	}
