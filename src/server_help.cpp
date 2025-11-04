@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/04 12:34:51 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/04 12:38:15 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,9 @@ void EventHandler::handleClientWrite(int fd) {
 
 	it->second.sendPendingMessages();
 
+	if (!it->second._has_msg) {
+		_server.disableWrite(_epoll_fd, fd);
+	}
 	if (!it->second._has_msg) {
 		_server.disableWrite(_epoll_fd, fd);
 	}
@@ -79,6 +82,10 @@ void EventHandler::processEvent(const epoll_event& event) {
 			if (_server.initConnection(_clients) == -1)
 				break;
 		}
+		for (;;){
+			if (_server.initConnection(_clients) == -1)
+				break;
+		}
 		return;
 	}
 
@@ -115,6 +122,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 
 	while (running) {
 		int event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+		cout << "Number of events: " << event_count << "\n";
 		
 		if (event_count == -1) {
 			if (errno == EINTR) {
