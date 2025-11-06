@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/04 12:38:15 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/06 16:35:28 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,6 @@ void EventHandler::handleClientWrite(int fd) {
 	if (!it->second._has_msg) {
 		_server.disableWrite(_epoll_fd, fd);
 	}
-	if (!it->second._has_msg) {
-		_server.disableWrite(_epoll_fd, fd);
-	}
 	// Client will be marked to disconnect in some cases / check if client should quit
 	if (it->second.should_quit && !it->second._has_msg) {
 		std::cout << "Client quit after sending all messages: fd=" << fd << std::endl;
@@ -64,13 +61,15 @@ void EventHandler::handleClientDisconnect(int fd, uint32_t events) {
 }
 
 void EventHandler::cleanupClient(int fd) {
-	std::map<int, Client>::iterator it = _clients.find(fd);
-	if (it != _clients.end()) {
-		del_and_close(_epoll_fd, fd);
-		_clients.erase(it);
-	} else {
-		del_and_close(_epoll_fd, fd);
-	}
+	// std::map<int, Client>::iterator it = _clients.find(fd);
+	// if (it != _clients.end()) {
+	// 	del_and_close(_epoll_fd, fd);
+	// 	_clients.erase(it);
+	// } else {
+	// 	del_and_close(_epoll_fd, fd);
+	// }
+	del_and_close(_epoll_fd, fd);
+	_clients.erase(fd);
 }
 
 void EventHandler::processEvent(const epoll_event& event) {
@@ -122,7 +121,6 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 
 	while (running) {
 		int event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-		cout << "Number of events: " << event_count << "\n";
 		
 		if (event_count == -1) {
 			if (errno == EINTR) {

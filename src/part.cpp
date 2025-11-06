@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:46 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/31 13:08:12 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/06 16:30:04 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,5 @@ void Part::execute(Client &cli, const std::string& param, const std::string& cmd
 		}
 
 		cli.response(partLine);
-		// cli.sendPendingMessages();
 	}
 }

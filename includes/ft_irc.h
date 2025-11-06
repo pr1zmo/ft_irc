@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:27 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/04 10:49:43 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/06 17:39:54 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,11 @@
 # define BUFFER_SIZE 512
 # define DEFAULT_PORT 6667
 
-extern bool running;
+extern int running;
 using namespace std;
 
 int ft_error(int err, const string &msg);
 void add_fd(int epfd, int fd, uint32_t events);
-void mod_fd(int epfd, int fd, uint32_t events);
 void del_and_close(int epfd, int fd);
 string to_string98(int n);
 vector<string> split(const string &s, char delimiter);

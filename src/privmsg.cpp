@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:38 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/31 13:08:15 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/06 16:30:09 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,6 @@ void Privmsg::execute(Client &cli, const std::string& param, const std::string& 
 			for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it) {
 				if (it->second.getNickname() == target) {
 					it->second.response(":" + cli.getNickname() + " PRIVMSG " + target + " :" + message + "\r\n");
-					// it->second.sendPendingMessages();
 					userFound = true;
 					break;
 				}

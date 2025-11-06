@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:23 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/31 14:05:35 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/06 17:48:54 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,18 +46,14 @@ class Server {
 
 		class ServerFailedException : public std::exception {
 		public:
-			explicit ServerFailedException(const std::string& msg)
-				: message_("Server failed to start => ") {ft_error(errno, msg);}
+			explicit ServerFailedException(const std::string& msg) { std::cout << "Server failed to start => ", ft_error(errno, msg); };
 
 			virtual const char* what() const throw() {
-				return message_.c_str();
+				return "";
 			}
 
 			// also must match base dtor: throw()
 			virtual ~ServerFailedException() throw() {}
-
-		private:
-			std::string message_;
 		};
 		public:
 		void startServer(int epoll_fd, std::map<int, Client>& clients);

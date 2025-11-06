@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:00 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/01 21:05:48 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/06 18:00:18 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,41 +14,11 @@
 #include <sys/ioctl.h>
 
 #include "ft_irc.h"
-bool running = true;
-
-int ft_error(int err, const string &msg)
-{
-	cerr << "Error: " << msg << ": (" << strerror(err) << ")" << endl;
-	return err;
-}
-
-void add_fd(int epoll_fd, int fd, uint32_t events) {
-	epoll_event ev;
-	ev.events = events;
-	ev.data.fd = fd;
-	
-	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1) {
-		ft_error(errno, "epoll_ctl ADD");
-	}
-}
-
-void mod_fd(int epfd, int fd, uint32_t events) {
-	struct epoll_event ev;
-	ev.events = events;
-	ev.data.fd = fd;
-	if (epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev) == -1) {
-		perror("epoll_ctl(MOD)");
-	}
-}
-
-void del_and_close(int epfd, int fd) {
-	epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL); // ignore errors on DEL
-	close(fd);
-}
+int running = 1;
 
 void on_signal(int sig) {
 	if (sig == SIGINT || sig == SIGTERM) {
-		running = false;
+		running = 0;
 	}
 }
 
@@ -60,6 +30,7 @@ static void install_handlers() {
 
 	sigaction(SIGINT,  &sa, 0);
 	sigaction(SIGTERM, &sa, 0);
+	sigaction(SIGQUIT, &sa, 0);
 }
 
 int main(int ac, char *av[]){

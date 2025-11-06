@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/04 11:14:47 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/06 18:44:03 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,6 +176,7 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 
 		// cout << "The current command to run: " << complete_cmd << "\n";
 		int result = executioner.run(cli, complete_cmd, clients, server);
+		cout << "Received command: " << complete_cmd << "\n";
 		if (result == -1) {
 			return -1;
 		}

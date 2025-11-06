@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/31 15:50:36 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/06 16:31:14 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,6 @@ Client& Client::operator=(const Client &other) {
 		epoll_fd = other.epoll_fd;
 	}
 	return *this;
-}
-
-bool Client::authenticate(const std::string &msg) {
-	(void)msg;
-	// Simple authentication logic for demonstration
-	return true; // Always authenticate successfully for now
 }
 
 void Client::response(const std::string &msg) {

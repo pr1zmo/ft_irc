@@ -6,11 +6,13 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 21:50:52 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/31 15:53:10 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/06 18:56:22 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "IRCbot.hpp"
+#include <sys/wait.h>
+#include <sys/types.h>
 
 /*
  * An irc bot that connects to the server like any other client
@@ -61,6 +63,16 @@ int Bot::parseParams(char *msg, std::vector<std::string>& params){
 	return params.size();
 }
 
+int sendMessage(int sockfd, const std::string& message){
+	ssize_t bytes_sent = send(sockfd, message.c_str(), message.size(), 0);
+	if (bytes_sent < 0) {
+		ft_error(errno, "send failed");
+		return -1;
+	}
+	usleep(500000); // Sleep for 0.5 seconds to allow server to respond
+	return bytes_sent;
+}
+
 void Bot::run(){
 	char buffer[4096];
 	memset(buffer, 0, sizeof(buffer));
@@ -73,21 +85,28 @@ void Bot::run(){
 		return;
 	}
 	buffer[bytes_received] = '\0';
-	cout << "Received: " << buffer;
+	cout << buffer;
 
 	std::vector<std::string> params;
 	if (parseParams(buffer, params) < 1)
 		return;
-		
 
-	// int size = 4096;
-	// char buffer[size];
-	send(_sockfd, "HELP\r\n", 7, 0);
-	// Simple bot logic: respond to PING with PONG
-	if (params.size() > 0 && params[0] == "PING") {
-		std::string pong_response = "PONG :" + params[1] + "\r\n";
-		send(_sockfd, pong_response.c_str(), pong_response.length(), 0);
-		cout << "Sent: " << pong_response;
+	sendMessage(_sockfd, "PASS a\r\n");
+	sendMessage(_sockfd, "NICK " + _bot_nick + "\r\n");
+	sendMessage(_sockfd, "USER " + _bot_nick + " 0 * :IRC Bot\r\n");
+	sendMessage(_sockfd, "JOIN #general\r\n");
+	memset(buffer, 0, sizeof(buffer));
+	while (true){
+		bytes_received = recv(_sockfd, buffer, sizeof(buffer) - 1, 0);
+		if (bytes_received < 0) {
+			ft_error(errno, "recv failed");
+			return;
+		} else if (bytes_received == 0) {
+			cout << "Connection closed by server." << endl;
+			return;
+		}
+		buffer[bytes_received] = '\0';
+		cout << buffer << endl;
 	}
 }
 
@@ -99,9 +118,10 @@ int main(int ac, char **av) {
 	try{
 		Bot bot(av[1], atoi(av[2]), av[3]);
 		if (bot.connectToServer()){
-			while (true){
-				bot.run();
-			}
+			// while (true){
+			// 	bot.run();
+			// }
+			bot.run();
 		}
 		else 
 			cout << "Could not connect\n";

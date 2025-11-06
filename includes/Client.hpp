@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:20 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/31 14:09:15 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/06 16:31:08 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ class Client {
 		Command* getCmd() const { return _cmd; }
 		struct sockaddr_in getAddress() const { return _address; }
 		socklen_t getAddrLen() const { return _addrLen; }
-		bool authenticate(const std::string &msg);
 		void response(const std::string &msg);
 		void sendPendingMessages();
 		void markDisconnected();
