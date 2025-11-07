@@ -6,12 +6,11 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 09:43:28 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/31 14:40:27 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/07 14:52:18 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef IRCBOT_HPP
-#define IRCBOT_HPP
+#pragma once
 
 #include <iostream>
 #include <vector>
@@ -23,19 +22,32 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <map>
+#include <cstring>
+#include <fstream>
+#include <iomanip>
+#include <ctime>
+#include <sstream>
+#include "BotConfig.hpp"
 
 using namespace std;
 
+class BotConf;
+
 class Bot {
 	private:
-		int _sockfd;
-		struct sockaddr_in _server_addr;
-		std::string _bot_nick;
-		fd_set _read_fds;
-		// Command _commandHandler;
+	struct sockaddr_in _server_addr;
+		int		_sockfd;
+		int		_channel_count;
+		string	_server_pass;
+		string	_bot_nick;
+		fd_set	_read_fds;
+		time_t	upTime;
+		size_t	startTime;
 
 	public:
-		Bot(const std::string& server_ip, int server_port, const std::string& bot_nick);
+		Bot(){};
+		Bot(BotConf &conf);
 		~Bot();
 		size_t serv_fd;
 		int getSockfd() { return _sockfd; };
@@ -44,8 +56,8 @@ class Bot {
 		int parseParams(char *msg, std::vector<std::string>& params);
 
 		int setCredentials();
+		string getUpTime() const;
+		int sendMessage(const string &str);
 
-		void run();
+		void run(BotConf &conf);
 };
-
-#endif

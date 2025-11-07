@@ -7,11 +7,11 @@ CFLAGS += -Wall -Wextra -Werror
 SRCDIR = src
 OBJDIR = obj
 BOT_OBJDIR = obj_bot
-SRCS = $(filter-out $(wildcard $(SRCDIR)/*bot.cpp), $(wildcard $(SRCDIR)/*.cpp))
+SRCS = $(filter-out $(wildcard $(SRCDIR)/bot/*.cpp), $(wildcard $(SRCDIR)/*.cpp))
 OBJS = $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
-BONUS_SRCS = $(wildcard $(SRCDIR)/*bot.cpp)
-BONUS_OBJS = $(BONUS_SRCS:$(SRCDIR)/%.cpp=$(BOT_OBJDIR)/%.o)
+BONUS_SRCS = $(wildcard $(SRCDIR)/bot/*.cpp)
+BONUS_OBJS = $(BONUS_SRCS:$(SRCDIR)/bot/%.cpp=$(BOT_OBJDIR)/%.o)
 
 RM = rm -f
 MKDIR = mkdir -p
@@ -35,7 +35,7 @@ b_run: fclean
 	@clear
 	./$(BOT_NAME) 127.0.0.1 6667 a
 
-$(BOT_OBJDIR)/%.o: $(SRCDIR)/%.cpp
+$(BOT_OBJDIR)/%.o: $(SRCDIR)/bot/%.cpp
 	@$(MKDIR) $(BOT_OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
