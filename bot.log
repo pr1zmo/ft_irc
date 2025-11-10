@@ -1,0 +1,41 @@
+:krimo PRIVMSG Bot42 :are_you_human
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 443 Bot42 #general :is already on channel
+:krimo PRIVMSG Bot42 :!time
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 443 Bot42 #general :is already on channel
+:krimo PRIVMSG Bot42 :!time
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 443 Bot42 #general :is already on channel
+:krimo PRIVMSG Bot42 :!time
+:krimo PRIVMSG Bot42 :!time
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 443 Bot42 #general :is already on channel
+:krimo PRIVMSG Bot42 :!time
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 443 Bot42 #general :is already on channel
+:krimo PRIVMSG Bot42 :!time
+:krimo PRIVMSG Bot42 :!kys
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 443 Bot42 #general :is already on channel
+:krimo PRIVMSG Bot42 :!time
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 443 Bot42 #general :is already on channel
+:krimo PRIVMSG Bot42 :!time
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 443 Bot42 #general :is already on channel
+:krimo PRIVMSG Bot42 :!time
+ERROR :Invalid PRIVMSG format
+:server 401 Bot42 Inval :No such nick/channel
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 001 Bot42 :Welcome to the IRC server! Registered successfully
+:server 443 Bot42 #general :is already on channel
+:krimo PRIVMSG Bot42 :!time

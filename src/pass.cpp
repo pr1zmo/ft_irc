@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:43 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/09/29 09:42:44 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/10 17:01:29 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void Pass::execute(Client &cli, const std::string& param,	 const std::string& cm
 	(void)clients;
 	//
 	// Implementation of PASS command execution
-	std::cout << "PASS command executed with param: " << param << std::endl;
 	if (param.empty()) {
 		cli.response(":server 461 * PASS :Not enough parameters\r\n");
 		return;

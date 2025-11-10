@@ -33,7 +33,7 @@ $(BOT_NAME): $(BONUS_OBJS)
 b_run: fclean
 	$(MAKE) -j20 bonus
 	@clear
-	./$(BOT_NAME) 127.0.0.1 6667 a
+	./$(BOT_NAME) bot.conf
 
 $(BOT_OBJDIR)/%.o: $(SRCDIR)/bot/%.cpp
 	@$(MKDIR) $(BOT_OBJDIR)

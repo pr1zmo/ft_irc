@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 09:43:28 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/07 14:52:18 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/10 18:55:54 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ class Bot {
 		Bot(){};
 		Bot(BotConf &conf);
 		~Bot();
-		size_t serv_fd;
+		int serv_fd;
 		int getSockfd() { return _sockfd; };
 		bool connectToServer();
 		vector<string> bot_params;
@@ -58,6 +58,10 @@ class Bot {
 		int setCredentials();
 		string getUpTime() const;
 		int sendMessage(const string &str);
+
+		void handle_response(const string &response, BotConf &conf);
+		void handle_privmsg(const string &message, BotConf &conf, const string &sender);
+		void handle_system(const string &message, BotConf &conf, const string &sender);
 
 		void run(BotConf &conf);
 };

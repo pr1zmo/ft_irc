@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:38 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/06 16:30:09 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/10 17:02:14 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,6 @@ void Privmsg::execute(Client &cli, const std::string& param, const std::string& 
 		}
 	}
 
-	std::cout << "PRIVMSG executed: targets=[" << targets_str << "] message=\"" << message << "\"\n";
+	// std::cout << "PRIVMSG executed: targets=[" << targets_str << "] message=\"" << message << "\"\n";
 }
 
