@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/01 21:46:28 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/11 20:47:51 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,8 +159,6 @@ class Privmsg : public Command {
 		Privmsg(/* args */);
 		~Privmsg();
 
-		int userExists(std::string uname);
-		void handleFileTransfer(Client &cli, const std::string& param);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -186,26 +184,6 @@ class Pong : public Command {
 		~Pong();
 		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
-};
-
-class File : public Command {
-	std::ifstream _fileStream;
-	socklen_t _recipient_ip;
-	int _recipient_port;
-	// int fileSize;
-	
-	Client *sender;
-	Client *receiver;
-	public:
-		File(/* args */);
-		~File();
-		
-		int establish_connection(socklen_t ip, int port);
-		int parseFile();
-		int parseCommand(const std::string &msg);
-		int sendFile();
-		int receiveFile();
-		void execute(Client &cli, const std::string &msg, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
 #endif
