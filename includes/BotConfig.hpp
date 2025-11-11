@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 09:45:44 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/10 14:52:02 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/11 13:46:12 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,4 +57,5 @@ class BotConf {
 
 		string get(const string &key) const;
 		bool has(const string &key) const;
+		void set(const string &key, const string &value) { values[key] = value; }
 };

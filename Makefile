@@ -12,6 +12,7 @@ OBJS = $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
 BONUS_SRCS = $(wildcard $(SRCDIR)/bot/*.cpp)
 BONUS_OBJS = $(BONUS_SRCS:$(SRCDIR)/bot/%.cpp=$(BOT_OBJDIR)/%.o)
+VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 RM = rm -f
 MKDIR = mkdir -p
@@ -33,7 +34,7 @@ $(BOT_NAME): $(BONUS_OBJS)
 b_run: fclean
 	$(MAKE) -j20 bonus
 	@clear
-	./$(BOT_NAME) bot.conf
+	$(VALGRIND) ./$(BOT_NAME) bot.conf
 
 $(BOT_OBJDIR)/%.o: $(SRCDIR)/bot/%.cpp
 	@$(MKDIR) $(BOT_OBJDIR)
@@ -48,7 +49,7 @@ fclean: clean
 run: fclean
 	$(MAKE) -j20 re
 	@clear
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME) 6667 a
+	$(VALGRIND) ./$(NAME) 6667 a
 
 re: fclean all
 
