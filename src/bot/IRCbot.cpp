@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 21:50:52 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/11 14:23:17 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/12 09:26:40 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,11 @@ Bot::Bot(BotConf &conf) {
 }
 
 Bot::~Bot() {
+	if (_sockfd >= 0)
+		close(_sockfd);
+}
+
+void Bot::quit() {
 	if (_sockfd >= 0)
 		close(_sockfd);
 }
@@ -291,6 +296,8 @@ void Bot::run(BotConf &conf){
 	}
 }
 
+Bot *b_signal;
+
 static string to_string98(int n) {
 	ostringstream oss;
 	oss << n;
@@ -299,14 +306,16 @@ static string to_string98(int n) {
 
 bool running = true;
 
-void handle_signal(Bot &bot){
+void on_signal(int x){
+	if (x == SIGINT || x == SIGTERM)
+		b_signal->quit();
+}
+
+void handle_signal(){
 	struct sigaction sa;
 
 	std::memset(&sa, 0, sizeof(sa));
-	sa.sa_handler = [](int x){
-		if (x == SIGINT || x == SIGTERM)
-			running = false;
-	};
+	sa.sa_handler = on_signal;
 
 	sigaction(SIGINT, &sa, 0);
 	sigaction(SIGTERM, &sa, 0);
@@ -321,7 +330,8 @@ int main(int ac, char **av) {
 		conf.load(av[1]);
 		conf.get("server.host");
 		Bot bot(conf);
-		handle_signal(bot);
+		b_signal = &bot;
+		handle_signal();
 		if (bot.connectToServer()){
 			cout << "Connected to server successfully.\n";
 			if (conf.get("connection.start_time") == "0")

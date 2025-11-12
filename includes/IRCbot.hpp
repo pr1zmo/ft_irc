@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 09:43:28 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/10 18:55:54 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/12 09:22:51 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,5 @@ class Bot {
 		void handle_system(const string &message, BotConf &conf, const string &sender);
 
 		void run(BotConf &conf);
+		void quit();
 };
