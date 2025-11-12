@@ -1,5 +1,5 @@
 NAME = ircserv
-BOT_NAME = bot
+BOT_NAME = ircbot
 CC = c++
 CFLAGS = -I./includes -g3 -std=c++98
 # CFLAGS+= -fsanitize=address
