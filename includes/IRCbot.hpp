@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 09:43:28 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/12 09:22:51 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/14 16:36:08 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,13 +55,19 @@ class Bot {
 		vector<string> bot_params;
 		int parseParams(char *msg, std::vector<std::string>& params);
 
-		int setCredentials();
+		class ConfigFileException : public exception{
+			public:
+				virtual const char* what() const throw();
+		};
+
 		string getUpTime() const;
 		int sendMessage(const string &str);
 
 		void handle_response(const string &response, BotConf &conf);
 		void handle_privmsg(const string &message, BotConf &conf, const string &sender);
 		void handle_system(const string &message, BotConf &conf, const string &sender);
+
+		void join_channels(BotConf &conf);
 
 		void run(BotConf &conf);
 		void quit();

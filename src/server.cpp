@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/10 17:01:54 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/14 15:32:08 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ Server::Server(int port, int maxClients, const string &password)
 		_locked = true;
 
 	_serverAddr.sin_family = AF_INET;
-	_serverAddr.sin_addr.s_addr = INADDR_ANY;
+	_serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	// cout << "Hosted server on IP: " << inet_ntoa(_serverAddr.sin_addr) << endl;
+	// exit(1);
 	_serverAddr.sin_port = htons(port);
 
 	if ((_serverSocket = socket(AF_INET, SOCK_STREAM, 0)) < 3)

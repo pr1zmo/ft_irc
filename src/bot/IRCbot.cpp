@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/05 21:50:52 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/12 09:26:40 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/14 15:09:09 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,6 +247,15 @@ void Bot::handle_response(const string &message, BotConf &conf){
 	}
 }
 
+void Bot::join_channels(BotConf &conf){
+	if (!conf.has("channels"))
+		throw Bot::ConfigFileException();
+	vector<string> channels = ft_split(conf.get("channels"), ',');
+	for (u_long i = 0; i < channels.size(); i++){
+		sendMessage("JOIN " + channels.at(i) + "\r\n");
+	}
+}
+
 void Bot::run(BotConf &conf){
 	char buffer[4096];
 	memset(buffer, 0, sizeof(buffer));
@@ -268,7 +277,7 @@ void Bot::run(BotConf &conf){
 	sendMessage("NICK " + _bot_nick + "\r\n");
 	sendMessage("USER " + _bot_nick + " 0 * :IRC Bot\r\n");
 
-	sendMessage("JOIN #general\r\n");
+	join_channels(conf);
 	memset(buffer, 0, sizeof(buffer));
 	while (true){
 		bytes_received = recv(_sockfd, buffer, sizeof(buffer) - 1, 0);
@@ -320,6 +329,10 @@ void handle_signal(){
 	sigaction(SIGINT, &sa, 0);
 	sigaction(SIGTERM, &sa, 0);
 	sigaction(SIGQUIT, &sa, 0);
+}
+
+const char* Bot::ConfigFileException::what() const throw(){
+	return "Wrong value in the config file\n";
 }
 
 int main(int ac, char **av) {
