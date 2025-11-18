@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/18 10:29:37 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/18 14:54:26 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ int Server::initConnection(map<int, Client>& clients) {
 	
 	clients[cli_fd] = Client(cli_fd, cli_addr, epoll_fd);
 
-	add_fd(epoll_fd, cli_fd, EPOLLIN | EPOLLET);
+	add_fd(epoll_fd, cli_fd, EPOLLIN);
 
 	string client_info = "Your connection info:\r\n";
 	client_info += "\tIP: " + string(inet_ntoa(cli_addr.sin_addr)) + "\r\n";
@@ -112,12 +112,10 @@ int Server::initConnection(map<int, Client>& clients) {
 
 int Server::setEpoll() {
 	int epoll_fd = epoll_create1(0);
-	if (epoll_fd == -1) {
-		ft_error(errno, "epoll_create1");
-		return -1;
-	}
+	if (epoll_fd == -1)
+		throw ServerFailedException("epoll_create1");
 
-	add_fd(epoll_fd, _serverSocket, EPOLLIN | EPOLLET);
+	add_fd(epoll_fd, _serverSocket, EPOLLIN);
 
 	return epoll_fd;
 }
@@ -135,7 +133,7 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 			cli._msgBuffer.append(buffer, bytesRead);
 
 			if (cli._msgBuffer.size() > 4096) {
-				string err = "ERROR :Input buffer overflow\r\n";
+				string err = "ERROR :Exceeded the character length limit\r\n";
 				cli.response(err);
 				cli._msgBuffer.clear();
 				cli.markDisconnected();
@@ -163,7 +161,8 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 	string complete_cmd;
 	size_t pos;
 
-	while ((pos = cli._msgBuffer.find("\r\n")) != string::npos) {
+	while ((pos = cli._msgBuffer.find("\r\n")) != string::npos || 
+		   (pos = cli._msgBuffer.find("\n")) != string::npos) {
 		complete_cmd = cli._msgBuffer.substr(0, pos);
 
 		cli._msgBuffer.erase(0, pos + 2);
@@ -196,7 +195,7 @@ void Server::terminate(map<int, Client>& clients) {
 
 void Server::disableWrite(int epoll_fd, int client_fd){
 	epoll_event ev;
-	ev.events = EPOLLIN | EPOLLET;
+	ev.events = EPOLLIN;
 	ev.data.fd = client_fd;
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, client_fd, &ev) == -1) {
 		ft_error(errno, "epoll_ctl(MOD) disableWrite");

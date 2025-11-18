@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:24 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/18 10:29:32 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/18 14:26:18 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ vector<string> split(const string &s, char delimiter) {
 
 void enableWrite(int epoll_fd, int cli_fd){
 	epoll_event ev;
-	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
+	ev.events = EPOLLIN | EPOLLOUT;
 	ev.data.fd = cli_fd;
 	if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, cli_fd, &ev) == -1) {
 		ft_error(errno, "epoll_ctl(MOD) enableWrite");
