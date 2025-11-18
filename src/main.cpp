@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:00 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/07 14:27:43 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/17 13:43:00 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,8 @@ int main(int ac, char *av[]){
 		server.startServer(server.epoll_fd, clients);
 	}
 	catch (const std::exception& e) {
-	cerr << e.what() << endl;
+		cerr << e.what() << endl;
 		return 1;
 	}
-
-
 	return 0;
 }

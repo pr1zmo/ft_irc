@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/06 16:35:28 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/18 10:32:38 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,13 +61,6 @@ void EventHandler::handleClientDisconnect(int fd, uint32_t events) {
 }
 
 void EventHandler::cleanupClient(int fd) {
-	// std::map<int, Client>::iterator it = _clients.find(fd);
-	// if (it != _clients.end()) {
-	// 	del_and_close(_epoll_fd, fd);
-	// 	_clients.erase(it);
-	// } else {
-	// 	del_and_close(_epoll_fd, fd);
-	// }
 	del_and_close(_epoll_fd, fd);
 	_clients.erase(fd);
 }
@@ -77,10 +70,6 @@ void EventHandler::processEvent(const epoll_event& event) {
 	uint32_t events = event.events;
 
 	if (fd == _server.getServerSocket()) {
-		for (;;){
-			if (_server.initConnection(_clients) == -1)
-				break;
-		}
 		for (;;){
 			if (_server.initConnection(_clients) == -1)
 				break;
@@ -120,7 +109,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 	EventHandler handler(*this, epoll_fd, clients);
 
 	while (running) {
-		int event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+		int event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 0);
 		
 		if (event_count == -1) {
 			if (errno == EINTR) {

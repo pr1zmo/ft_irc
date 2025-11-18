@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 09:43:28 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/14 16:36:08 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/17 15:25:49 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,8 @@ class Bot {
 	private:
 	struct sockaddr_in _server_addr;
 		int		_sockfd;
-		int		_channel_count;
 		string	_server_pass;
 		string	_bot_nick;
-		fd_set	_read_fds;
-		time_t	upTime;
 		size_t	startTime;
 
 	public:

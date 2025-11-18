@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/14 15:32:08 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/18 10:29:37 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,10 +168,8 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 
 		cli._msgBuffer.erase(0, pos + 2);
 
-		if (complete_cmd.size() > 510) {
-			cli.response("ERROR :Line too long\r\n");
-			return -2;
-		}
+		if (complete_cmd.size() > 510)
+			return (cli.response("ERROR :Line too long\r\n"), -2);
 
 		if (complete_cmd.empty())
 			continue;
@@ -196,26 +194,6 @@ void Server::terminate(map<int, Client>& clients) {
 	}
 }
 
-/*
- * This function enables write events for a client socket in the epoll instance
- * Without it the server won't know when the socket is ready to send data
- * This is important for non-blocking sockets to avoid EAGAIN errors
-*/
-// void Server::enableWrite(int epoll_fd, int client_fd){
-// 	epoll_event ev;
-// 	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
-// 	ev.data.fd = client_fd;
-// 	if (epoll_ctl(epoll_fd, EPOLL_CTL_MOD, client_fd, &ev) == -1) {
-// 		ft_error(errno, "epoll_ctl(MOD) enableWrite");
-// 	}
-// }
-
-/*
- * This function disables write events for a client socket in the epoll instance
- * This is used when there are no pending messages to send
- * Disabling write events helps reduce unnecessary wake-ups and CPU usage
-*/
-
 void Server::disableWrite(int epoll_fd, int client_fd){
 	epoll_event ev;
 	ev.events = EPOLLIN | EPOLLET;
@@ -225,15 +203,15 @@ void Server::disableWrite(int epoll_fd, int client_fd){
 	}
 }
 Channel* Server::getChannel(const std::string& name) {
-    std::map<std::string, Channel*>::iterator it = _channels.find(name);
-    if (it == _channels.end())
-        return NULL;
-    return it->second;
+	std::map<std::string, Channel*>::iterator it = _channels.find(name);
+	if (it == _channels.end())
+		return NULL;
+	return it->second;
 }
 
 void Server::addChannel(const std::string& name, Channel* channel) {
-    if (name.empty() || channel == NULL) return;
-    _channels[name] = channel;
+	if (name.empty() || channel == NULL) return;
+	_channels[name] = channel;
 }
 
 void Server::removeChannel(const std::string& name) {
