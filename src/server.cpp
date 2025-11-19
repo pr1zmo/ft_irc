@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/18 14:54:26 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/19 16:51:53 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,14 @@ Server::Server(int port, int maxClients, const string &password)
 
 	_serverAddr.sin_family = AF_INET;
 	_serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	// cout << "Hosted server on IP: " << inet_ntoa(_serverAddr.sin_addr) << endl;
-	// exit(1);
 	_serverAddr.sin_port = htons(port);
 
-	if ((_serverSocket = socket(AF_INET, SOCK_STREAM, 0)) < 3)
+	if ((_serverSocket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 		throw ServerFailedException("socket");
 
-	if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) < 0)
+	if (fcntl(_serverSocket, F_SETFL, O_NONBLOCK) == -1) {
 		throw ServerFailedException("fcntl");
+	}
 
 	int opt = 1;
 	if (setsockopt(_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
@@ -83,19 +82,12 @@ int Server::initConnection(map<int, Client>& clients) {
 		ft_error(errno, "accept");
 		return -1;
 	}
-	
-	// Make socket non-blocking
-	int flags = fcntl(cli_fd, F_GETFL, 0);
-	if (flags == -1) {
+
+	if (fcntl(cli_fd, F_SETFL, O_NONBLOCK) == -1) {
 		close(cli_fd);
 		return -1;
 	}
-	
-	if (fcntl(cli_fd, F_SETFL, flags | O_NONBLOCK) == -1) {
-		close(cli_fd);
-		return -1;
-	}
-	
+
 	clients[cli_fd] = Client(cli_fd, cli_addr, epoll_fd);
 
 	add_fd(epoll_fd, cli_fd, EPOLLIN);
@@ -201,6 +193,7 @@ void Server::disableWrite(int epoll_fd, int client_fd){
 		ft_error(errno, "epoll_ctl(MOD) disableWrite");
 	}
 }
+
 Channel* Server::getChannel(const std::string& name) {
 	std::map<std::string, Channel*>::iterator it = _channels.find(name);
 	if (it == _channels.end())

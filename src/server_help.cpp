@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/18 10:32:38 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/19 16:51:08 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,14 +41,12 @@ void EventHandler::handleClientWrite(int fd) {
 	if (!it->second._has_msg) {
 		_server.disableWrite(_epoll_fd, fd);
 	}
-	// Client will be marked to disconnect in some cases / check if client should quit
+
 	if (it->second.should_quit && !it->second._has_msg) {
-		std::cout << "Client quit after sending all messages: fd=" << fd << std::endl;
+		std::cout << "Client disconnected: fd=" << fd << std::endl;
 		cleanupClient(fd);
 		return;
 	}
-
-	// No more message => Disable epoll
 }
 
 void EventHandler::handleClientDisconnect(int fd, uint32_t events) {
@@ -70,10 +68,7 @@ void EventHandler::processEvent(const epoll_event& event) {
 	uint32_t events = event.events;
 
 	if (fd == _server.getServerSocket()) {
-		for (;;){
-			if (_server.initConnection(_clients) == -1)
-				break;
-		}
+		_server.initConnection(_clients);
 		return;
 	}
 
@@ -91,7 +86,7 @@ void EventHandler::processEvent(const epoll_event& event) {
 	// Handle incoming data
 	if (events & EPOLLIN) {
 		handleClientRead(fd);
-		
+
 		// Re-check if client was marked for disconnect
 		it = _clients.find(fd);
 		if (it == _clients.end()) {
@@ -112,7 +107,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 		int event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 0);
 		
 		if (event_count == -1) {
-			if (errno == EINTR) {
+			if (errno == EINTR) { // Interrupted by signal, continue loop
 				continue;
 			}
 			ft_error(errno, "epoll_wait");
