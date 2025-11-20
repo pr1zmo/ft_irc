@@ -1,5 +1,3 @@
-Here is the updated README.md. I have refined the **Features** section to include the commands found in your source files (like `LIST`, `PART`, `OPER`, `NOTICE`) and expanded the **Bonus** section to accurately describe how the File Transfer (DCC) and Bot work based on our discussions and your file structure.
-
 ```markdown
 # ft_irc - Internet Relay Chat Server
 
