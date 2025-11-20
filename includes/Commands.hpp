@@ -6,12 +6,11 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/11 20:47:51 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/20 18:59:38 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef Command_HPP
-#define Command_HPP
+#pragma once
 
 #include "ft_irc.h"
 #include "Server.hpp"
@@ -185,5 +184,3 @@ class Pong : public Command {
 		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
-
-#endif

@@ -1,5 +1,16 @@
-#ifndef CHANNEL_HPP
-#define CHANNEL_HPP
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel.hpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/20 19:00:15 by zelbassa          #+#    #+#             */
+/*   Updated: 2025/11/20 19:01:53 by zelbassa         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#pragma once
 
 #include <string>
 #include <vector>
@@ -95,4 +106,3 @@ private:
     std::set<std::string> invitedUsers;        // invited nicks
     std::set<std::string> ops;                 // channel operators (mode +o)
 };
-#endif

@@ -6,12 +6,11 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:20 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/17 15:33:26 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/20 18:59:29 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef Client_HPP
-#define Client_HPP
+#pragma once
 
 #include "ft_irc.h"
 #include "Channel.hpp"
@@ -74,5 +73,3 @@ class Client {
 		void leaveChannel();
 		
 };
-
-#endif

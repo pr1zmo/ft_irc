@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/19 16:51:53 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:13:44 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ Server::Server()
 {
 }
 
-Server::Server(int port, int maxClients, const string &password)
-	:_port(port), _maxClients(maxClients), _password(password), _locked(false)
+Server::Server(int port, const string &password)
+	:_port(port), _password(password), _locked(false)
 {
 	if (!_password.empty())
 		_locked = true;
@@ -113,6 +113,7 @@ int Server::setEpoll() {
 }
 
 int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Server& server) {
+	(void)epoll_fd;
 	int fd = cli.getFd();
 	char buffer[BUFFER_SIZE];
 	size_t _btsRd = 0;
@@ -134,8 +135,8 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 			continue;
 		}
 		else if (bytesRead == 0) {
-			close(cli.getFd());
-			break;
+			cli.markDisconnected();
+			return 0;
 		}
 		else {
 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -154,10 +155,13 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 	size_t pos;
 
 	while ((pos = cli._msgBuffer.find("\r\n")) != string::npos || 
-		   (pos = cli._msgBuffer.find("\n")) != string::npos) {
+			(pos = cli._msgBuffer.find("\n")) != string::npos) {
 		complete_cmd = cli._msgBuffer.substr(0, pos);
 
-		cli._msgBuffer.erase(0, pos + 2);
+		if (cli._msgBuffer[pos] == '\r' && pos + 1 < cli._msgBuffer.size() && cli._msgBuffer[pos + 1] == '\n')
+			cli._msgBuffer.erase(0, pos + 2);
+		else
+			cli._msgBuffer.erase(0, pos + 1);
 
 		if (complete_cmd.size() > 510)
 			return (cli.response("ERROR :Line too long\r\n"), -2);
@@ -169,9 +173,6 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 		if (result == -1) {
 			return -1;
 		}
-
-		if (cli._has_msg)
-			enableWrite(epoll_fd, fd);
 	}
 
 	return 0;
@@ -213,5 +214,3 @@ void Server::removeChannel(const std::string& name) {
 		_channels.erase(it);
 	}
 }
-
-// ensure this matches the declaration in Server.hpp (const)

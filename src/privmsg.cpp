@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:38 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/10 17:02:14 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:27:30 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,6 @@ Privmsg::~Privmsg()
 
 void Privmsg::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
 	(void)cmd;
-	// control-A sentinel used for DCC detection
-	std::string ctrl(1, '\001');
 	
 	if (param.empty()) {
 		cli.response("ERROR :No recipient given\r\n");
@@ -95,11 +93,7 @@ void Privmsg::execute(Client &cli, const std::string& param, const std::string& 
 			if (!userFound) {
 				cli.response(":server 401 " + cli.getNickname() + " " + target + " :No such nick/channel\r\n");
 			}
-			// check for DCC in the message payload (use ctrl char)
-			// if (message.find(ctrl + "DCC SEND") != std::string::npos) {
-			//     handleFileTransfer(cli, message);
-			//     return;
-			// }
+			
 		}
 	}
 

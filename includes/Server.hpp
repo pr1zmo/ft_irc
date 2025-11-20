@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:23 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/06 17:48:54 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/20 16:47:29 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class Server {
 	//	std::map<int, Client>	_clients;
 	public:
 		Server();
-		Server(int port, int maxClients, const std::string &password);
+		Server(int port, const std::string &password);
 		int epoll_fd;
 		~Server();
 
@@ -52,7 +52,6 @@ class Server {
 				return "";
 			}
 
-			// also must match base dtor: throw()
 			virtual ~ServerFailedException() throw() {}
 		};
 		public:

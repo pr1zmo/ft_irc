@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:00 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/18 14:08:16 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/20 18:56:15 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 int running = 1;
 
 void on_signal(int sig) {
-	if (sig == SIGINT || sig == SIGTERM) {
+	if (sig == SIGINT || sig == SIGTERM || sig == SIGQUIT) {
 		running = 0;
 	}
 }
@@ -26,11 +26,10 @@ static void install_handlers() {
 	struct sigaction sa;
 	std::memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = &on_signal;
-	sigemptyset(&sa.sa_mask);
 
-	sigaction(SIGINT,  &sa, 0);
-	sigaction(SIGTERM, &sa, 0);
-	sigaction(SIGQUIT, &sa, 0);
+	sigaction(SIGINT,  &sa, 0); // Handle ^C interrupt signal
+	sigaction(SIGTERM, &sa, 0); // Handle ^\ terminate signal
+	sigaction(SIGQUIT, &sa, 0); // Handle ^\ quit signal
 }
 
 int main(int ac, char *av[]){
@@ -42,10 +41,9 @@ int main(int ac, char *av[]){
 		cerr << "Usage: ./ircserv [PORT] [PASSWORD]" << endl;
 		return 1;
 	}
-	
 	try{
 		std::map<int, Client> clients;
-		Server server(std::atoi(av[1]), 10, std::string(av[2]));
+		Server server(std::atoi(av[1]), std::string(av[2]));
 		server.epoll_fd = server.setEpoll();
 		server.startServer(server.epoll_fd, clients);
 	}
