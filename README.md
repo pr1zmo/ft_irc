@@ -1,50 +1,72 @@
+Here is the updated README.md. I have refined the **Features** section to include the commands found in your source files (like `LIST`, `PART`, `OPER`, `NOTICE`) and expanded the **Bonus** section to accurately describe how the File Transfer (DCC) and Bot work based on our discussions and your file structure.
+
+```markdown
 # ft_irc - Internet Relay Chat Server
 
 ## 📌 Project Overview
 **ft_irc** is a custom implementation of an IRC (Internet Relay Chat) server, written in **C++98**.  
-It allows multiple clients to connect using a real IRC client, authenticate, join channels, send messages, and interact in real-time.  
+It allows multiple clients to connect using standard IRC clients (like irssi, HexChat, or nc), authenticate, join channels, send messages, and interact in real-time.  
 
-This project was part of the 42 curriculum and is designed to deepen understanding of:
-- **Network programming** (sockets, TCP/IP)
-- **Non-blocking I/O and multiplexing** (`epoll`)
-- **Standard internet protocols**
-- **Robust server design and error handling**
-
-IRC is one of the earliest real-time text-based communication protocols, and building an IRC server from scratch provides strong insights into how modern chat systems operate.
+This project was built to comply with the 42 curriculum standards, focusing on:
+- **Network programming** (TCP/IP sockets, IPv4).
+- **Non-blocking I/O and I/O Multiplexing** (using `epoll`).
+- **RFC Compliance** (partial implementation of RFC 1459/2812).
+- **Robust server design** (Signal handling, graceful shutdowns, memory management).
 
 ---
 
 ## ⚙️ Features
 
-### ✅ Mandatory
-- Multiple clients can connect simultaneously.
-- Authentication with password, nickname, and username.
-- Channels with operators and regular users.
-- Private messaging and channel-wide messaging.
-- Channel operator commands:
-  - `KICK` – remove a user from a channel.
-  - `INVITE` – invite a user to a channel.
-  - `TOPIC` – change/view the channel’s topic.
-  - `MODE` – manage channel settings:
-    - `i` → invite-only mode
-    - `t` → topic restricted to operators
-    - `k` → set/remove channel key (password)
-    - `o` → grant/remove operator privileges
-    - `l` → set/remove user limit
+### ✅ Core Functionality
+- **Multi-client Support**: Handles multiple simultaneous connections via non-blocking file descriptors.
+- **Authentication**: Password verification (`PASS`), Nickname registration (`NICK`), and User setup (`USER`).
+- **Graceful Shutdown**: Handles signals (`SIGINT`, `SIGQUIT`) to close connections and free memory properly.
 
-### 🎁 Bonus (implemented and working!)
-- **File transfer** between clients.
-- **Chat bot** integrated into the server.
+### 📡 Supported Commands
+The server supports the following IRC commands:
+
+| Category | Commands | Description |
+|----------|----------|-------------|
+| **Auth** | `PASS`, `NICK`, `USER` | Connection registration and authentication. |
+| **Channel** | `JOIN`, `PART` | Join or leave specific channels. |
+| **Channel** | `TOPIC` | View or change the channel topic. |
+| **Channel** | `NAMES`, `LIST` | View users in a channel or list available channels. |
+| **Channel** | `INVITE`, `KICK` | Invite users or forcibly remove them. |
+| **Modes** | `MODE` | Set channel privileges and restrictions (see below). |
+| **Comms** | `PRIVMSG`, `NOTICE` | Send private messages or channel messages. |
+| **Server** | `PING`, `PONG` | Keep-alive mechanism to detect lost connections. |
+| **Server** | `OPER`, `QUIT` | Operator privileges and disconnection. |
+
+### 🛡️ Channel Modes (`MODE`)
+- `i` : **Invite-only** channel.
+- `t` : **Topic** restricted to channel operators.
+- `k` : **Key** (password) required to join.
+- `o` : Give/take **Operator** privileges.
+- `l` : Set **User limit** for the channel.
 
 ---
 
-## 🛠️ Technologies Used & Learned
-- **C++98**: low-level programming with strict compliance to the standard.
-- **Socket programming**: managing connections over TCP/IP (IPv4 & IPv6).
-- **Multiplexing**: efficient client handling using `epoll()` (with alternatives supported).
-- **Non-blocking I/O**: ensuring the server never hangs on client operations.
-- **System calls**: `socket`, `bind`, `listen`, `accept`, `recv`, `send`, `fcntl`, etc.
-- **Makefile**: for project compilation and management.
+## 🎁 Bonus Features
+
+### 📂 File Transfer (DCC)
+The server supports **Direct Client-to-Client (DCC)** file transfer.
+- **Mechanism**: The server acts as a transparent relay for DCC handshake messages sent via `PRIVMSG`.
+- **How it works**: Clients exchange IP/Port information through the server, then establish a direct TCP connection between themselves to transfer files.
+- **Usage**: Works out-of-the-box with modern clients (e.g., `/dcc send <nick> <file>` in irssi).
+
+### 🤖 IRC Bot
+An integrated automated bot is included in the project (`src/bot/`).
+- The bot can connect to the server, join channels, and interact with users.
+- Provides utility or fun responses to specific commands.
+
+---
+
+## 🛠️ Technologies & Design
+- **Language**: C++98 (Strict standard compliance).
+- **Architecture**: Event-driven using `epoll()` (Linux).
+- **Pattern**: Command Pattern (via `Executioner.cpp`) to decouple command parsing from execution logic.
+- **Socket API**: `socket`, `bind`, `listen`, `accept`, `recv`, `send`.
+- **Utils**: Custom parsing logic for IRC messages (handling `\r\n`, partial packets, and buffering).
 
 ---
 
@@ -65,31 +87,22 @@ make
 ```bash
 ./ircserv <port> <password>
 ```
-- **port** → the port number to listen on (e.g., `6667`).
-- **password** → password required by clients to connect.
+*   **port**: The port number to listen on (e.g., `6667`).
+*   **password**: The connection password.
 
 ### 4. Connect using an IRC client
-Example using `irssi`:
+**Using `irssi`:**
 ```bash
 irssi -c localhost -p 6667 -w <password>
 ```
 
----
-
-## 🧪 Testing
-You can also test basic functionality using `nc`:
+**Using `netcat` (raw TCP):**
 ```bash
-nc 127.0.0.1 6667
+nc localhost 6667
+PASS <password>
+NICK <nickname>
+USER <username> 0 * :<realname>
 ```
-
----
-
-## 📖 Lessons Learned
-Through this project, I gained experience in:
-- Writing **robust server software** that can handle multiple clients gracefully.
-- Debugging **concurrent networking issues**.
-- Implementing **real-world protocols** from scratch.
-- Designing **clean, modular C++ code** without external libraries.
 
 ---
 
@@ -97,3 +110,4 @@ Through this project, I gained experience in:
 - [zelbassa](https://github.com/pr1zmo)
 - [mbouras](https://github.com/medibrs)
 - [adouiyeh](https://github.com/adouiyeh)
+```
