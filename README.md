@@ -1,4 +1,3 @@
-```markdown
 # ft_irc - Internet Relay Chat Server
 
 ## 📌 Project Overview
