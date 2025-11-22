@@ -17,7 +17,6 @@ Executioner::Executioner()
 	_commands["PASS"] = new Pass();
 	_commands["NICK"] = new Nick();
 	_commands["USER"] = new User();
-	_commands["OPER"] = new Oper();
 	_commands["QUIT"] = new Quit();
 	_commands["JOIN"] = new Join();
 	_commands["TOPIC"] = new Topic();
@@ -27,7 +26,6 @@ Executioner::Executioner()
 	_commands["KICK"] = new Kick();
 	_commands["PART"] = new Part();
 	_commands["PRIVMSG"] = new Privmsg();
-	_commands["NOTICE"] = new Notice();
 	_commands["PING"] = new Ping();
 	_commands["PONG"] = new Pong();
 	_commands["HELP"] = new Help();
@@ -51,7 +49,8 @@ int Executioner::run(Client &cli, const std::string &msg, std::map<int, Client>&
 
 	size_t pos = msg.find(' ');
 	std::string cmd = (pos == std::string::npos) ? msg : msg.substr(0, pos);
-	
+	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper);
+	std::cout << "Parsed command: '" << cmd << "'" << std::endl;
 	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
 	if (it != _commands.end()) {
 		Command* cmdInstance = it->second;
@@ -59,7 +58,7 @@ int Executioner::run(Client &cli, const std::string &msg, std::map<int, Client>&
 		cmdInstance->execute(cli, (pos == std::string::npos) ? "" : msg.substr(pos + 1), cmd, clients, server);
 		// check if client has registered after PASS/NICK/USER
 		if (cli._isAuth && ( cmd == "NICK" || cmd == "USER")) {
-			if (!cli.getNickname().empty() && !cli.getUsername().empty()) {
+			if (!cli.getNickname().empty() && !cli.getUsername().empty() && !cli.isRegistered()) {	
 				cli.response(":server 001 " + cli.getNickname() + " :Welcome to the IRC server! Registered successfully\r\n");
 				cli.registerClient();
 			}

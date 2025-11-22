@@ -32,6 +32,10 @@ void Part::execute(Client &cli, const std::string& param, const std::string& cmd
 	(void)cmd;
 	(void)clients;
 
+	if (!cli.isRegistered()) {
+		cli.response(":server 451 * :You have not registered\r\n");
+		return;
+	}
 	if (param.empty()) {
 		cli.response(":server 461 " + cli.getNickname() + " PART :Not enough parameters\r\n"); 
 		return;

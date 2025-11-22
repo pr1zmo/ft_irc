@@ -42,9 +42,9 @@ public:
     size_t userCount() const;
 
     
-    bool addOp(const std::string& nick, Server& server);
+    bool addOp(Client& cli, const std::string& nick, Server* server);
     // if 'server' is non-null the method will broadcast a MODE -o message to the channel
-    bool removeOp(const std::string& nick, Server* server = NULL);
+    bool removeOp(Client& cli, const std::string& nick, Server* server = NULL);
     bool isOp(const std::string& nick) const;
 
    
@@ -63,12 +63,13 @@ public:
     const Message& getMessage(size_t idx) const;
     size_t messageCount() const;
     void broadcast(const std::string& nick, const std::string& msg, class Server& server) const;
+    void broadcast2(const std::string& nick, const std::string& msg, Server& server) const ;
 
     
     void debugPrint() const;
     std::string getName() const { return name; }
     std::string getTopic() const { return topic; }
-    void setTopic(const std::string& t) { topic = t; }
+    // void setTopic(const std::string& t) { topic = t; }
 
     void setPassword(const std::string& p) { password = p; }
     bool checkPassword(const std::string& p) const { return password == p; }    
@@ -89,6 +90,10 @@ public:
         return users.empty();
     }
 
+    std::string getTopicSetBy() const;
+    time_t getTopicTimestamp() const;
+    void setTopic(const std::string& newTopic, const std::string& setter);
+
 private:
     std::string name;
     std::string topic;
@@ -98,6 +103,8 @@ private:
     bool inviteOnly;
     bool topicRestricted;
     bool passwordProtected;
+    std::string topicSetBy; 
+    time_t topicTimestamp;  
 
     std::map<std::string, Client*> users;            // ordered list (join order)
     std::set<std::string> users_set;           // fast membership checks

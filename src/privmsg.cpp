@@ -38,6 +38,10 @@ Privmsg::~Privmsg()
 void Privmsg::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
 	(void)cmd;
 	
+	if (!cli.isRegistered()) {
+		cli.response("ERROR :You have not registered\r\n");
+		return;
+	}
 	if (param.empty()) {
 		cli.response("ERROR :No recipient given\r\n");
 		return;
