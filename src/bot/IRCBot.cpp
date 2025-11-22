@@ -4,7 +4,7 @@
 #include <cstring>
 #include <iostream>
 
-IRCBot::IRCBot(INIParser &parser) : _sock_fd(-1)
+IRCBot::IRCBot(INIParser &parser) : _sock_fd(-1), _registered(false)
 {
     _server_host = parser.get("server", "host", DEFAULT_HOST);
     _server_port = parser.get("server", "port", DEFAULT_PORT);
@@ -24,6 +24,8 @@ IRCBot::~IRCBot() {}
 
 int IRCBot::sendMsg(const std::string &msg)
 {
+
+    log("<<< " + msg);
     size_t bytes_sent = send(_sock_fd, msg.c_str(), msg.size(), 0);
     return bytes_sent;
 }
@@ -74,6 +76,7 @@ void IRCBot::run()
         close(_sock_fd);
         return;
     }
+
     sendRegistration();
 
     struct pollfd pfd;
@@ -134,17 +137,31 @@ void IRCBot::run()
             {
                 std::string msg = _recvBuffer.substr(0, pos);
                 _recvBuffer.erase(0, pos + 2);
-                handleMsg(msg);
+                if (_registered)
+                    handleMsg(msg);
+                else if (!(_registered = handleRegister(msg)))
+                {
+                    if (msg.find(" 433 ") != std::string::npos)
+                    {
+                        std::cerr << "Nickname already in use!\n";
+                        close(_sock_fd);
+                        return;
+                    }
+                    if (msg.find(" 464 ") != std::string::npos)
+                    {
+                        std::cerr << "Password incorrect!\n";
+                        close(_sock_fd);
+                        return;
+                    }
+                }
             }
         }
-
         if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL))
         {
-            std::cerr << "Socket error or hangup\n";
+            std::cerr << "Socket error or hangup" << std::endl;
             break;
         }
     }
-
     close(_sock_fd);
 }
 
@@ -175,31 +192,36 @@ void IRCBot::loadChannels(INIParser &ini)
     }
 }
 
+bool IRCBot::handleRegister(const std::string &raw)
+{
+    if (raw.find(" 001 ") != std::string::npos)
+    {
+        for (std::map<std::string, ChannelInfo>::iterator it = _channels.begin();
+             it != _channels.end(); ++it)
+        {
+            if (it->second.autoJoin)
+            {
+                const std::string &chan = it->first;
+
+                // Join the channel
+                sendMsg("JOIN " + chan + "\r\n");
+
+                // Send greeting message -- NOTE THE REQUIRED ':' BEFORE THE TEXT
+                if (!it->second.greeting.empty())
+                {
+                    sendMsg("PRIVMSG " + chan + " :" + it->second.greeting + "\r\n");
+                }
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 void IRCBot::handleMsg(const std::string &raw)
 {
-    log("<<< " + raw + "\n");
+    log(">>> " + raw + "\n");
 
-    // if (raw.find(" 001 ") != std::string::npos)
-    // {
-    //     for (std::map<std::string, ChannelInfo>::iterator it = _channels.begin();
-    //          it != _channels.end(); ++it)
-    //     {
-    //         if (it->second.autoJoin)
-    //         {
-    //             const std::string &chan = it->first;
-
-    //             // Join the channel
-    //             sendMsg("JOIN " + chan + "\r\n");
-
-    //             // Send greeting message -- NOTE THE REQUIRED ':' BEFORE THE TEXT
-    //             if (!it->second.greeting.empty())
-    //             {
-    //                 sendMsg("PRIVMSG " + chan + " :" + it->second.greeting + "\r\n");
-    //             }
-    //         }
-    //     }
-    //     return;
-    // }
     IRCMessage msg = parseMsg(raw);
 
     if (msg.command == "PRIVMSG" && !msg.params.empty())
@@ -268,7 +290,7 @@ void IRCBot::log(const std::string &msg)
 {
     if (_logging)
     {
-        std::ofstream outfile(_log_file, std::ios::app);
+        std::ofstream outfile(_log_file.c_str(), std::ios::app);
         time_t now = time(NULL);
         // outfile << "[" << std::put_time(std::localtime(&now), "%F %T") << "] " << msg;
         char buf[64];

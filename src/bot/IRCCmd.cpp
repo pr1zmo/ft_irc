@@ -7,7 +7,7 @@ void IRCBot::dispatchCommand(const std::string &nick, const std::string &target,
         cmdPing(nick, target);
 
     else if (cmd == "say")
-        cmdSay(nick, target, args);
+        cmdSay(target, args);
 
     else if (cmd == "join")
         cmdJoin(nick, args);
@@ -27,7 +27,7 @@ void IRCBot::cmdPing(const std::string &nick, const std::string &target)
     sendPriv(target, nick + ": pong!");
 }
 
-void IRCBot::cmdSay(const std::string &nick, const std::string &target, const std::string &args)
+void IRCBot::cmdSay(const std::string &target, const std::string &args)
 {
     if (args.empty())
         sendPriv(target, "Usage: !say <text>");
@@ -61,6 +61,7 @@ void IRCBot::sendRegistration()
     sendMsg("PASS " + _server_pass + "\r\n");
     sendMsg("NICK " + _nickname + "\r\n");
     sendMsg("USER " + _username + " 0 * :" + _realname + "\r\n");
+
 }
 
 void splitCommand(const std::string &input, std::string &cmd, std::string &args)

@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#include <ostream>
 
 #include "INIParser.hpp"
 
@@ -53,6 +54,7 @@ class IRCBot
     std::string _server_host;
     std::string _server_port;
     std::string _server_pass;
+    bool _registered;
     bool _logging;
     std::string _log_file;
     std::map<std::string, ChannelInfo> _channels;
@@ -67,13 +69,14 @@ public:
     void log(const std::string &msg);
     bool connectToServer();
     void sendRegistration();
+    bool handleRegister(const std::string &raw);
     IRCMessage parseMsg(const std::string &raw);
     void run();
 
     void dispatchCommand(const std::string &nick, const std::string &target, const std::string &cmd, const std::string &args);
     void sendPriv(const std::string &target, const std::string &text);
     void cmdPing(const std::string &nick, const std::string &target);
-    void cmdSay(const std::string &nick, const std::string &target, const std::string &args);
+    void cmdSay(const std::string &target, const std::string &args);
     void cmdJoin(const std::string &, const std::string &chan);
     void cmdPart(const std::string &, const std::string &chan);
     void cmdHelp(const std::string &, const std::string &target);

@@ -1,0 +1,50 @@
+[2025-11-22 22:10:20] <<< PASS pass
+[2025-11-22 22:10:20] <<< NICK Bot42
+[2025-11-22 22:10:20] <<< USER Bot42 0 * :Automated IRC Service Bot
+[2025-11-22 22:10:33] <<< PASS est
+[2025-11-22 22:10:33] <<< NICK Bot42
+[2025-11-22 22:10:33] <<< USER Bot42 0 * :Automated IRC Service Bot
+[2025-11-22 22:10:37] <<< PASS test
+[2025-11-22 22:10:37] <<< NICK Bot42
+[2025-11-22 22:10:37] <<< USER Bot42 0 * :Automated IRC Service Bot
+[2025-11-22 22:10:37] <<< JOIN #FAQ
+[2025-11-22 22:10:37] <<< PRIVMSG #FAQ :Hello!!!!!
+[2025-11-22 22:10:37] <<< JOIN #dev
+[2025-11-22 22:10:37] <<< PRIVMSG #dev :Hello!!!!!
+[2025-11-22 22:10:37] <<< JOIN #general
+[2025-11-22 22:10:37] <<< PRIVMSG #general :Hello everyone! Bot42 has joined the channel.
+[2025-11-22 22:10:37] >>> :Bot42!Bot42@0 MODE #FAQ +o Bot42
+[2025-11-22 22:10:37] >>> :Bot42!Bot42@0 JOIN :#FAQ
+[2025-11-22 22:10:37] >>> :server 331 Bot42 #FAQ :No topic is set
+[2025-11-22 22:10:37] >>> :server 353 Bot42 = #FAQ :@Bot42
+[2025-11-22 22:10:37] >>> :server 366 Bot42 #FAQ :End of /NAMES list.
+[2025-11-22 22:10:37] >>> :Bot42!Bot42@0 MODE #dev +o Bot42
+[2025-11-22 22:10:37] >>> :Bot42!Bot42@0 JOIN :#dev
+[2025-11-22 22:10:37] >>> :server 331 Bot42 #dev :No topic is set
+[2025-11-22 22:10:37] >>> :server 353 Bot42 = #dev :@Bot42
+[2025-11-22 22:10:37] >>> :server 366 Bot42 #dev :End of /NAMES list.
+[2025-11-22 22:10:37] >>> :Bot42!Bot42@0 MODE #general +o Bot42
+[2025-11-22 22:10:37] >>> :Bot42!Bot42@0 JOIN :#general
+[2025-11-22 22:10:37] >>> :server 331 Bot42 #general :No topic is set
+[2025-11-22 22:10:37] >>> :server 353 Bot42 = #general :@Bot42
+[2025-11-22 22:10:37] >>> :server 366 Bot42 #general :End of /NAMES list.
+[2025-11-22 22:11:07] <<< PING :BotCheck
+[2025-11-22 22:11:07] >>> PONG :server
+[2025-11-22 22:11:37] <<< PING :BotCheck
+[2025-11-22 22:11:37] >>> PONG :server
+[2025-11-22 22:12:07] <<< PING :BotCheck
+[2025-11-22 22:12:07] >>> PONG :server
+[2025-11-22 22:12:37] <<< PING :BotCheck
+[2025-11-22 22:12:37] >>> PONG :server
+[2025-11-22 22:13:00] >>> :Faker PRIVMSG Bot42 :!join #ayoub
+[2025-11-22 22:13:00] <<< JOIN #ayoub
+[2025-11-22 22:13:00] >>> :Bot42!Bot42@0 JOIN :#ayoub
+[2025-11-22 22:13:00] >>> :server 331 Bot42 #ayoub :No topic is set
+[2025-11-22 22:13:00] >>> :server 353 Bot42 = #ayoub :Bot42 @Faker
+[2025-11-22 22:13:00] >>> :server 366 Bot42 #ayoub :End of /NAMES list.
+[2025-11-22 22:13:10] <<< PING :BotCheck
+[2025-11-22 22:13:10] >>> PONG :server
+[2025-11-22 22:13:40] <<< PING :BotCheck
+[2025-11-22 22:13:40] >>> PONG :server
+[2025-11-22 22:14:10] <<< PING :BotCheck
+[2025-11-22 22:14:10] >>> PONG :server
