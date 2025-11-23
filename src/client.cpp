@@ -18,7 +18,7 @@ Client::Client(): should_quit(false){
 }
 
 Client::Client(int fd, struct sockaddr_in cli_addr, int e_fd)
-	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _nick("Guest" + to_string98(fd)), _pending_msg(""), _has_msg(false), last_activity(time(NULL)), should_quit(false), _isAuth(false), epoll_fd(e_fd){
+	: _fd(fd), _address(cli_addr), _addrLen(sizeof(cli_addr)), _pending_msg(""),_isRegistered(false) ,  _has_msg(false), last_activity(time(NULL)), should_quit(false), _isAuth(false), epoll_fd(e_fd){
 }
 
 Client::~Client() {
@@ -30,8 +30,10 @@ Client& Client::operator=(const Client &other) {
 		_address = other._address;
 		_addrLen = other._addrLen;
 		_isAuth = other._isAuth;
+		_username = other._username;
 		_cmd = other._cmd; // Shallow copy for now...
 		epoll_fd = other.epoll_fd;
+		_isRegistered = other._isRegistered;
 	}
 	return *this;
 }
@@ -73,12 +75,12 @@ void Client::markDisconnected() {
 // Command* Client::getCmd() const {
 // 	return this->_cmd;
 // }
-void Client::setNickname(const std::string &nick) {
-	// Assuming _nick is not const for this operation
-	*(const_cast<std::string*>(&_nick)) = nick;
+void Client::setNickname( std::string &nick) {
+	
+	_nick = nick;
 }
 
-std::string Client::getNickname() const {
+std::string Client::getNickname()  {
 	return _nick;
 }
 void Client::registerClient() {
