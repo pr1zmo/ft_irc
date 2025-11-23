@@ -42,7 +42,6 @@ void IRCBot::cmdJoin(const std::string &, const std::string &chan)
 
 void IRCBot::cmdPart(const std::string &, const std::string &chan)
 {
-    std::cout << "chan " << chan << std::endl;
     sendMsg("PART " + chan + "\r\n");
 }
 

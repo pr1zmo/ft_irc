@@ -3,6 +3,27 @@
 #include <unistd.h>
 #include <cstring>
 #include <iostream>
+#include <signal.h>
+
+int sig = 0;
+
+void on_signal(int)
+{
+    sig = 1;
+}
+
+void handle_signals()
+{
+    struct sigaction sa;
+
+    std::memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = on_signal;
+
+    sigaction(SIGINT, &sa, 0);
+    sigaction(SIGTERM, &sa, 0);
+    sigaction(SIGQUIT, &sa, 0);
+
+}
 
 IRCBot::IRCBot(INIParser &parser) : _sock_fd(-1), _registered(false)
 {
@@ -20,7 +41,11 @@ IRCBot::IRCBot(INIParser &parser) : _sock_fd(-1), _registered(false)
     // TODO: check for the port range
 }
 
-IRCBot::~IRCBot() {}
+IRCBot::~IRCBot()
+{
+    if (_sock_fd >= 0)
+        close(_sock_fd);
+}
 
 int IRCBot::sendMsg(const std::string &msg)
 {
@@ -89,7 +114,7 @@ void IRCBot::run()
     char buf[4096];
     std::string _recvBuffer;
 
-    while (true)
+    while (!sig)
     {
         pfd.revents = 0;
 
@@ -285,6 +310,7 @@ IRCMessage IRCBot::parseMsg(const std::string &raw)
 
     return msg;
 }
+
 
 void IRCBot::log(const std::string &msg)
 {

@@ -1,9 +1,5 @@
-
-
-
 #include <iostream>
 #include "INIParser.hpp"
-
 #include "IRCBot.hpp"
 
 
@@ -11,6 +7,7 @@ int main(int ac, char **av)
 {
     if (ac > 1)
     {
+        handle_signals();
         INIParser ini; 
         ini.load(av[1]);
         try {

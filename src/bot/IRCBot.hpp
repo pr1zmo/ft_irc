@@ -25,9 +25,7 @@
 #define DEFAULT_HOST "127.0.0.1"
 #define DEFAULT_PORT "6667"
 #define DEFAULT_PASS "pass"
-
-// TODO
-// #define DEFAULT_NICK "BOT_"
+extern int sig;
 
 struct ChannelInfo
 {
@@ -45,7 +43,7 @@ struct IRCMessage
 
 class IRCBot
 {
-
+    
     // struct sockaddr_in _server_addr;
     int _sock_fd;
     std::string _nickname;
@@ -72,7 +70,6 @@ public:
     bool handleRegister(const std::string &raw);
     IRCMessage parseMsg(const std::string &raw);
     void run();
-
     void dispatchCommand(const std::string &nick, const std::string &target, const std::string &cmd, const std::string &args);
     void sendPriv(const std::string &target, const std::string &text);
     void cmdPing(const std::string &nick, const std::string &target);
@@ -83,6 +80,7 @@ public:
 };
 
 
+void handle_signals();
 void splitCommand(const std::string &input, std::string &cmd, std::string &args);
 
 #endif
