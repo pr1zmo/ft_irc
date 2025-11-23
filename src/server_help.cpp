@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/22 21:15:14 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:40:40 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,6 @@ void EventHandler::processEvent(const epoll_event& event) {
 	}
 
 	// Handle incoming data
-	// 
 	if (events & EPOLLIN) {
 		handleClientRead(fd);
 

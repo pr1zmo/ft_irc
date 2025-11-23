@@ -59,7 +59,5 @@ void Mode::execute(Client &cli, const std::string& param, const std::string& cmd
 			cli.response("Error: No such user.\r\n");
 			return;
 		}
-		// Apply mode changes to the user
-		// user->applyModeChanges(modeChanges);
 	}
 }

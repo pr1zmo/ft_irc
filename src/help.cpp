@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:09 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/29 12:51:40 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:48:45 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,11 @@ Help::Help() : helpContent(
             "\n"
             "Core / session:\n"
             "  QUIT [:<message>]                — disconnect from the server\n"
-            "  PING <token>                     — ping the server\n"
-            "  PONG <token>                     — reply to a PING\n"
+            "  PING                             — ping the server\n"
+            "  PONG                             — reply to a PING\n"
             "\n"
             "Messaging:\n"
             "  PRIVMSG <nick>|<#channel> :<text>   — send a private or channel message\n"
-            "  NOTICE  <nick>|<#channel> :<text>   — like PRIVMSG, but recipients must not auto-reply\n"
             "\n"
             "Channels:\n"
             "  JOIN <#chan>[,<#chan>...] [<key>[,<key>...]]   — join/create channels\n"
@@ -50,17 +49,13 @@ Help::Help() : helpContent(
             "     +l <n>/-l     set/remove user limit\n"
             "\n"
             "Server operators:\n"
-            "  OPER <name> <password>                          — obtain operator privileges\n"
             "\n"
             "File transfer (client-to-client via CTCP DCC):\n"
             "  Send a CTCP payload inside PRIVMSG. The server only forwards it:\n"
-            "    PRIVMSG <nick> :\\x01DCC SEND <file> <ip> <port> <size>\\x01\n"
-            "\n"
-            "Help:\n"
-            "  HELP [<command>]                                 — show general or command-specific help\n"
+            "    handled in the HEX-chat IRC client\n"
             "\n"
             "Conventions:\n"
-            "  • Commands are case-insensitive and must end with CRLF (\\r\\n).\n"
+            "  • Commands are not case-insensitive and must end with CRLF (\\r\\n).\n"
             "  • Lines are limited to 512 bytes including CRLF (RFC).\n"
             "  • Channels start with '#'. The last parameter may contain spaces and must be prefixed with ':'.\n"
             "\n"

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 21:27:42 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:33:00 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,17 +76,16 @@ string Client::get_pending_msg() {
 void Client::markDisconnected() {
 	should_quit = true;
 }
-// Command* Client::getCmd() const {
-// 	return this->_cmd;
-// }
+
 void Client::setNickname( std::string &nick) {
 	
 	_nick = nick;
 }
 
-// const std::string Client::getNickname() const {
-// 	return _nick;
-// }
+std::string Client::getNickname() {
+	return _nick;
+}
+
 void Client::registerClient() {
 	_isRegistered = true;
 }
@@ -107,7 +106,3 @@ void Client::leaveChannel() {
 	// Placeholder implementation
 	// Channel* channel = getChannel();
 }
-// mark the client as disconnected
-// void Client::disconnect() {
-// 	should_quit = true;
-// }

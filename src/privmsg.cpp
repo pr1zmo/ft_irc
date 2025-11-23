@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:38 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/20 17:27:30 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:40:21 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,6 @@ Privmsg::Privmsg(/* args */)
 Privmsg::~Privmsg()
 {
 }
-
-// void Privmsg::handleFileTransfer(Client &cli, const std::string& param){
-
-// }
 
 void Privmsg::execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server) {
 	(void)cmd;
@@ -100,7 +96,4 @@ void Privmsg::execute(Client &cli, const std::string& param, const std::string& 
 			
 		}
 	}
-
-	// std::cout << "PRIVMSG executed: targets=[" << targets_str << "] message=\"" << message << "\"\n";
 }
-

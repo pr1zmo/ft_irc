@@ -12,20 +12,20 @@ Join::~Join()
 void Join::execute(Client &cli, const std::string& rawParam, const std::string& /*cmd*/,
                         std::map<int, Client>& /*clients*/, Server& server)
 {
-    if (!cli.isRegistered()) { cli.response(":server 451 * :You have not registered\r\n"); return; }
+	if (!cli.isRegistered()) { cli.response(":server 451 * :You have not registered\r\n"); return; }
 
-    std::string param = rawParam; 
-    if (param.empty()) { cli.response(":server 461 " + cli.getNickname() + " JOIN :Not enough parameters\r\n"); return; }
+	std::string param = rawParam; 
+	if (param.empty()) { cli.response(":server 461 " + cli.getNickname() + " JOIN :Not enough parameters\r\n"); return; }
 
-    std::string channelName, key;
-    size_t sp = param.find(' ');
-    channelName = (sp == std::string::npos ? param : param.substr(0, sp));
-    if (sp != std::string::npos) key = param.substr(sp + 1); 
+	std::string channelName, key;
+	size_t sp = param.find(' ');
+	channelName = (sp == std::string::npos ? param : param.substr(0, sp));
+	if (sp != std::string::npos) key = param.substr(sp + 1); 
 
-    if (channelName.empty() || channelName[0] != '#') {
-        cli.response(":server 403 " + cli.getNickname() + " " + channelName + " :No such channel\r\n");
-        return;
-    }
+	if (channelName.empty() || channelName[0] != '#') {
+		cli.response(":server 403 " + cli.getNickname() + " " + channelName + " :No such channel\r\n");
+		return;
+	}
 
     Channel* channel = server.getChannel(channelName);
 	if (!channel) {

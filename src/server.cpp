@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 20:45:00 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:41:07 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,6 @@ Server::~Server() {
  * Notifies when a client sends data or disconnects or is ready to writeMA
  * In this case we only handle read events
 */
-
-
 
 /*
  * Accepts a new client connection

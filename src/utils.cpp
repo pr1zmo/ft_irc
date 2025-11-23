@@ -6,12 +6,11 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:24 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/19 16:53:33 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:49:54 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_irc.h"
-#include "IRCbot.hpp"
 
 void show_help(){
 	ifstream file("src/help.md");

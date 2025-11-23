@@ -328,3 +328,174 @@
 [2025-11-23 03:28:22] <<< PING :BotCheck
 [2025-11-23 03:28:22] >>> PONG :server
 [2025-11-23 03:28:25] >>> :Ali!t1Faker@0 QUIT ::Leaving
+[2025-11-23 21:35:24] <<< PASS a
+[2025-11-23 21:35:24] <<< NICK Bot42
+[2025-11-23 21:35:24] <<< USER Bot42 0 * :Automated IRC Service Bot
+[2025-11-23 21:35:24] <<< JOIN #FAQ
+[2025-11-23 21:35:24] <<< PRIVMSG #FAQ :Hello!!!!!
+[2025-11-23 21:35:24] <<< JOIN #dev
+[2025-11-23 21:35:24] <<< PRIVMSG #dev :Hello!!!!!
+[2025-11-23 21:35:24] <<< JOIN #general
+[2025-11-23 21:35:24] <<< PRIVMSG #general :Hello everyone! Bot42 has joined the channel.
+[2025-11-23 21:35:24] >>> :Bot42!Bot42@0 MODE #FAQ +o Bot42
+[2025-11-23 21:35:24] >>> :Bot42!Bot42@0 JOIN :#FAQ
+[2025-11-23 21:35:24] >>> :server 331 Bot42 #FAQ :No topic is set
+[2025-11-23 21:35:24] >>> :server 353 Bot42 = #FAQ :@Bot42
+[2025-11-23 21:35:24] >>> :server 366 Bot42 #FAQ :End of /NAMES list.
+[2025-11-23 21:35:24] >>> :Bot42!Bot42@0 MODE #dev +o Bot42
+[2025-11-23 21:35:24] >>> :Bot42!Bot42@0 JOIN :#dev
+[2025-11-23 21:35:24] >>> :server 331 Bot42 #dev :No topic is set
+[2025-11-23 21:35:24] >>> :server 353 Bot42 = #dev :@Bot42
+[2025-11-23 21:35:24] >>> :server 366 Bot42 #dev :End of /NAMES list.
+[2025-11-23 21:35:24] >>> :Bot42!Bot42@0 MODE #general +o Bot42
+[2025-11-23 21:35:24] >>> :Bot42!Bot42@0 JOIN :#general
+[2025-11-23 21:35:24] >>> :server 331 Bot42 #general :No topic is set
+[2025-11-23 21:35:24] >>> :server 353 Bot42 = #general :@Bot42
+[2025-11-23 21:35:24] >>> :server 366 Bot42 #general :End of /NAMES list.
+[2025-11-23 21:35:41] <<< PASS a
+[2025-11-23 21:35:41] <<< NICK Bot42
+[2025-11-23 21:35:41] <<< USER Bot42 0 * :Automated IRC Service Bot
+[2025-11-23 21:35:54] <<< PING :BotCheck
+[2025-11-23 21:35:54] >>> PONG :server
+[2025-11-23 21:35:54] <<< PASS a
+[2025-11-23 21:35:54] <<< NICK Bot42-1
+[2025-11-23 21:35:54] <<< USER Bot42 0 * :Automated IRC Service Bot
+[2025-11-23 21:35:54] <<< JOIN #FAQ
+[2025-11-23 21:35:54] <<< PRIVMSG #FAQ :Hello!!!!!
+[2025-11-23 21:35:54] <<< JOIN #dev
+[2025-11-23 21:35:54] <<< PRIVMSG #dev :Hello!!!!!
+[2025-11-23 21:35:54] <<< JOIN #general
+[2025-11-23 21:35:54] <<< PRIVMSG #general :Hello everyone! Bot42 has joined the channel.
+[2025-11-23 21:35:54] >>> :Bot42-1!Bot42@0 JOIN :#FAQ
+[2025-11-23 21:35:54] >>> :Bot42-1!Bot42@0 JOIN :#FAQ
+[2025-11-23 21:35:54] >>> :server 331 Bot42-1 #FAQ :No topic is set
+[2025-11-23 21:35:54] >>> :server 353 Bot42-1 = #FAQ :@Bot42 Bot42-1
+[2025-11-23 21:35:54] >>> :server 366 Bot42-1 #FAQ :End of /NAMES list.
+[2025-11-23 21:35:55] >>> :Bot42-1!Bot42@0 JOIN :#dev
+[2025-11-23 21:35:55] >>> :Bot42-1 PRIVMSG #FAQ :Hello!!!!!
+[2025-11-23 21:35:55] >>> :Bot42-1!Bot42@0 JOIN :#dev
+[2025-11-23 21:35:55] >>> :server 331 Bot42-1 #dev :No topic is set
+[2025-11-23 21:35:55] >>> :Bot42-1 PRIVMSG #dev :Hello!!!!!
+[2025-11-23 21:35:55] >>> :server 353 Bot42-1 = #dev :@Bot42 Bot42-1
+[2025-11-23 21:35:55] >>> :Bot42-1!Bot42@0 JOIN :#general
+[2025-11-23 21:35:55] >>> :server 366 Bot42-1 #dev :End of /NAMES list.
+[2025-11-23 21:35:55] >>> :Bot42-1 PRIVMSG #general :Hello everyone! Bot42 has joined the channel.
+[2025-11-23 21:35:55] >>> :Bot42-1!Bot42@0 JOIN :#general
+[2025-11-23 21:35:55] >>> :server 331 Bot42-1 #general :No topic is set
+[2025-11-23 21:35:55] >>> :server 353 Bot42-1 = #general :@Bot42 Bot42-1
+[2025-11-23 21:35:55] >>> :server 366 Bot42-1 #general :End of /NAMES list.
+[2025-11-23 21:36:11] <<< PASS a
+[2025-11-23 21:36:11] <<< NICK Bot42-1
+[2025-11-23 21:36:11] <<< USER Bot42 0 * :Automated IRC Service Bot
+[2025-11-23 21:36:25] <<< PING :BotCheck
+[2025-11-23 21:36:25] <<< PING :BotCheck
+[2025-11-23 21:36:25] >>> PONG :server
+[2025-11-23 21:36:25] >>> PONG :server
+[2025-11-23 21:36:55] <<< PING :BotCheck
+[2025-11-23 21:36:55] <<< PING :BotCheck
+[2025-11-23 21:36:55] >>> PONG :server
+[2025-11-23 21:36:55] >>> PONG :server
+[2025-11-23 21:37:25] <<< PING :BotCheck
+[2025-11-23 21:37:25] <<< PING :BotCheck
+[2025-11-23 21:37:25] >>> PONG :server
+[2025-11-23 21:37:25] >>> PONG :server
+[2025-11-23 21:37:55] <<< PING :BotCheck
+[2025-11-23 21:37:55] <<< PING :BotCheck
+[2025-11-23 21:37:55] >>> PONG :server
+[2025-11-23 21:37:55] >>> PONG :server
+[2025-11-23 21:38:25] <<< PING :BotCheck
+[2025-11-23 21:38:25] <<< PING :BotCheck
+[2025-11-23 21:38:25] >>> PONG :server
+[2025-11-23 21:38:25] >>> PONG :server
+[2025-11-23 21:38:55] <<< PING :BotCheck
+[2025-11-23 21:38:55] <<< PING :BotCheck
+[2025-11-23 21:38:55] >>> PONG :server
+[2025-11-23 21:38:55] >>> PONG :server
+[2025-11-23 21:39:25] <<< PING :BotCheck
+[2025-11-23 21:39:25] <<< PING :BotCheck
+[2025-11-23 21:39:25] >>> PONG :server
+[2025-11-23 21:39:25] >>> PONG :server
+[2025-11-23 21:39:55] <<< PING :BotCheck
+[2025-11-23 21:39:55] <<< PING :BotCheck
+[2025-11-23 21:39:55] >>> PONG :server
+[2025-11-23 21:39:55] >>> PONG :server
+[2025-11-23 21:40:25] <<< PING :BotCheck
+[2025-11-23 21:40:25] <<< PING :BotCheck
+[2025-11-23 21:40:25] >>> PONG :server
+[2025-11-23 21:40:25] >>> PONG :server
+[2025-11-23 21:40:55] <<< PING :BotCheck
+[2025-11-23 21:40:55] <<< PING :BotCheck
+[2025-11-23 21:40:55] >>> PONG :server
+[2025-11-23 21:40:55] >>> PONG :server
+[2025-11-23 21:41:25] <<< PING :BotCheck
+[2025-11-23 21:41:25] <<< PING :BotCheck
+[2025-11-23 21:41:25] >>> PONG :server
+[2025-11-23 21:41:25] >>> PONG :server
+[2025-11-23 21:41:55] <<< PING :BotCheck
+[2025-11-23 21:41:55] >>> PONG :server
+[2025-11-23 21:41:55] <<< PING :BotCheck
+[2025-11-23 21:41:55] >>> PONG :server
+[2025-11-23 21:42:25] <<< PING :BotCheck
+[2025-11-23 21:42:25] <<< PING :BotCheck
+[2025-11-23 21:42:25] >>> PONG :server
+[2025-11-23 21:42:25] >>> PONG :server
+[2025-11-23 21:42:55] <<< PING :BotCheck
+[2025-11-23 21:42:55] <<< PING :BotCheck
+[2025-11-23 21:42:55] >>> PONG :server
+[2025-11-23 21:42:55] >>> PONG :server
+[2025-11-23 21:43:25] <<< PING :BotCheck
+[2025-11-23 21:43:25] <<< PING :BotCheck
+[2025-11-23 21:43:25] >>> PONG :server
+[2025-11-23 21:43:25] >>> PONG :server
+[2025-11-23 21:43:55] <<< PING :BotCheck
+[2025-11-23 21:43:55] <<< PING :BotCheck
+[2025-11-23 21:43:55] >>> PONG :server
+[2025-11-23 21:43:55] >>> PONG :server
+[2025-11-23 21:44:25] <<< PING :BotCheck
+[2025-11-23 21:44:25] >>> PONG :server
+[2025-11-23 21:44:25] <<< PING :BotCheck
+[2025-11-23 21:44:25] >>> PONG :server
+[2025-11-23 21:44:55] <<< PING :BotCheck
+[2025-11-23 21:44:55] >>> PONG :server
+[2025-11-23 21:44:55] <<< PING :BotCheck
+[2025-11-23 21:44:55] >>> PONG :server
+[2025-11-23 21:45:25] <<< PING :BotCheck
+[2025-11-23 21:45:25] >>> PONG :server
+[2025-11-23 21:45:25] <<< PING :BotCheck
+[2025-11-23 21:45:25] >>> PONG :server
+[2025-11-23 21:45:55] <<< PING :BotCheck
+[2025-11-23 21:45:55] >>> PONG :server
+[2025-11-23 21:45:55] <<< PING :BotCheck
+[2025-11-23 21:45:55] >>> PONG :server
+[2025-11-23 21:46:25] <<< PING :BotCheck
+[2025-11-23 21:46:25] >>> PONG :server
+[2025-11-23 21:46:25] <<< PING :BotCheck
+[2025-11-23 21:46:25] >>> PONG :server
+[2025-11-23 21:46:55] <<< PING :BotCheck
+[2025-11-23 21:46:55] >>> PONG :server
+[2025-11-23 21:46:55] <<< PING :BotCheck
+[2025-11-23 21:46:55] >>> PONG :server
+[2025-11-23 21:47:25] <<< PING :BotCheck
+[2025-11-23 21:47:25] >>> PONG :server
+[2025-11-23 21:47:25] <<< PING :BotCheck
+[2025-11-23 21:47:25] >>> PONG :server
+[2025-11-23 21:47:55] <<< PING :BotCheck
+[2025-11-23 21:47:55] >>> PONG :server
+[2025-11-23 21:47:55] <<< PING :BotCheck
+[2025-11-23 21:47:55] >>> PONG :server
+[2025-11-23 21:48:25] <<< PING :BotCheck
+[2025-11-23 21:48:25] >>> PONG :server
+[2025-11-23 21:48:25] <<< PING :BotCheck
+[2025-11-23 21:48:25] >>> PONG :server
+[2025-11-23 21:48:55] <<< PING :BotCheck
+[2025-11-23 21:48:55] >>> PONG :server
+[2025-11-23 21:48:55] <<< PING :BotCheck
+[2025-11-23 21:48:55] >>> PONG :server
+[2025-11-23 21:49:25] <<< PING :BotCheck
+[2025-11-23 21:49:25] >>> PONG :server
+[2025-11-23 21:49:25] <<< PING :BotCheck
+[2025-11-23 21:49:25] >>> PONG :server
+[2025-11-23 21:49:55] <<< PING :BotCheck
+[2025-11-23 21:49:55] >>> PONG :server
+[2025-11-23 21:49:55] <<< PING :BotCheck
+[2025-11-23 21:49:55] >>> PONG :server

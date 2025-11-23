@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/20 18:59:38 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:46:31 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,14 +84,6 @@ class User : public Command {
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
-class Oper : public Command {
-	public:
-		Oper(/* args */);
-		~Oper();
-		// void execute(Client &cli);
-		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
-};
-
 class Quit : public Command {
 	public:
 		Quit(/* args */);
@@ -108,6 +100,7 @@ class Join : public Command {
 		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
+
 class Invite : public Command {
 	public:
 		Invite(/* args */);
@@ -115,6 +108,7 @@ class Invite : public Command {
 		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
+
 class Topic : public Command {
 	public:
 		Topic(/* args */);
@@ -122,6 +116,7 @@ class Topic : public Command {
 		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
+
 class Mode : public Command {
 	public:
 		Mode(/* args */);
@@ -129,6 +124,7 @@ class Mode : public Command {
 		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
+
 class List : public Command {
 	public:
 		List(/* args */);
@@ -136,6 +132,7 @@ class List : public Command {
 		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
+
 class Kick : public Command {
 	public:
 		Kick(/* args */);
@@ -143,7 +140,6 @@ class Kick : public Command {
 		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
-
 
 class Part : public Command {
 	public:
@@ -158,14 +154,6 @@ class Privmsg : public Command {
 		Privmsg(/* args */);
 		~Privmsg();
 
-		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
-};
-
-class Notice : public Command {
-	public:
-		Notice(/* args */);
-		~Notice();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 

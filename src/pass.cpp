@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:43 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/10 17:01:29 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:39:58 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,7 @@ void Pass::execute(Client &cli, const std::string& param,	 const std::string& cm
 	(void)param;
 	(void)cmd;
 	(void)clients;
-	//
-	// Implementation of PASS command execution
+
 	if (param.empty()) {
 		cli.response(":server 461 * PASS :Not enough parameters\r\n");
 		return;
@@ -27,10 +26,8 @@ void Pass::execute(Client &cli, const std::string& param,	 const std::string& cm
 		cli.response(":server 462 * :You may not re-register\r\n");
 		return;
 	}
-	// Here you would typically check the password against a stored value
 	if (param == server.getPassword()) {
 		cli._isAuth = true;
-		//cli.response(":server 001 * :Welcome to the IRC server!\r\n");
 	} else {
 		cli.response(":server 464 * :Password incorrect\r\n");
 	}

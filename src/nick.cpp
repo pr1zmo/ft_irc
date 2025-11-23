@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:57 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/29 12:49:10 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:39:41 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,6 @@ Nick::Nick(/* args */)
 Nick::~Nick()
 {
 }
-
-
-
 
 static inline std::string trim(const std::string &s) {
 	size_t a = 0;

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:41 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/29 12:52:33 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:40:03 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ void Ping::execute(Client &cli, const std::string& param, const std::string& cmd
 	(void)cmd;
 	(void)clients;
 	(void)server;
-	// Implementation of PING command execution
 
 	cli.response("PONG :server\r\n");
 }

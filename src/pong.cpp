@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/27 18:48:45 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/29 12:52:01 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:40:09 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,6 @@ void Pong::execute(Client &cli, const std::string& param, const std::string& cmd
 	(void)cmd;
 	(void)clients;
 	(void)server;
-	// Implementation of PONG command execution
+
 	cli.response("PONG :server\r\n");
 }

@@ -34,25 +34,25 @@ bool Channel::contains(const std::string& nick) const {
 size_t Channel::userCount() const { return users.size(); }
 
 bool Channel::addOp(Client& cli, const std::string& nick, Server* server) {
-    if (!contains(nick)) return false;
+	if (!contains(nick)) return false;
 
-    std::string modeMsg = ":" + cli.getNickname() + "!" + cli.getUsername() + "@" + cli.getHostname() +
-                          " MODE " + name + " +o " + nick + "\r\n";
-    this->broadcast("", modeMsg, *server);
+	std::string modeMsg = ":" + cli.getNickname() + "!" + cli.getUsername() + "@" + cli.getHostname() +
+								" MODE " + name + " +o " + nick + "\r\n";
+	this->broadcast("", modeMsg, *server);
 
-    ops.insert(nick); 
-    return true;
+	ops.insert(nick); 
+	return true;
 }
 
 bool Channel::removeOp(Client& cli, const std::string& nick, Server* server) {
-    if (ops.find(nick) == ops.end()) return false;
+	if (ops.find(nick) == ops.end()) return false;
 
-    std::string modeMsg = ":" + cli.getNickname() + "!" + cli.getUsername() + "@" + cli.getHostname() +
-                          " MODE " + name + " -o " + nick + "\r\n";
-    this->broadcast("", modeMsg, *server);
+	std::string modeMsg = ":" + cli.getNickname() + "!" + cli.getUsername() + "@" + cli.getHostname() +
+								" MODE " + name + " -o " + nick + "\r\n";
+	this->broadcast("", modeMsg, *server);
 
-    ops.erase(nick); // Remove the user from the ops set
-    return true;
+	ops.erase(nick); // Remove the user from the ops set
+	return true;
 }
 
 bool Channel::isOp(const std::string& nick) const {
@@ -147,93 +147,92 @@ void Channel::debugPrint() const {
 	std::cout << std::endl;
 }
 std::string Channel::getTopicSetBy() const {
-    return topicSetBy;
+	return topicSetBy;
 }
 
 time_t Channel::getTopicTimestamp() const {
-    return topicTimestamp;
+	return topicTimestamp;
 }
 void Channel::setTopic(const std::string& newTopic, const std::string& setter) {
-    topic = newTopic;
-    topicSetBy = setter;
-    topicTimestamp = time(NULL); 
+	topic = newTopic;
+	topicSetBy = setter;
+	topicTimestamp = time(NULL); 
 }
 void Channel::applyModeChanges(const std::string& modeChanges, const std::string& target, Client& cli, Server& server) {
-    bool adding = true;
-    std::cout << "Applying mode changes: " << modeChanges << std::endl;
+	bool adding = true;
+	std::cout << "Applying mode changes: " << modeChanges << std::endl;
 
-    for (size_t i = 0; i < modeChanges.size(); ++i) {
-        char ch = modeChanges[i];
-        if (ch == '+') {
-            adding = true;
-        } else if (ch == '-') {
-            adding = false;
-        } else {
-            std::string modeMsg = ":" + cli.getNickname() + "!" + cli.getUsername() + "@" + cli.getHostname() +
-                                  " MODE " + name + " " + (adding ? "+" : "-") + ch;
+	for (size_t i = 0; i < modeChanges.size(); ++i) {
+		char ch = modeChanges[i];
+		if (ch == '+') {
+			adding = true;
+		} else if (ch == '-') {
+			adding = false;
+		} else {
+			std::string modeMsg = ":" + cli.getNickname() + "!" + cli.getUsername() + "@" + cli.getHostname() + " MODE " + name + " " + (adding ? "+" : "-") + ch;
 
-            switch (ch) {
-                case 'o': // operator status
-                    if (users.find(target) == users.end()) {
-                        cli.response(":server 441 " + cli.getNickname() + " " + target + " " + name + " :They aren't on that channel\r\n");
-                        return;
-                    }
-                    if (adding) {
-                        addOp(cli, target, &server);
-                    } else {
-                        if (ops.size() == 1 && isOp(target)) {
-                            cli.response(":server 482 " + cli.getNickname() + " " + name + " :Cannot remove the last channel operator\r\n");
-                            return;
-                        }
-                        removeOp(cli,target, &server);
-                    }
-                    break;
+			switch (ch) {
+				case 'o': // operator status
+					if (users.find(target) == users.end()) {
+						cli.response(":server 441 " + cli.getNickname() + " " + target + " " + name + " :They aren't on that channel\r\n");
+						return;
+					}
+					if (adding) {
+						addOp(cli, target, &server);
+					} else {
+						if (ops.size() == 1 && isOp(target)) {
+							cli.response(":server 482 " + cli.getNickname() + " " + name + " :Cannot remove the last channel operator\r\n");
+							return;
+						}
+						removeOp(cli,target, &server);
+					}
+					break;
 
-                case 'i': // invite-only
-                    inviteOnly = adding;
-                    broadcast("", modeMsg + "\r\n", server);
-                    break;
+				case 'i': // invite-only
+					inviteOnly = adding;
+					broadcast("", modeMsg + "\r\n", server);
+					break;
 
-                case 't': // topic protection
-                    topicRestricted = adding;
-                    broadcast("", modeMsg + "\r\n", server);
-                    break;
+				case 't': // topic protection
+					topicRestricted = adding;
+					broadcast("", modeMsg + "\r\n", server);
+					break;
 
-                case 'k': // channel key
-                    if (adding) {
-                        if (target.empty()) {
-                            cli.response(":server 461 " + cli.getNickname() + " MODE :Not enough parameters\r\n");
-                            return;
-                        }
-                        setPassword(target);
-                        passwordProtected = true;
-                        modeMsg += " " + target;
-                    } else {
-                        passwordProtected = false;
-                    }
-                    broadcast("", modeMsg + "\r\n", server);
-                    break;
+				case 'k': // channel key
+					if (adding) {
+						if (target.empty()) {
+							cli.response(":server 461 " + cli.getNickname() + " MODE :Not enough parameters\r\n");
+							return;
+						}
+						setPassword(target);
+						passwordProtected = true;
+						modeMsg += " " + target;
+					} else {
+						passwordProtected = false;
+					}
+					broadcast("", modeMsg + "\r\n", server);
+					break;
 
-                case 'l': // user limit
-                    if (adding) {
-                        if (target.empty()) {
-                            cli.response(":server 461 " + cli.getNickname() + " MODE :Not enough parameters\r\n");
-                            return;
-                        }
-                        size_t limit = std::atoi(target.c_str());
-                        setUserLimit(limit);
-                        has_limit = true;
-                        modeMsg += " " + target;
-                    } else {
-                        has_limit = false;
-                    }
-                    broadcast("", modeMsg + "\r\n", server);
-                    break;
+				case 'l': // user limit
+					if (adding) {
+						if (target.empty()) {
+							cli.response(":server 461 " + cli.getNickname() + " MODE :Not enough parameters\r\n");
+							return;
+						}
+						size_t limit = std::atoi(target.c_str());
+						setUserLimit(limit);
+						has_limit = true;
+						modeMsg += " " + target;
+					} else {
+						has_limit = false;
+					}
+					broadcast("", modeMsg + "\r\n", server);
+					break;
 
-                default: // unknown mode
-                    cli.response(":server 472 " + cli.getNickname() + " " + ch + " :is unknown mode char to me\r\n");
-                    return;
-            }
-        }
-    }
+				default: // unknown mode
+					cli.response(":server 472 " + cli.getNickname() + " " + ch + " :is unknown mode char to me\r\n");
+					return;
+			}
+		}
+	}
 }

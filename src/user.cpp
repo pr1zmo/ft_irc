@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/10/28 21:05:10 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:42:14 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ void User::execute(Client &cli, const std::string& param, const std::string& cmd
 	std::string username, hostname, servername, realname;
 	
 	if (cli._isAuth == false) {
-		//error for not authenticated
 		cli.response(":server 464 * :Password required\r\n");
 		return;
 	}

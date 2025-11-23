@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 19:00:51 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/22 21:11:20 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:38:32 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,13 @@ Executioner::Executioner()
 }
 
 Executioner::~Executioner() {
-	for (std::map<std::string, Command*>::iterator it = _commands.begin(); it != _commands.end(); ++it) {
+	for (std::map<std::string, Command*>::iterator it = _commands.begin(); it != _commands.end(); ++it)
 		delete it->second;
-	}
 	_commands.clear();
 }
 
 int Executioner::run(Client &cli, const std::string &msg, std::map<int, Client>& clients, Server& server) {
 	Command command;
-	// std::cout << "Executing command: " << msg << std::endl;
 	int ret = command.parseCommand(const_cast<char*>(msg.c_str()));
 	if (ret == 0) {
 		cli.response("Error: Command too long.\r\n");
@@ -50,15 +48,11 @@ int Executioner::run(Client &cli, const std::string &msg, std::map<int, Client>&
 	size_t pos = msg.find(' ');
 	std::string cmd = (pos == std::string::npos) ? msg : msg.substr(0, pos);
 	std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::toupper);
-	std::cout << "Parsed command: '" << cmd << "'" << std::endl;
 	std::map<std::string, Command*>::iterator it = _commands.find(cmd);
 	if (it != _commands.end()) {
 		Command* cmdInstance = it->second;
-		// cmdInstance->setOp(cli.isOperator() ? 1 : 0);
 		cmdInstance->execute(cli, (pos == std::string::npos) ? "" : msg.substr(pos + 1), cmd, clients, server);
-		// check if client has registered after PASS/NICK/USER
 		if (cli._isAuth && ( cmd == "NICK" || cmd == "USER")) {
-			cout << "EVALUTING REGISTRATION FOR CLIENT " << cli.getFd() << endl;
 			if (!cli.getNickname().empty() && !cli.getUsername().empty() && !cli.isRegistered()) {	
 				cli.response(":server 001 " + cli.getNickname() + " :Welcome to the IRC server! Registered successfully\r\n");
 				cli.registerClient();

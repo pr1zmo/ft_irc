@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:20 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 20:34:38 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:51:46 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,23 +23,21 @@ class Client {
 	struct sockaddr_in	_address;
 	socklen_t 				_addrLen;
 	Command* 				_cmd;
-	// User information
 	std::string				_username;
 	std::string				_realname;
 	std::string				_hostname;
 	std::string				_servername;
-	std::string		_name;
-	std::string		_pass;
-	std::string		_nick;
+	std::string				_name;
+	std::string				_pass;
+	std::string				_nick;
 	std::string				_pending_msg;
 	bool						_isRegistered;
-	// const std::string _cmd;
 	public:
 		bool			_has_msg;
 		std::string	_msgBuffer;
 		size_t		last_activity;
 		bool			should_quit;
-		bool			_isAuth; // Example member to track authentication status
+		bool			_isAuth;
 		int			epoll_fd;
 		Client();
 		Client(int fd, struct sockaddr_in cli_addr, int e_fd);
@@ -71,5 +69,4 @@ class Client {
 		Channel* getChannel() const;
 		void joinChannel(Channel* channel);
 		void leaveChannel();
-		
 };
