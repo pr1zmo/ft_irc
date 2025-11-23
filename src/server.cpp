@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:32 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/20 17:13:44 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 20:45:00 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,7 @@ int Server::handleCmd(Client &cli, int epoll_fd, map<int, Client>& clients, Serv
 			cli._msgBuffer.erase(0, pos + 1);
 
 		if (complete_cmd.size() > 510)
-			return (cli.response("ERROR :Line too long\r\n"), -2);
+			return (cli.response("ERROR :Line too long\r\n"), -1);
 
 		if (complete_cmd.empty())
 			continue;
