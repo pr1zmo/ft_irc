@@ -84,6 +84,7 @@ void EventHandler::processEvent(const epoll_event& event) {
 	}
 
 	// Handle incoming data
+	// 
 	if (events & EPOLLIN) {
 		handleClientRead(fd);
 
