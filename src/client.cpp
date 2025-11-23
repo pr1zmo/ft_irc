@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 20:51:23 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:27:42 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,10 @@
 #include <sys/ioctl.h>
 
 Client::Client(): should_quit(false){
+	_fd = -1;
+	_addrLen = 0;
+	_isRegistered = false;
+	_pending_msg = "";
 }
 
 Client::Client(int fd, struct sockaddr_in cli_addr, int e_fd)
@@ -80,9 +84,9 @@ void Client::setNickname( std::string &nick) {
 	_nick = nick;
 }
 
-std::string Client::getNickname()  {
-	return _nick;
-}
+// const std::string Client::getNickname() const {
+// 	return _nick;
+// }
 void Client::registerClient() {
 	_isRegistered = true;
 }
