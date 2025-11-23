@@ -28,9 +28,9 @@ class Client {
 	std::string				_realname;
 	std::string				_hostname;
 	std::string				_servername;
-	const std::string		_name;
-	const std::string		_pass;
-	const std::string		_nick;
+	std::string		_name;
+	std::string		_pass;
+	std::string		_nick;
 	std::string				_pending_msg;
 	bool						_isRegistered;
 	// const std::string _cmd;
@@ -55,15 +55,15 @@ class Client {
 		void markDisconnected();
 
 		std::string get_pending_msg();
-		void setNickname(const std::string &nick);
-		std::string getNickname() const;
-		void setUsername(const std::string &username) { *(const_cast<std::string*>(&_username)) = username; }
-		void setRealname(const std::string &realname) { *(const_cast<std::string*>(&_realname)) = realname; }
-		void setHostname(const std::string &hostname) { *(const_cast<std::string*>(&_hostname)) = hostname; }
-		void setServername(const std::string &servername) { *(const_cast<std::string*>(&_servername)) = servername; }
-		std::string getUsername() const { return _username; }
-		std::string getRealname() const { return _realname; }
-		std::string getHostname() const { return _hostname; }
+		void setNickname( std::string &nick);
+		std::string getNickname();
+		void setUsername(std::string &username) { _username = username; }
+		void setRealname( std::string &realname) { _realname = realname; }
+		void setHostname( std::string &hostname) { _hostname= hostname; }
+		void setServername( std::string &servername) { _servername = servername; }
+		std::string getUsername()  { return _username; }
+		std::string getRealname()  { return _realname; }
+		std::string getHostname()  { return _hostname; }
 		std::string getServername() const { return _servername; }
 		bool isRegistered() const { return _isRegistered; }
 		void registerClient();
