@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:20 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/20 18:59:29 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/22 21:09:13 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ class Client {
 
 		std::string get_pending_msg();
 		void setNickname(const std::string &nick);
-		std::string getNickname() const;
+		const std::string getNickname() const;
 		void setUsername(const std::string &username) { *(const_cast<std::string*>(&_username)) = username; }
 		void setRealname(const std::string &realname) { *(const_cast<std::string*>(&_realname)) = realname; }
 		void setHostname(const std::string &hostname) { *(const_cast<std::string*>(&_hostname)) = hostname; }

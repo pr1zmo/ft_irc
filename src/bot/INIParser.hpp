@@ -13,12 +13,12 @@ std::string trim(std::string str);
 class INIParser
 {
 
-    INIData _data;
+	INIData _data;
 
-    public:
-        int load(const std::string &filename);
-        std::string get(const std::string& section, const std::string& key, const std::string &fallback);
-        // std::string& get(const std::string &section, const std::string &key) const;
+	public:
+		int load(const std::string &filename);
+		std::string get(const std::string& section, const std::string& key, const std::string &fallback);
+		// std::string& get(const std::string &section, const std::string &key) const;
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:23 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/20 16:47:29 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/22 20:45:54 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ class Server {
 
 		class ServerFailedException : public std::exception {
 		public:
-			explicit ServerFailedException(const std::string& msg) { std::cout << "Server failed to start => ", ft_error(errno, msg); };
+			ServerFailedException(const std::string& msg) { std::cout << "Server failed to start => ", ft_error(errno, msg); };
 
 			virtual const char* what() const throw() {
 				return "";
