@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/24 18:05:57 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/24 18:37:09 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 	EventHandler handler(*this, epoll_fd, clients);
 
 	while (running) {
-		int event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 100);
+		int event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		
 		if (event_count == -1) {
 			if (errno == EINTR) { // Interrupted by signal, continue loop
