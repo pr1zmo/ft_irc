@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 19:00:15 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 21:44:18 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/24 10:12:56 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,8 @@ public:
 	Channel(const std::string& name);
 	~Channel();
 
-
-	bool addUser(const std::string& nick, Client* clientPtr);           // returns true if added
-	bool removeUser(const std::string& nick);        // returns true if removed
+	bool addUser(const std::string& nick, Client* clientPtr);
+	bool removeUser(const std::string& nick);
 	bool contains(const std::string& nick) const;
 	size_t userCount() const;
 
@@ -46,28 +45,23 @@ public:
 	bool removeOp(Client& cli, const std::string& nick, Server* server = NULL);
 	bool isOp(const std::string& nick) const;
 
-
 	bool inviteUser(const std::string& nick);
 	bool uninviteUser(const std::string& nick);
 	bool isInvited(const std::string& nick) const;
 
-	
 	bool banUser(const std::string& nick);
 	bool unbanUser(const std::string& nick);
 	bool isBanned(const std::string& nick) const;
 	bool kickUser(const std::string& nick, const std::string& reason = "");
 
-	
 	void pushMessage(const Message& m);
 	const Message& getMessage(size_t idx) const;
 	size_t messageCount() const;
 	void broadcast(const std::string& nick, const std::string& msg, class Server& server) const;
 
-	
 	void debugPrint() const;
 	std::string getName() const { return name; }
 	std::string getTopic() const { return topic; }
-	// void setTopic(const std::string& t) { topic = t; }
 
 	void setPassword(const std::string& p) { password = p; }
 	bool checkPassword(const std::string& p) const { return password == p; }    

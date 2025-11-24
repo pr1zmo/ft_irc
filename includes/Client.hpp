@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:20 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 21:51:46 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/24 10:14:38 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,5 +68,4 @@ class Client {
 		void unregisterClient();
 		Channel* getChannel() const;
 		void joinChannel(Channel* channel);
-		void leaveChannel();
 };

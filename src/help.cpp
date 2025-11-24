@@ -6,14 +6,14 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:09 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 21:48:45 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:57:45 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // Help.cpp
 #include "Commands.hpp"
 
-Help::Help() : helpContent( 
+Help::Help() : helpContent(
             "*** ft_irc — HELP ***\n"
             "\n"
             "Server start (shell):\n"

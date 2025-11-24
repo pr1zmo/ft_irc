@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 21:46:31 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/24 10:13:33 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ std::vector<std::string> full;
 		std::string const helpContent;
 		std::map<std::string, std::vector<std::string> > topics;
 		bool load();
-		// std::string printUsage() const;
 		const std::vector<std::string>* getTopic(const std::string& key) const;
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
@@ -80,7 +79,6 @@ class User : public Command {
 	public:
 		User(/* args */);
 		~User();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -88,7 +86,6 @@ class Quit : public Command {
 	public:
 		Quit(/* args */);
 		~Quit();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -97,7 +94,6 @@ class Join : public Command {
 		Join(/* args */);
 		~Join();
 		Channel* channel;
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -105,7 +101,6 @@ class Invite : public Command {
 	public:
 		Invite(/* args */);
 		~Invite();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -113,7 +108,6 @@ class Topic : public Command {
 	public:
 		Topic(/* args */);
 		~Topic();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -121,7 +115,6 @@ class Mode : public Command {
 	public:
 		Mode(/* args */);
 		~Mode();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -129,7 +122,6 @@ class List : public Command {
 	public:
 		List(/* args */);
 		~List();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -137,7 +129,6 @@ class Kick : public Command {
 	public:
 		Kick(/* args */);
 		~Kick();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -145,7 +136,6 @@ class Part : public Command {
 	public:
 		Part(/* args */);
 		~Part();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -153,7 +143,6 @@ class Privmsg : public Command {
 	public:
 		Privmsg(/* args */);
 		~Privmsg();
-
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -161,7 +150,6 @@ class Ping : public Command {
 	public:
 		Ping(/* args */);
 		~Ping();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };
 
@@ -169,6 +157,5 @@ class Pong : public Command {
 	public:
 		Pong(/* args */);
 		~Pong();
-		// void execute(Client &cli);
 		void execute(Client &cli, const std::string& param, const std::string& cmd, std::map<int, Client>& clients, Server& server);
 };

@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:14:16 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 21:33:00 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/24 10:15:26 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,9 +100,4 @@ Channel* Client::getChannel() const {
 void Client::joinChannel(Channel* channel) {
 	// join the channel
 	channel->addUser(this->getNickname(), const_cast<Client*>(this));
-	
-}
-void Client::leaveChannel() {	
-	// Placeholder implementation
-	// Channel* channel = getChannel();
 }
