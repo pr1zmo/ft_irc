@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/21 20:13:29 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 21:42:14 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/24 13:45:36 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ void User::execute(Client &cli, const std::string& param, const std::string& cmd
 	std::cout << "Hostname: " << hostname << std::endl;
 	std::cout << "Servername: " << servername << std::endl;
 	std::cout << "Realname: " << realname << std::endl;
+	std::cout << "Count: " << cli.getFd() - 4 << std::endl;
 	cli.setUsername(username);
 	cli.setHostname(hostname);
 	cli.setServername(servername);

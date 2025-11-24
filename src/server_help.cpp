@@ -6,7 +6,7 @@
 /*   By: zelbassa <zelbassa@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 14:59:05 by zelbassa          #+#    #+#             */
-/*   Updated: 2025/11/23 21:40:40 by zelbassa         ###   ########.fr       */
+/*   Updated: 2025/11/24 18:05:57 by zelbassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,10 @@ void EventHandler::processEvent(const epoll_event& event) {
 	uint32_t events = event.events;
 
 	if (fd == _server.getServerSocket()) {
+		if (_clients.size() >= MAX_CLIENTS - 5) {
+			std::cerr << "Max clients reached. New connection refused." << std::endl;
+			return;
+		}
 		_server.initConnection(_clients);
 		return;
 	}
@@ -104,7 +108,7 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 	EventHandler handler(*this, epoll_fd, clients);
 
 	while (running) {
-		int event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 0);
+		int event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 100);
 		
 		if (event_count == -1) {
 			if (errno == EINTR) { // Interrupted by signal, continue loop
