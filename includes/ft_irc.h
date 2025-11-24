@@ -54,5 +54,8 @@ void del_and_close(int epfd, int fd);
 string to_string98(int n);
 vector<string> split(const string &s, char delimiter);
 void enableWrite(int epoll_fd, int cli_fd);
+bool isValidPort(const char* portStr, int &portOut);
+bool isValidPassword(const std::string &pwd);
+
 
 #endif

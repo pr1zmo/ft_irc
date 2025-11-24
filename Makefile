@@ -18,7 +18,7 @@ MKDIR = mkdir -p
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@$(MKDIR) $(OBJDIR)

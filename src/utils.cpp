@@ -49,3 +49,35 @@ void enableWrite(int epoll_fd, int cli_fd){
 		ft_error(errno, "epoll_ctl(MOD) enableWrite");
 	}
 }
+
+bool isValidPort(const char* portStr, int &portOut)
+{
+    for (int i = 0; portStr[i]; i++)
+	
+        if (!isdigit(portStr[i]))
+            return false;
+
+    long port = std::strtol(portStr, NULL, 10);
+
+    if (port < 1 || port > 65535)
+        return false;
+
+    portOut = static_cast<int>(port);
+    return true;
+}
+
+
+bool isValidPassword(const std::string &pwd)
+{
+    if (pwd.empty())
+        return false;
+
+    if (pwd.length() > 64)
+        return false;
+
+    for (size_t i = 0; i < pwd.length(); i++)
+        if (isspace(pwd[i]))
+            return false;
+
+    return true;
+}

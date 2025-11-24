@@ -27,23 +27,43 @@ static void install_handlers() {
 	std::memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = &on_signal;
 
-	sigaction(SIGINT,  &sa, 0); // Handle ^C interrupt signal
-	sigaction(SIGTERM, &sa, 0); // Handle ^\ terminate signal
-	sigaction(SIGQUIT, &sa, 0); // Handle ^\ quit signal
+	sigaction(SIGINT,  &sa, 0); 
+	sigaction(SIGTERM, &sa, 0);
+	sigaction(SIGQUIT, &sa, 0);
 }
 
 int main(int ac, char *av[]){
-	cout << "\n----- FT_IRC SERVER -----\n" << endl;
-
+	
 	install_handlers();
-
+	
 	if (ac != 3) {
 		cerr << "Usage: ./ircserv [PORT] [PASSWORD]" << endl;
 		return 1;
 	}
+	
+    int port;
+	
+    if (!isValidPort(av[1], port)) {
+		cerr << "Error: invalid port number." << endl;
+        return 1;
+    }
+
+	if (port < 1024) {
+		cerr << "Error: ports below 1024 require root privileges." << endl;
+		return 1;
+	}
+
+	if (!isValidPassword(std::string(av[2]))) {
+		cerr << "Error: invalid server password." << endl;
+		return 1;
+    }
+	
+	cout << "\n----- FT_IRC SERVER -----\n" << endl;
+    cout << "Starting server on port: " << port << endl;
+
 	try {
 		std::map<int, Client> clients;
-		Server server(std::atoi(av[1]), std::string(av[2]));
+		Server server(port, std::string(av[2]));
 		server.epoll_fd = server.setEpoll();
 		server.startServer(server.epoll_fd, clients);
 	}

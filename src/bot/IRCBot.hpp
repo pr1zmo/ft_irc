@@ -44,7 +44,6 @@ struct IRCMessage
 class IRCBot
 {
 	
-	// struct sockaddr_in _server_addr;
 	int _sock_fd;
 	std::string _nickname;
 	std::string _username;
@@ -60,11 +59,9 @@ class IRCBot
 public:
 	IRCBot(INIParser &parser);
 	~IRCBot();
-	int sendMsg(const std::string &msg);
 	void handleMsg(const std::string &msg);
 	void loadChannels(INIParser &ini);
 	std::string buildJoinList();
-	void log(const std::string &msg);
 	bool connectToServer();
 	void sendRegistration();
 	bool handleRegister(const std::string &raw);
@@ -77,9 +74,11 @@ public:
 	void cmdJoin(const std::string &, const std::string &chan);
 	void cmdPart(const std::string &, const std::string &chan);
 	void cmdHelp(const std::string &, const std::string &target);
+	void log(const std::string &msg);
+	int sendMsg(const std::string &msg);
 };
 
-
+void on_signal(int sig);
 void handle_signals();
 void splitCommand(const std::string &input, std::string &cmd, std::string &args);
 

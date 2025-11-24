@@ -36,9 +36,6 @@ IRCBot::IRCBot(INIParser &parser) : _sock_fd(-1), _registered(false)
 	_logging = (parser.get("logging", "enabled", "false") == "true");
 	_log_file = parser.get("logging", "log_file", "bot.logs");
 	loadChannels(parser);
-
-	// long lport = std::strtol(server_port.c_str());
-	// TODO: check for the port range
 }
 
 IRCBot::~IRCBot()
@@ -52,6 +49,7 @@ int IRCBot::sendMsg(const std::string &msg)
 
 	log("<<< " + msg);
 	size_t bytes_sent = send(_sock_fd, msg.c_str(), msg.size(), 0);
+	std::cout << bytes_sent << std::endl;
 	return bytes_sent;
 }
 
@@ -123,10 +121,10 @@ void IRCBot::run()
 		if (ret < 0)
 		{
 			std::cerr << "poll() failed\n";
+			sig = 1;
 			break;
 		}
 
-		// Timeout
 		if (ret == 0)
 		{
 			unsigned long now = time(NULL);
@@ -140,14 +138,10 @@ void IRCBot::run()
 			continue;
 		}
 
-		// Incoming data
 		if (pfd.revents & POLLIN)
 		{
 			std::memset(buf, 0, sizeof(buf));
 			int r = recv(_sock_fd, buf, sizeof(buf) - 1, 0);
-
-			// int r = recv(_sock_fd, buf, sizeof(buf), 0); // read full buffer now
-			// std::cout << buf << std::endl;
 
 			if (r <= 0)
 			{
@@ -187,9 +181,38 @@ void IRCBot::run()
 			break;
 		}
 	}
+	if (sig)
+		sendMsg("QUIT\r\n");
 	close(_sock_fd);
 }
 
+
+bool isValidChannelName(const std::string &name)
+{
+    if (name.empty())
+        return false;
+
+    if (name[0] != '#' && name[0] != '&' && name[0] != '+' && name[0] != '!')
+        return false;
+
+    if (name.length() < 2 || name.length() > 50)
+        return false;
+
+    for (size_t i = 1; i < name.length(); i++)
+    {
+        char c = name[i];
+
+        if (c == ' '  ||  
+            c == ','  ||  
+            c == '\a' ||  
+            c == ':') 
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
 void IRCBot::loadChannels(INIParser &ini)
 {
 	std::string list = ini.get("global", "channels", "");
@@ -201,15 +224,19 @@ void IRCBot::loadChannels(INIParser &ini)
 
 	while (std::getline(ss, chan, ','))
 	{
-		// std::cout << chan << std::endl;
 		trim(chan);
 		if (chan.empty())
 			continue;
 
+        if (!isValidChannelName(chan))
+        {
+            std::cerr << "Invalid channel name in config: " << chan << "\n";
+            continue;
+        }
+
 		ChannelInfo info;
 		std::string sectionName = "channel." + chan;
 
-		// Load optional values
 		info.greeting = ini.get(sectionName, "greeting", "Hello!!!!!");
 		info.autoJoin = (ini.get(sectionName, "auto_join", "true") == "true");
 
@@ -228,10 +255,8 @@ bool IRCBot::handleRegister(const std::string &raw)
 			{
 				const std::string &chan = it->first;
 
-				// Join the channel
 				sendMsg("JOIN " + chan + "\r\n");
 
-				// Send greeting message -- NOTE THE REQUIRED ':' BEFORE THE TEXT
 				if (!it->second.greeting.empty())
 				{
 					sendMsg("PRIVMSG " + chan + " :" + it->second.greeting + "\r\n");
@@ -270,9 +295,6 @@ IRCMessage IRCBot::parseMsg(const std::string &raw)
 	size_t i = 0;
 	size_t len = raw.size();
 
-	// : nick!user@host PRIVMSG #chatroom :hello world
-	// :asdasd PRIVMSG Bot42 :!help
-	// Prefix
 	if (i < len && raw[i] == ':')
 	{
 		size_t end = raw.find(' ', i);
@@ -280,7 +302,6 @@ IRCMessage IRCBot::parseMsg(const std::string &raw)
 		i = end + 1;
 	}
 
-	// Command
 	size_t end = raw.find(' ', i);
 	if (end == std::string::npos)
 	{
@@ -291,7 +312,6 @@ IRCMessage IRCBot::parseMsg(const std::string &raw)
 	msg.command = raw.substr(i, end - i);
 	i = end + 1;
 
-	// Params
 	while (i < len && raw[i] != ':')
 	{
 		end = raw.find(' ', i);
@@ -304,13 +324,11 @@ IRCMessage IRCBot::parseMsg(const std::string &raw)
 		i = end + 1;
 	}
 
-	// Trailing text
 	if (i < len && raw[i] == ':')
 		msg.trailing = raw.substr(i + 1);
 
 	return msg;
 }
-
 
 void IRCBot::log(const std::string &msg)
 {
@@ -318,7 +336,6 @@ void IRCBot::log(const std::string &msg)
 	{
 		std::ofstream outfile(_log_file.c_str(), std::ios::app);
 		time_t now = time(NULL);
-		// outfile << "[" << std::put_time(std::localtime(&now), "%F %T") << "] " << msg;
 		char buf[64];
 		strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
 		outfile << "[" << buf << "] " << msg;

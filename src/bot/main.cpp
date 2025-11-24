@@ -13,6 +13,7 @@ int main(int ac, char **av)
 		try {
 			IRCBot bot(ini);
 			bot.run();
+			
 		} catch (std::exception& e)
 		{
 			std::cerr << e.what() << std::endl;
