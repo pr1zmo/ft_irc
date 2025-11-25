@@ -29,5 +29,5 @@ public:
 	EventHandler(Server& server, int epoll_fd, std::map<int, Client>& clients) : _server(server), _epoll_fd(epoll_fd), _clients(clients){};
 	~EventHandler() {};
 
-	void processEvent(const epoll_event& event);
+	int processEvent(const epoll_event& event);
 };

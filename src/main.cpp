@@ -58,8 +58,7 @@ int main(int ac, char *av[]){
 		return 1;
     }
 	
-	cout << "\n----- FT_IRC SERVER -----\n" << endl;
-    cout << "Starting server on port: " << port << endl;
+	cout << "Starting server on port: " << port << endl;
 
 	try {
 		std::map<int, Client> clients;

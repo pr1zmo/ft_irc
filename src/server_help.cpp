@@ -21,6 +21,12 @@ void EventHandler::handleClientRead(int fd) {
 		return;
 	}
 
+	if (_clients.size() >= MAX_CLIENTS - 6){
+		_clients[fd].response("Max clients reached, please try connecting later...\n");
+		_clients[fd].markDisconnected();
+		return;
+	}
+
 	int err = _server.handleCmd(it->second, _epoll_fd, _clients, _server);
 
 	if (err == -2) {
@@ -59,32 +65,44 @@ void EventHandler::handleClientDisconnect(int fd, uint32_t events) {
 }
 
 void EventHandler::cleanupClient(int fd) {
+	std::map<int, Client>::iterator it = _clients.find(fd);
+	if (it == _clients.end())
+		return;
+
+	if (it->second.isRegistered() && !it->second.getNickname().empty()) {
+		std::string quitMsg = ":" + it->second.getNickname() + "!" + it->second.getUsername() + "@" + it->second.getHostname() +" QUIT :Connection closed\r\n";
+		
+		std::map<std::string, Channel*>& channels = _server.getChannels();
+		for (std::map<std::string, Channel*>::iterator chIt = channels.begin(); chIt != channels.end(); ++chIt) {
+			Channel* channel = chIt->second;
+			if (channel && channel->hasUser(it->second.getNickname())) {
+				channel->broadcast(it->second.getNickname(), quitMsg, _server);
+				channel->removeUser(it->second.getNickname());
+			}
+		}
+	}
 	del_and_close(_epoll_fd, fd);
 	_clients.erase(fd);
 }
 
-void EventHandler::processEvent(const epoll_event& event) {
+int EventHandler::processEvent(const epoll_event& event) {
 	int fd = event.data.fd;
 	uint32_t events = event.events;
 
 	if (fd == _server.getServerSocket()) {
-		if (_clients.size() >= MAX_CLIENTS - 5) {
-			std::cerr << "Max clients reached. New connection refused." << std::endl;
-			return;
-		}
 		_server.initConnection(_clients);
-		return;
+		return 0;
 	}
 
 	if (events & (EPOLLHUP | EPOLLERR)) {
 		handleClientDisconnect(fd, events);
-		return;
+		return 0;
 	}
 
 	std::map<int, Client>::iterator it = _clients.find(fd);
 	if (it != _clients.end() && it->second.should_quit && !it->second._has_msg) {
 		cleanupClient(fd);
-		return;
+		return 0;
 	}
 
 	// Handle incoming data
@@ -94,13 +112,14 @@ void EventHandler::processEvent(const epoll_event& event) {
 		// Re-check if client was marked for disconnect
 		it = _clients.find(fd);
 		if (it == _clients.end()) {
-			return;
+			return 0;
 		}
 	}
 
 	if (events & EPOLLOUT) {
 		handleClientWrite(fd);
 	}
+	return 0;
 }
 
 void Server::startServer(int epoll_fd, map<int, Client>& clients) {
@@ -109,8 +128,8 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 
 	while (running) {
 		int event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-		
-		if (event_count == -1) {
+
+		if (event_count < 0) {
 			if (errno == EINTR) { // Interrupted by signal, continue loop
 				continue;
 			}
@@ -119,7 +138,8 @@ void Server::startServer(int epoll_fd, map<int, Client>& clients) {
 		}
 
 		for (int i = 0; i < event_count; i++) {
-			handler.processEvent(events[i]);
+			if (handler.processEvent(events[i]) == -1)
+				break;
 		}
 	}
 

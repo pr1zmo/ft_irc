@@ -181,8 +181,7 @@ void IRCBot::run()
 			break;
 		}
 	}
-	if (sig)
-		sendMsg("QUIT\r\n");
+	sendMsg("QUIT\r\n");
 	close(_sock_fd);
 }
 

@@ -62,7 +62,6 @@ void Client::sendPendingMessages() {
 		}
 	} else if (sent < 0) {
 		if (errno != EAGAIN && errno != EWOULDBLOCK) {
-			std::cerr << "Send error on fd=" << _fd << ": " << strerror(errno) << std::endl;
 			_has_msg = false;
 			_pending_msg.clear();
 		}
