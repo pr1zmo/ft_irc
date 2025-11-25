@@ -73,6 +73,9 @@ int Server::initConnection(map<int, Client>& clients) {
 	struct sockaddr_in cli_addr;
 	socklen_t cli_addr_len = sizeof(cli_addr);
 
+	if (clients.size() >= MAX_CLIENTS) {
+		return -1;
+	}
 	int cli_fd = accept(_serverSocket, (struct sockaddr *)&cli_addr, &cli_addr_len);
 	if (cli_fd == -1) {
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
