@@ -49,7 +49,6 @@ int IRCBot::sendMsg(const std::string &msg)
 
 	log("<<< " + msg);
 	size_t bytes_sent = send(_sock_fd, msg.c_str(), msg.size(), 0);
-	std::cout << bytes_sent << std::endl;
 	return bytes_sent;
 }
 
@@ -96,7 +95,6 @@ void IRCBot::run()
 	if (!connectToServer())
 	{
 		std::cerr << "Failed to connect to the server" << std::endl;
-		close(_sock_fd);
 		return;
 	}
 
@@ -182,7 +180,6 @@ void IRCBot::run()
 		}
 	}
 	sendMsg("QUIT\r\n");
-	close(_sock_fd);
 }
 
 
